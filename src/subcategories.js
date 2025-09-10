@@ -802,8 +802,16 @@ const SubCategories = () => {
   );
 
   return (
-    <section className="categories-section">
-      <div className="categories-container">
+    <section className="subcats-section">
+      {/* Top-right decorative image only on Sub Categories */}
+      <div className="subcats-topimage">
+        <img
+          src={process.env.PUBLIC_URL + '/assests/img2.png'}
+          alt="Decoration"
+          loading="lazy"
+        />
+      </div>
+      <div className="subcats-container">
         {/* Top bar button to open quotation */}
         <div className="subcats-topbar">
           <button

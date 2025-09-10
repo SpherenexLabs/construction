@@ -21,27 +21,30 @@
 *::before,
 *::after { box-sizing: border-box; }
 
-.categories-section{
+.subcats-section{
   background:var(--bg);
   min-height:100vh;
   position:relative; /* for background layering */
 }
 
-/* Page background image (top-right letterhead + watermark) */
-.categories-section::before{
-  content:"";
-  position:absolute; inset:0;
-  /* Use public asset (avoid spaces in filenames to prevent resolution issues) */
-  background-image: url('/assests/img1.jpeg');
-  background-repeat: no-repeat;
-  background-position: top right; /* keep the gold wedge in the corner */
-  background-size: clamp(320px, 42vw, 780px) auto; /* responsive scaling */
-  opacity: 1;
-  pointer-events:none; /* keep page fully interactive */
-  z-index:0;
+/* Top-right decorative image wrapper */
+.subcats-topimage{
+  width: 100%;
+  display: flex;
+  justify-content: flex-end; /* push to the right */
+  background: #fff; /* match page background at the very top */
+}
+.subcats-topimage img{
+  height: 120px;           /* adjust as needed */
+  width: auto;
+  object-fit: contain;
+  display: block;
 }
 
-.categories-container{
+/* Page background image (top-right letterhead + watermark) */
+/* removed decorative background; handled inline in subcategories.js for better control */
+
+.subcats-container{
   max-width:1180px;
   margin:0 auto;
   padding:16px 14px 28px;

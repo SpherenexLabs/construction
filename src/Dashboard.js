@@ -22,7 +22,8 @@ const Dashboard = ({ user }) => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log('Searching for:', searchQuery);
+    const q = (searchQuery || '').trim();
+    navigate(q ? `/subcategories?q=${encodeURIComponent(q)}` : '/subcategories');
   };
 
   return (
@@ -49,7 +50,7 @@ const Dashboard = ({ user }) => {
                 <input
                   type="text"
                   className="search-input"
-                  placeholder="Search projects, clients, reports..."
+                  placeholder="Search items, categories, brands..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
