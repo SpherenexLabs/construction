@@ -81,12 +81,7 @@ const Dashboard = ({ user }) => {
               
               {showProfileMenu && (
                 <div className="profile-menu">
-                  <div className="profile-menu-item">
-                    <span>Profile Settings</span>
-                  </div>
-                  <div className="profile-menu-item">
-                    <span>Account Settings</span>
-                  </div>
+                  
                   <div className="profile-menu-divider"></div>
                   <button className="profile-menu-item logout-item" onClick={handleLogout}>
                     <span>Logout</span>

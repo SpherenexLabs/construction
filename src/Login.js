@@ -28,6 +28,12 @@ const Login = () => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
+          <img
+            src={process.env.PUBLIC_URL + '/assests/vrm.png'}
+            alt="VRM Groups Logo"
+            className="login-logo"
+            loading="lazy"
+          />
           <h1>Admin Login</h1>
           <p>Welcome back! Please sign in to your account.</p>
         </div>
