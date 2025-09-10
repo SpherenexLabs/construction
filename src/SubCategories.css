@@ -1,0 +1,226 @@
+/* ------------------------------
+   SubCategories.css
+   Clean cards + sticky top bar + modal picker
+--------------------------------*/
+
+/* Base */
+:root{
+  --bg:#f6f7fb;
+  --card:#ffffff;
+  --ink:#0f172a;         /* near-black */
+  --muted:#64748b;       /* slate-500 */
+  --line:#e5e7eb;        /* gray-200 */
+  --line-soft:#f1f5f9;   /* slate-100 */
+  --accent:#111827;      /* slate-900 */
+  --accent-weak:#f3f4f6;
+  --shadow:0 8px 24px rgba(2,6,23,.06);
+  --radius:16px;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+.categories-section{
+  background:var(--bg);
+  min-height:100vh;
+  position:relative; /* for background layering */
+}
+
+/* Page background image (top-right letterhead + watermark) */
+.categories-section::before{
+  content:"";
+  position:absolute; inset:0;
+  /* Use public asset (avoid spaces in filenames to prevent resolution issues) */
+  background-image: url('/assests/img1.jpeg');
+  background-repeat: no-repeat;
+  background-position: top right; /* keep the gold wedge in the corner */
+  background-size: clamp(320px, 42vw, 780px) auto; /* responsive scaling */
+  opacity: 1;
+  pointer-events:none; /* keep page fully interactive */
+  z-index:0;
+}
+
+.categories-container{
+  max-width:1180px;
+  margin:0 auto;
+  padding:16px 14px 28px;
+  position:relative; z-index:1; /* place above the background image */
+}
+
+/* Top bar with "View Quotation (N)" */
+.subcats-topbar{
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display:flex;
+  justify-content:flex-end;
+  padding:8px 0 6px;
+  background:linear-gradient(180deg, rgba(246,247,251,0.98), rgba(246,247,251,0.92) 60%, rgba(246,247,251,0));
+  backdrop-filter:saturate(180%) blur(4px);
+}
+
+/* Header */
+.categories-header{
+  margin:6px 0 12px;
+}
+.categories-title{
+  margin:0;
+  font-size:1.25rem;
+  font-weight:900;
+  color:var(--ink);
+}
+
+/* Grid of category cards */
+.categories-grid{
+  display:grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap:12px;
+}
+
+.category-card{
+  grid-column:span 12;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  transition: transform .08s ease, box-shadow .18s ease;
+}
+@media (min-width:600px){ .category-card{ grid-column:span 6; } }
+@media (min-width:1000px){ .category-card{ grid-column:span 4; } }
+
+.category-card:hover{ transform:translateY(-1px); box-shadow:0 12px 30px rgba(2,6,23,.08); }
+
+.category-image img{
+  width:100%;
+  height:180px;
+  display:block;
+  object-fit:cover;
+  background:#e2e8f0;
+}
+
+.category-footer{
+  padding:10px 12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.category-title-text{
+  margin:0;
+  font-weight:800;
+  color:var(--ink);
+  font-size:1rem;
+}
+
+/* Button inside the card footer */
+.category-view-btn{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:8px 10px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:var(--accent-weak);
+  color:var(--ink);
+  font-weight:700;
+  cursor:pointer;
+}
+.category-view-btn:hover{ background:#e5e7eb; }
+
+/* Primary button (top bar) */
+.btn{
+  border:1px solid var(--accent);
+  background:var(--accent);
+  color:#fff;
+  padding:10px 14px;
+  border-radius:10px;
+  font-weight:800;
+  cursor:pointer;
+}
+.btn.primary{ background:var(--accent); color:#fff; }
+.btn.ghost{ background:#fff; color:var(--ink); }
+.btn[disabled]{ opacity:.55; cursor:not-allowed; }
+
+/* ----------------- Modal (items picker) ----------------- */
+.modal-overlay{
+  position:fixed; inset:0;
+  background:rgba(15,23,42,.5);
+  display:flex; align-items:center; justify-content:center;
+  padding:18px;
+  z-index:50;
+}
+
+.modal-card{
+  width:min(980px, 100%);
+  max-height:90vh;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  display:grid;
+  grid-template-rows:auto 1fr auto;
+  overflow:hidden;
+}
+
+.modal-head{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px;
+  padding:12px 14px;
+  border-bottom:1px solid var(--line-soft);
+}
+.modal-head h3{ margin:0; font-size:1.05rem; font-weight:900; color:var(--ink); }
+
+.modal-close{
+  border:0; background:transparent; font-size:22px; line-height:1;
+  cursor:pointer; color:#475569;
+}
+
+.modal-body{
+  padding:12px 14px;
+  overflow:auto;
+}
+
+.modal-actions{
+  display:flex; gap:10px;
+  justify-content:flex-end;
+  padding:10px 14px;
+  border-top:1px solid var(--line-soft);
+}
+
+/* Items grid inside modal — compact card layout */
+.items-grid{
+  display:grid; grid-template-columns:repeat(12, 1fr); gap:10px;
+}
+
+.item-card{
+  grid-column:span 12;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  overflow:hidden;
+  cursor:pointer;
+  transition: box-shadow .18s ease;
+}
+.item-card:hover{ box-shadow:0 6px 18px rgba(16,24,40,.08); }
+
+@media (min-width:520px){ .item-card{ grid-column:span 6; } }   /* 2-up */
+@media (min-width:920px){ .item-card{ grid-column:span 4; } }   /* 3-up */
+@media (min-width:1200px){ .item-card{ grid-column:span 3; } }  /* 4-up */
+
+.item-checked{
+  border-color:var(--accent);
+  box-shadow:0 0 0 2px var(--accent) inset;
+}
+
+.item-imgwrap img{
+  width:100%; height:110px; object-fit:cover; display:block; background:#e2e8f0;
+}
+
+.item-meta{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:8px; padding:8px 10px;
+}
+.item-name{ font-weight:700; color:var(--ink); font-size:.95rem; }
+.item-checkbox{ width:16px; height:16px; accent-color:var(--accent); }
