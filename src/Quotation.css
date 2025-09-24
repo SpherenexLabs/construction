@@ -1,212 +1,1177 @@
-/* Quotation.css — HTML letterhead + clean table + preview/print */
-
-:root{
-  --bg:#f6f7fb;
-  --card:#ffffff;
-  --ink:#0f172a;
-  --muted:#64748b;
-  --line:#e5e7eb;
-  --line-soft:#f1f5f9;
-  --accent:#111827;
-  --shadow:0 8px 24px rgba(2,6,23,.06);
-  --radius:16px;
+/* Root Variables - Mint Green Color Scheme */
+:root {
+  --primary-green: #8ddfc7;
+  --primary-green-dark: #155d50;
+  --light-green: #c8f5e3;
+  --border-color: #333;
+  --text-dark: #000;
+  --bg-white: #fff;
+  --bg-light: #f5f5f5;
 }
 
-*,
-*::before,
-*::after { box-sizing: border-box; }
+/* Global Styles with improved font rendering */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', 'Helvetica', sans-serif;
+  font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
 
-.qtn-wrap{ padding:16px; background:var(--bg); min-height:100vh; }
+.quotation-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  color: var(--text-dark);
+}
 
 /* Toolbar */
-.qtn-toolbar{
-  display:flex; align-items:center; gap:10px;
-  max-width:980px; margin:0 auto 10px;
-}
-.qtn-toolbar .spacer{ flex:1 1 auto; }
-.btn{
-  background:var(--accent);
-  color:#fff; border:1px solid var(--accent);
-  padding:10px 14px; border-radius:10px;
-  font-weight:800; cursor:pointer;
-}
-.btn:hover{ filter:brightness(.96); }
-.btn.ghost{ background:#fff; color:var(--ink); }
-.btn.sm{ padding:6px 10px; border-radius:8px; font-weight:800; }
-.link{ background:transparent; border:0; color:#0ea5e9; cursor:pointer; }
-.link.danger{ color:#ef4444; }
-
-/* Paper */
-.qtn-sheet{
-  width: 794px; /* A4 width at ~96dpi */
-  min-height: 1123px; /* A4 height at ~96dpi */
-  margin:0 auto;
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  overflow:hidden;
-  position:relative;
-  display:flex; flex-direction:column;
-}
-.qtn-body{ flex:1 1 auto; display:flex; flex-direction:column; }
-
-/* Top decorations removed */
-.watermark{ position:absolute; left:50%; top:52%; transform:translate(-50%, -50%); width:65%; opacity:.08; pointer-events:none; }
-
-/* Letterhead (HTML) */
-.qtn-header{ padding:14px 16px 12px; background:#fff; border-bottom:1px solid var(--line); position:relative; z-index:1; }
-.qtn-header{
-  display:grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap:12px; align-items:center;
-}
-.brand{ display:flex; align-items:center; gap:10px; }
-.brand-logo{ width:64px; height:64px; object-fit:contain; }
-.brand-meta h1{ margin:2px 0 0; font-size:1.3rem; font-weight:900; letter-spacing:.03em; color:var(--ink); display:flex; gap:6px; align-items:baseline; }
-.brand-meta .vrm{ color:#e1a247; font-weight:900; }
-.brand-meta .groups{ color:#0b0f19; font-weight:900; letter-spacing:.01em; }
-.brand-meta .slogan{ margin:2px 0 0; color:#334155; font-weight:600; }
-.doc-title{ text-align:center; }
-.doc-title h2{ margin:0; letter-spacing:.10em; font-size:1.1rem; font-weight:900; color:var(--ink); }
-.inp.title{ text-transform:uppercase; font-weight:900; text-align:center; }
-.addr{ text-align:right; color:#374151; font-size:.92rem; }
-.refrow{
-  margin-top:10px;
-  display:grid; grid-template-columns: 1fr 1fr; gap:10px;
-}
-.refcell{ display:flex; flex-direction:column; gap:4px; color:#374151; }
-.refcell > span{ font-size:.86rem; color:#6b7280; }
-.inp{
-  width:100%; padding:10px 12px;
-  border:1px solid var(--line);
-  border-radius:10px; background:#fff;
-  font-size:.98rem;
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  background: var(--bg-light);
+  border-radius: 5px;
 }
 
-@media (max-width:760px){
-  .qtn-header{ grid-template-columns:1fr; }
-  .addr{ text-align:left; }
+.spacer {
+  flex: 1;
 }
 
-/* Client / Party section */
-.qtn-meta{ padding:12px 16px; border-bottom:1px solid var(--line-soft); }
-.grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-/* Extra vertical gap between name/email row and phone/address row */
-.qtn-meta .grid-2 + .grid-2{ margin-top:14px; }
-@media (max-width:720px){ .grid-2{ grid-template-columns:1fr; } }
-.client-view{
-  border:1px solid var(--line-soft);
-  background:#fafafa;
-  border-radius:12px;
-  padding:10px 12px;
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 5px;
 }
 
-/* Items table */
-.qtn-items{ padding: 8px 16px 12px; }
-.table{ width:100%; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:#fff; }
-.tr{ display:grid; grid-template-columns: 70px 1.6fr 140px 160px 160px 90px; align-items:center; }
-@media (max-width:860px){ .tr{ grid-template-columns: 52px 1fr 110px 130px 130px 80px; } }
-.td{ padding:10px 12px; border-bottom:1px solid var(--line-soft); }
-.tr.th{ background:var(--accent); color:#fff; }
-.tr.th .td{ border-bottom-color:var(--accent); }
-.td.no{ text-align:center; }
-.td.qty{ text-align:center; }
-.td.price, .td.amt{ text-align:right; }
-.td.actions{ text-align:center; }
-
-.qtybox{ display:flex; align-items:center; justify-content:center; gap:8px; }
-.inp.small{ padding:6px 8px; }
-.inp.center{ text-align:center; }
-.inp.right{ text-align:right; }
-/* Remove default number input spinners */
-.no-spin::-webkit-outer-spin-button,
-.no-spin::-webkit-inner-spin-button{ -webkit-appearance: none; margin: 0; }
-.no-spin{ appearance: textfield; -moz-appearance: textfield; }
-
-/* Totals */
-.qtn-totals{
-  padding: 6px 16px 14px;
-  display:flex; flex-direction:column; align-items:flex-end; gap:6px;
-  background:#fff;
-}
-.qtn-totals .row{ display:flex; gap:18px; align-items:center; }
-.qtn-totals .lbl{ min-width:140px; text-align:right; font-weight:600; color:#374151; }
-.qtn-totals .val{ min-width:160px; text-align:right; font-weight:900; }
-.qtn-totals .grand .lbl{ font-size:1.05rem; }
-.qtn-totals .grand .val{ font-size:1.15rem; }
-
-/* Footer note */
-.qtn-foot{ padding: 0 16px 16px; color:#374151; font-size:.95rem; background:#fff; }
-
-/* Footer contact row styled like the template */
-.lh-footer{ background:#fff; position:relative; padding: 10px 16px 0; margin-top:auto; }
-.lh-footer .sep-line{ height:2px; background:#111827; margin:0 0 10px; }
-.contact-row{
-  display:grid;
-  grid-template-columns: 1fr 1fr; /* left: address/site, right: email/phone */
-  gap:12px 28px; color:#111827; font-weight:700; padding-bottom:12px;
-}
-.contact{ display:flex; align-items:flex-start; gap:10px; line-height:1.25; }
-.contact svg{ color:#111827; min-width:16px; }
-.bottom-bar{ height:26px; background:#111827; position:relative; margin-top:10px; }
-/* Use a real element instead of ::before so html2canvas renders identically in PDF */
-.bottom-accent{
-  position:absolute;
-  left:0;
-  top:0; /* align with top of the navy bar so nothing sticks above */
-  width:0; height:0;
-  /* Match the bar height to avoid overflow below */
-  border-top:26px solid #ef6731;      /* orange color */
-  border-right:120px solid transparent; /* creates the diagonal */
+.btn.primary {
+  background: var(--primary-green-dark);
+  color: white;
 }
 
-/* Ref / Date-Time bar */
-.refbar{ padding:8px 16px 6px; display:flex; align-items:flex-end; justify-content:space-between; gap:12px; border-bottom:1px solid var(--line-soft); background:#fff; }
-.refgrid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.refcell{ display:flex; flex-direction:column; gap:4px; color:#374151; }
-.refcell > span{ font-size:.86rem; color:#6b7280; }
-
-/* Preview: hide inputs/buttons inside the paper only */
-.qtn-sheet.preview .inp,
-.qtn-sheet.preview .btn.sm,
-.qtn-sheet.preview .link {
-  visibility:hidden; pointer-events:none;
-  height:0; margin:0; padding:0; border:0;
+.btn.ghost {
+  background: transparent;
+  color: var(--primary-green-dark);
+  border: 1px solid var(--primary-green-dark);
 }
 
-/* Print */
-@media print{
-  .no-print{ display:none !important; }
-  body{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .qtn-wrap{ padding:0; background:#fff; }
-  .qtn-sheet{ border:0; border-radius:0; box-shadow:none; width:794px; min-height:1123px; }
-  .watermark{ opacity:.1; }
+.btn:hover {
+  opacity: 0.9;
 }
 
-/* ===== Letterhead: top strip + gold bar + wedge ===== */
-.qtn-sheet{
+/* Invoice Sheet with Complete Border Fix */
+.invoice-sheet {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  background: var(--bg-white);
+  border: 3px solid var(--border-color); /* Thicker outer border */
+  padding: 0;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   position: relative;
-  background:#fff;
-  overflow: hidden;
-
-  /* Tweak these to fine-tune print/screen proportions */
-  --lh-dark: #12181f;         /* very dark slate (top strip)   */
-  --lh-gold: #b77a2e;         /* gold/orange from your art     */
-  --lh-strip-h: 6mm;          /* dark strip height             */
-  --lh-gold-h: 10mm;          /* gold band height              */
 }
 
-/* very top dark band already in your markup */
-.qtn-sheet .top-strip{
-  position:absolute;
-  inset: 0 0 auto 0;          /* top:0; left:0; right:0 */
-  height: var(--lh-strip-h);
-  background: var(--lh-dark);
-  pointer-events:none;
+/* Ensure the sheet has a complete border all around */
+.invoice-sheet::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border: 3px solid var(--border-color);
+  pointer-events: none;
+  z-index: -1;
 }
 
-/* full-width gold band under the dark strip */
-.qtn-sheet .top-gold-line{
-  position:absolute;
+/* Modern Header Design */
+.modern-header {
+  background: var(--primary-green);
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 30px;
+  align-items: center;
+  border-bottom: 3px solid var(--border-color);
+  color: var(--primary-green-dark);
+  font-family: 'Arial', 'Helvetica', sans-serif;
+}
+
+.header-left-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.construction-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary-green-dark);
+  line-height: 1;
+  margin: 0;
+}
+
+.invoice-title-text {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary-green-dark);
+  line-height: 1;
+  margin: 0;
+}
+
+.company-name-text {
+  margin-top: 8px;
+}
+
+.company-name-text input {
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--primary-green-dark);
+  outline: none;
+  padding: 4px 0;
+  min-width: 200px;
+}
+
+.company-name-text input:focus {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+
+.company-name-text input::placeholder {
+  color: rgba(21, 93, 80, 0.7);
+}
+
+.header-center-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-container {
+ 
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-icon {
+  width: 56px;
+  height: 56px;
+  color: var(--primary-green-dark);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.header-right-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.contact-info {
+  text-align: right;
+}
+
+.contact-info input {
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary-green-dark);
+  outline: none;
+  text-align: right;
+  padding: 2px 0;
+  min-width: 180px;
+}
+
+.contact-info input:focus {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+.contact-info input::placeholder {
+  color: rgba(21, 93, 80, 0.7);
+}
+
+.address-info-right {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.street-address input,
+.city-state input,
+.zip-code input {
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--primary-green-dark);
+  outline: none;
+  text-align: right;
+  padding: 1px 0;
+  min-width: 160px;
+}
+
+.street-address input:focus,
+.city-state input:focus,
+.zip-code input:focus {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  padding: 1px 6px;
+}
+
+.street-address input::placeholder,
+.city-state input::placeholder,
+.zip-code input::placeholder {
+  color: rgba(21, 93, 80, 0.7);
+}
+
+/* Tax Invoice Title */
+.invoice-title {
+  background: var(--primary-green-dark);
+  color: white;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  padding: 15px;
+  margin: 0;
+  border-bottom: 2px solid var(--border-color);
+  font-family: 'Arial', 'Helvetica', sans-serif;
+}
+
+/* Bill To and Site Location Section */
+.bill-site-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.bill-to {
+  border-right: 2px solid var(--border-color);
+}
+
+.site-location {
+  border-right: none;
+}
+
+.section-title {
+  background: var(--bg-light);
+  font-weight: bold;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 14px;
+  font-family: 'Arial', 'Helvetica', sans-serif;
+}
+
+.field-group {
+  padding: 0;
+}
+
+.field {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  min-height: 30px;
+}
+
+.field:last-child {
+  border-bottom: none;
+}
+
+.field label {
+  background: var(--bg-light);
+  border-right: 2px solid var(--border-color);
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 90px;
+  display: flex;
+  align-items: center;
+  font-family: 'Arial', 'Helvetica', sans-serif;
+  white-space: nowrap;
+}
+
+.field input {
+  flex: 1;
+  border: none;
+  padding: 6px 10px;
+  font-size: 11px;
+  background: transparent;
+  outline: none;
+  font-family: 'Arial', 'Helvetica', sans-serif;
+  color: var(--text-dark);
+  font-weight: normal;
+}
+
+.field input:focus {
+  background: #ffffcc;
+}
+
+/* Materials Table with Complete Borders */
+.materials-table {
+  border-bottom: 2px solid var(--border-color);
+  border-left: none;
+  border-right: none;
+  border-top: none;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 35px 1fr 65px 50px 55px 85px 50px 50px 85px 85px;
+  background: var(--primary-green-dark);
+  color: white;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+.table-header > div {
+  padding: 10px 6px;
+  text-align: center;
+  border-right: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Arial', 'Helvetica', sans-serif;
+  word-break: break-word;
+}
+
+.table-header > div:last-child {
+  border-right: none;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 35px 1fr 65px 50px 55px 85px 50px 50px 85px 85px;
+  border-bottom: 1px solid var(--border-color);
+  min-height: 35px;
+  background: var(--bg-white);
+}
+
+.table-row:nth-child(even) {
+  background: #f9f9f9;
+}
+
+.table-row > div {
+  padding: 6px 4px;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-family: 'Arial', 'Helvetica', sans-serif;
+}
+
+.table-row > div:last-child {
+  border-right: none;
+}
+
+.col-desc {
+  justify-content: flex-start !important;
+  padding: 6px 8px !important;
+}
+
+.col-num {
+  font-weight: bold;
+  background: var(--bg-light);
+}
+
+.table-row input, .table-row select {
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 10px;
+  text-align: center;
+  padding: 4px 2px;
+  font-family: 'Arial', 'Helvetica', sans-serif;
+  color: var(--text-dark);
+  font-weight: normal;
+}
+
+.col-desc input {
+  text-align: left;
+  padding: 4px 6px;
+}
+
+.col-price input, .col-amount {
+  text-align: right;
+}
+
+.table-row input:focus {
+  background: #ffffcc;
+  border: 1px solid var(--primary-green-dark);
+  border-radius: 2px;
+}
+
+.table-row select:focus {
+  background: #ffffcc;
+  border: 1px solid var(--primary-green-dark);
+  border-radius: 2px;
+}
+
+.table-total-row {
+  background: var(--primary-green) !important;
+  font-weight: bold;
+  color: var(--primary-green-dark) !important;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.table-total-row > div {
+  padding: 10px 6px;
+  font-family: 'Arial', 'Helvetica', sans-serif;
+  font-weight: bold;
+}
+
+.total-label {
+  text-align: center !important;
+  font-weight: bold;
+}
+
+.remove-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 9px;
+  cursor: pointer;
+  font-family: 'Arial', 'Helvetica', sans-serif;
+}
+
+.remove-btn:hover {
+  background: #c82333;
+}
+
+/* Add Material Section */
+.add-material-section {
+  padding: 15px;
+  text-align: center;
+}
+
+.add-material {
+  background: var(--primary-green-dark);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: 'Arial', 'Helvetica', sans-serif;
+  font-weight: 600;
+}
+
+.add-material:hover {
+  background: #0f4a3e;
+}
+
+/* Bottom Section with Proper Borders */
+.bottom-section {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  border-bottom: none;
+}
+
+.amount-words {
+  padding: 15px;
+  border-right: 2px solid var(--border-color);
+  position: relative;
+}
+
+.amount-words .label {
+  font-weight: bold;
+  margin-bottom: 12px;
+  font-size: 12px;
+  font-family: 'Arial', 'Helvetica', sans-serif;
+}
+
+.words-value {
+  font-size: 11px;
+  margin-bottom: 25px;
+  min-height: 45px;
+  font-style: italic;
+  font-family: 'Arial', 'Helvetica', sans-serif;
+  color: var(--text-dark);
+  line-height: 1.3;
+}
+
+.signature-area {
+  margin-top: 50px;
+  text-align: center;
+  border-top: 2px solid var(--border-color);
+  padding-top: 8px;
+}
+
+.signature-label {
+  font-size: 11px;
+  font-weight: bold;
+  font-family: 'Arial', 'Helvetica', sans-serif;
+}
+
+.totals-section {
+  padding: 0;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 12px;
+  font-family: 'Arial', 'Helvetica', sans-serif;
+}
+
+.total-row:last-child {
+  border-bottom: none;
+}
+
+.total-row.grand-total {
+  background: var(--primary-green-dark);
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.total-row .label {
+  font-weight: 500;
+  color: inherit;
+}
+
+.total-row .value {
+  font-weight: bold;
+  min-width: 90px;
+  text-align: right;
+  color: inherit;
+}
+
+.discount-input {
+  width: 50px;
+  margin-left: 8px;
+  padding: 2px 4px;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  font-size: 10px;
+  font-family: 'Arial', 'Helvetica', sans-serif;
+}
+
+/* Preview Mode Styling */
+.preview input[readonly], 
+.preview select[disabled],
+.preview .company-field input[readonly],
+.preview .field input[readonly] {
+  background: transparent;
+  border: none;
+  color: var(--text-dark);
+  font-weight: normal;
+  cursor: default;
+}
+
+.preview .discount-input {
+  display: none;
+}
+
+/* Print Mode */
+.print-mode .remove-btn,
+.print-mode .add-material-section,
+.print-mode .col-action {
+  display: none !important;
+}
+
+.print-mode .table-header,
+.print-mode .table-row,
+.print-mode .table-total-row {
+  grid-template-columns: 35px 1fr 65px 50px 55px 85px 50px 50px 85px !important;
+}
+
+.print-mode input,
+.print-mode select {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  color: var(--text-dark) !important;
+  font-family: 'Arial', 'Helvetica', sans-serif !important;
+  font-size: inherit !important;
+  font-weight: normal !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+/* PDF Mode Enhancements */
+.pdf-mode * {
+  font-family: 'Arial', 'Helvetica', sans-serif !important;
+  font-smoothing: antialiased !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  text-rendering: optimizeLegibility !important;
+}
+
+.pdf-mode input, 
+.pdf-mode select {
+  font-weight: normal !important;
+  color: #000000 !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+/* Print Styles */
+@page {
+  size: A4;
+  margin: 12mm;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .quotation-container {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .invoice-sheet {
+    width: 100%;
+    min-height: auto;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+    border: 3px solid var(--border-color);
+  }
+  
+  .remove-btn,
+  .add-material-section,
+  .col-action {
+    display: none !important;
+  }
+  
+  .table-header,
+  .table-row,
+  .table-total-row {
+    grid-template-columns: 35px 1fr 65px 50px 55px 85px 50px 50px 85px !important;
+  }
+  
+  input, select {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    color: var(--text-dark) !important;
+    font-family: 'Arial', 'Helvetica', sans-serif !important;
+    font-size: inherit !important;
+    font-weight: normal !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+  }
+  
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+  }
+  
+  /* Ensure colors print correctly */
+  .company-header,
+  .invoice-title,
+  .table-header,
+  .total-row.grand-total,
+  .table-total-row {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  /* Force border visibility in print */
+  .invoice-sheet,
+  .company-field,
+  .field,
+  .table-row,
+  .materials-table {
+    border-color: #000 !important;
+  }
+}
+
+/* Responsive Design */
+@media screen and (max-width: 900px) {
+  .quotation-container {
+    padding: 10px;
+  }
+  
+  .invoice-sheet {
+    width: 100%;
+    transform: scale(0.75);
+    transform-origin: top center;
+    margin-bottom: -80px;
+  }
+  
+  .bill-site-section {
+    grid-template-columns: 1fr;
+  }
+  
+  .site-location {
+    border-top: 2px solid var(--border-color);
+    border-right: none;
+  }
+  
+  .bottom-section {
+    grid-template-columns: 1fr;
+  }
+  
+  .totals-section {
+    border-top: 2px solid var(--border-color);
+  }
+  
+  .amount-words {
+    border-right: none;
+    border-bottom: 2px solid var(--border-color);
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .invoice-sheet {
+    transform: scale(0.55);
+    margin-bottom: -140px;
+  }
+  
+  .table-header,
+  .table-row,
+  .table-total-row {
+    font-size: 9px;
+    grid-template-columns: 30px 1fr 50px 40px 45px 65px 40px 40px 65px 65px;
+  }
+  
+  .table-row input,
+  .table-row select {
+    font-size: 8px;
+  }
+}
+
+/* Input number spinner removal for all browsers */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* === PDF/PRINT text clipping fixes (append at end of file) === */
+
+/* Never capture a scaled sheet (prevents cropped text on narrow screens) */
+.print-mode .invoice-sheet,
+.pdf-mode .invoice-sheet {
+  transform: none !important;
+}
+
+/* Normalize line-height for everything during capture */
+.print-mode *,
+.pdf-mode * {
+  line-height: 1.35 !important;
+  -webkit-text-size-adjust: 100% !important;
+  text-rendering: optimizeLegibility !important;
+}
+
+/* Inputs/selects: add vertical room so ascenders/descenders aren't cut */
+.field input,
+.table-row input,
+.table-row select,
+.print-mode input,
+.print-mode select,
+.pdf-mode input,
+.pdf-mode select {
+  box-sizing: border-box !important;
+  line-height: 1.35em !important;
+  height: auto !important;
+  min-height: 26px !important;   /* bump if you use larger font-size */
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+  overflow: visible !important;   /* avoid hidden clipping */
+}
+
+/* Table cells: ensure enough height & vertical centering */
+.table-header > div,
+.table-row > div,
+.table-total-row > div,
+.field {
+  min-height: 28px;              /* bump to 30–32px if you raise font-size */
+  display: flex;
+  align-items: center;
+}
+
+/* Keep numbers and labels from sitting too tight */
+.total-row .label,
+.total-row .value,
+.invoice-title {
+  line-height: 1.35 !important;
+}
+
+/* Make sure number inputs don’t shrink differently across engines */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* ===== Compact TOTAL row (no big green block) ===== */
+.materials-table .table-total-row {
+  /* collapse to just: [label | amount] */
+  display: grid !important;
+  grid-template-columns: 1fr 140px !important; /* tweak 140px if you want a wider amount column */
+  align-items: center !important;
+  min-height: 40px !important;                 /* keeps it short */
+  margin: 0 !important;
+}
+
+/* Hide all the unused total-row cells */
+.materials-table .table-total-row .col-num,
+.materials-table .table-total-row .col-hsn,
+.materials-table .table-total-row .col-qty,
+.materials-table .table-total-row .col-unit,
+.materials-table .table-total-row .col-price,
+.materials-table .table-total-row .col-disc,
+.materials-table .table-total-row .col-gst,
+.materials-table .table-total-row .col-action {
+  display: none !important;
+}
+
+/* Place label + amount on one horizontal line */
+.materials-table .table-total-row .total-label {
+  grid-column: 1 / 2 !important;
+  text-align: left !important;
+  padding: 10px 12px !important;
+}
+.materials-table .table-total-row .col-amount {
+  grid-column: 2 / 3 !important;
+  text-align: right !important;
+  padding: 10px 12px !important;
+  font-weight: 700 !important;
+}
+
+/* Keep the same compact layout when printing / making PDF */
+.print-mode .table-total-row,
+.pdf-mode  .table-total-row { 
+  grid-template-columns: 1fr 140px !important; 
+  min-height: 40px !important;
+}
+@media print {
+  .table-total-row { 
+    grid-template-columns: 1fr 140px !important; 
+    min-height: 40px !important;
+  }
+}
+/* === Fix header contact/address inputs cutting off in PDF/print === */
+
+/* Ensure the right column can grow and doesn't clip */
+.header-right-info,
+.address-info-right {
+  width: 100%;
+  overflow: visible !important;
+}
+
+/* Safer metrics for all header inputs on screen */
+.header-right-info .contact-info input,
+.address-info-right .street-address input,
+.address-info-right .city-state input,
+.address-info-right .zip-code input {
+  display: inline-block;
+  width: 100%;
+  max-width: 280px;            /* was ~160–180; give more room */
+  box-sizing: border-box;
+  text-align: right;
+  line-height: 1.35;           /* prevents top/bottom clipping */
+  min-height: 28px;            /* consistent with the rest */
+  padding: 4px 10px 4px 6px;   /* extra right padding avoids last-char cut */
+  overflow: visible !important;
+  white-space: nowrap;         /* keep each line on one line */
+}
+
+/* During PDF/print capture: enforce the same padding/metrics (most important) */
+.print-mode .contact-info input,
+.print-mode .address-info-right input,
+.pdf-mode  .contact-info input,
+.pdf-mode  .address-info-right input {
+  line-height: 1.35 !important;
+  min-height: 28px !important;
+  padding-right: 12px !important;  /* key: prevents right-edge clipping */
+  padding-left: 6px !important;
+  width: 100% !important;
+  max-width: 300px !important;     /* a touch wider for capture */
+  overflow: visible !important;
+}
+
+/* If any glyphs still look squeezed, loosen letter spacing slightly in capture */
+.print-mode .contact-info input,
+.print-mode .address-info-right input,
+.pdf-mode  .contact-info input,
+.pdf-mode  .address-info-right input {
+  letter-spacing: 0.01em;
+}
+
+/* Make sure the header grid never scales (scaling can crop) in capture */
+.print-mode .modern-header,
+.pdf-mode  .modern-header {
+  transform: none !important;
+}
+/* Modern Header Design - FIXED LAYOUT */
+.modern-header {
+  background: var(--primary-green);
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 250px auto 350px; /* Increased right column width */
+  gap: 15px;
+  align-items: flex-start;
+  border-bottom: 3px solid var(--border-color);
+  color: var(--primary-green-dark);
+  font-family: 'Arial', 'Helvetica', sans-serif;
+  min-height: 140px;
+  overflow: visible; /* Ensure content doesn't get clipped */
+}
+
+.header-left-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  min-width: 280px;
+}
+
+.header-center-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 10px;
+}
+
+.header-right-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  font-size: 14px;
+  width: 81%;
+  min-width: 300px; /* Increased minimum width */
+  padding-left: 10px;
+  overflow: visible; /* Ensure no clipping */
+}
+
+/* Contact Info Styling */
+.contact-info {
+  text-align: right;
+  width: 100%;
+  margin-bottom: 2px;
+  overflow: visible; /* Prevent clipping */
+}
+
+.contact-info input {
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary-green-dark);
+  outline: none;
+  text-align: right;
+  padding: 3px 5px 3px 3px;
+  width: 100%;
+  max-width: none; /* Remove max-width restriction */
+  min-width: 280px; /* Ensure minimum display width */
+  box-sizing: border-box;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: visible;
+}
+
+/* Address Info Right - Better Spacing */
+.address-info-right {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  width: 100%;
+}
+
+.street-address input,
+.city-state input,
+.zip-code input {
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--primary-green-dark);
+  outline: none;
+  text-align: right;
+  padding: 2px 5px 2px 2px;
+  width: 100%;
+  max-width: none; /* Remove max-width restriction */
+  min-width: 280px; /* Ensure minimum display width */
+  box-sizing: border-box;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: visible;
+  margin-bottom: 1px;
+}
+
+/* PDF/Print Mode Fixes */
+.print-mode .modern-header,
+.pdf-mode .modern-header {
+  transform: none !important;
+  grid-template-columns: 250px auto 350px !important; /* Match screen layout */
+  min-height: 140px !important;
+  padding: 20px !important;
+  overflow: visible !important;
+}
+
+.print-mode .header-right-info,
+.pdf-mode .header-right-info {
+  width:81% !important;
+  min-width: 350px !important; /* Increased minimum width */
+  overflow: visible !important;
+}
+
+.print-mode .contact-info input,
+.print-mode .address-info-right input,
+.pdf-mode .contact-info input,
+.pdf-mode .address-info-right input {
+  width: 100% !important;
+  max-width: none !important; /* Remove width restrictions */
+  min-width: 280px !important;
+  padding-right: 5px !important;
+  padding-left: 3px !important;
+  line-height: 1.4 !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+  white-space: nowrap !important;
+  text-align: right !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em !important; /* Slight letter spacing for clarity */
+}
+
+/* Ensure inputs don't get cut off during PDF generation */
+.pdf-mode input,
+.print-mode input {
+  height: auto !important;
+  min-height: 20px !important;
+  font-smoothing: antialiased !important;
+  -webkit-font-smoothing: antialiased !important;
+  text-rendering: optimizeLegibility !important;
+}
+
+/* Company Name Input Fix */
+.company-name-text input {
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--primary-green-dark);
+  outline: none;
+  padding: 4px 8px 4px 0;
+  width: 100%;
+  min-width: 250px;
+  max-width: 270px;
+  box-sizing: border-box;
+  line-height: 1.3;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 900px) {
+  .modern-header {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    text-align: center;
+    min-height: auto;
+    padding: 15px;
+  }
+  
+  .header-left-info,
+  .header-right-info {
+    align-items: center;
+    text-align: center;
+  }
+  
+  .contact-info,
+  .address-info-right {
+    text-align: center;
+  }
+  
+  .contact-info input,
+  .address-info-right input {
+    text-align: center;
+  }
+}
+/* --- Fix Discount input clipping/spacing in totals --- */
+
+/* Give the row enough height and keep contents centered */
+.totals-section .total-row {
+  min-height: 36px;                 /* space for the input */
+  align-items: center;               /* vertical center */
+}
+
+/* Let the label host the input without squishing it */
+.totals-section .total-row .label {
+  display: inline-flex;              /* input sits inline with the text */
+  align-items: center;
+  gap: 8px;                          /* breathing room between text and input */
+  white-space: nowrap;               /* keeps it on one line */
+}
+
+/* Discount input sizing + text metrics */
+.discount-input {
+  display: inline-block;
+  width: 64px;                       /* a bit wider so numbers are visible */
+  min-height: 26px;                  /* room for ascenders/descenders */
+  line-height: 1.35;                 /* consistent with html2canvas capture */
+  padding: 3px 6px;
+  box-sizing: border-box;
+  vertical-align: middle;
+  font-size: 12px;
+}
+
+/* Ensure consistent rendering in print/PDF capture */
+.print-mode .discount-input,
+.pdf-mode  .discount-input {
+  height: auto !important;
+  min-height: 26px !important;
+  line-height: 1.35 !important;
+  padding-top: 3px !important;
+  padding-bottom: 3px !important;
+}
+
+/* If you ever see the input still nudge borders, add: */
+.totals-section .total-row .value {
+  line-height: 1.35;
 }

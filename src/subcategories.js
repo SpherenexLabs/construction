@@ -446,7 +446,7 @@ const ITEM_IMAGES = {
 
   solid_blocks: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtEz1XN7yylWtCQQWrj-xgCdDuaTq9-pxuIA&s",
   red_bricks: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2ViWoff7-W09tazJS_eiTmklrPWdhrWnRTA&s",
-  alpha_blocks: "https://thvnext.bing.com/th/id/OIP.I2GTgbQRKqg8stlcRDsDpgHaD7?w=282&h=180&c=7&r=0&o=5&cb=ucfimgc2&dpr=1.5&pid=1.7",
+  alpha_blocks: "https://images.jdmagicbox.com/v2/comp/bangalore/y4/080pxx80.xx80.190212081002.c4y4/catalogue/alpha-sand-hessargatta-main-road-bangalore-solid-block-manufacturers-8dbjjry4ll.jpg",
   m_sand: "https://promaninfi.com/blog/wp-content/uploads/2023/05/blog1.jpg",
   p_sand: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSYzNWZqhryg8SPbAcTqmTNCBPkeVDKe9EMWA&s",
 
@@ -475,7 +475,7 @@ const ITEM_IMAGES = {
   v_gaurd: "https://5.imimg.com/data5/SELLER/Default/2024/12/477552676/DE/TB/EW/230961617/superio-plus.png",
 
   lisa: "https://5.imimg.com/data5/SELLER/Default/2022/5/HD/YT/XF/37663009/lisha-copper-bronze-lighting-switch.jpg",
-  hi_fiswitches: "https://4.imimg.com/data4/FS/DG/NSDMERP-54382157/hifiswitches-250x250.png",
+  hi_fi_switches: "https://4.imimg.com/data4/FS/DG/NSDMERP-54382157/hifiswitches-250x250.png",
   gm: "https://jainbazaar.in/uploads/850be799f385c90f8d8297d9de2fa34c.jpg",
 
   home: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSVuHZIAmrjxS6WmL5g3y6YhAf_PB213Gr-bNNCFc6keFxI7FiN7KHjYGwJoUQjp5hn6w&usqp=CAU",
@@ -505,7 +505,7 @@ const ITEM_IMAGES = {
 
   tiles: "https://www.bing.com/th/id/OIP.L502FzWvyN1oD3B2a1AMWwHaHa?w=197&h=211&c=8&rs=1&qlt=90&o=6&dpr=1.5&pid=3.1&rm=2", 
   granate: "https://thvnext.bing.com/th/id/OIP.tKbeDULbwE48QNcQxDMegAHaFj?w=187&h=150&c=6&o=7&cb=ucfimgc2&dpr=1.5&pid=1.7&rm=3", 
-  syramic_tile: "https://thvnext.bing.com/th/id/OIP.PlTO3pHrTJQiC8eZcGOxcgHaE4?w=263&h=180&c=7&r=0&o=7&cb=ucfimgc2&dpr=1.5&pid=1.7&rm=3",
+  syramic_tiles: "https://thvnext.bing.com/th/id/OIP.PlTO3pHrTJQiC8eZcGOxcgHaE4?w=263&h=180&c=7&r=0&o=7&cb=ucfimgc2&dpr=1.5&pid=1.7&rm=3",
 
   haling_5mm: "https://thvnext.bing.com/th/id/OIP.OD1tOWiKWI_bM0EZlG--hgHaHa?w=191&h=191&c=7&r=0&o=7&cb=ucfimgc2&dpr=1.5&pid=1.7&rm=3", 
   topla: "https://thvnext.bing.com/th/id/OIP.OD1tOWiKWI_bM0EZlG--hgHaHa?w=191&h=191&c=7&r=0&o=7&cb=ucfimgc2&dpr=1.5&pid=1.7&rm=3", 
@@ -583,7 +583,7 @@ const SubCategories = () => {
                 subItems: [
                   { key: "solid_blocks", label: "SOLID BLOCKS", img: imgOrPH("solid_blocks", "SOLID BLOCKS") },
                   { key: "red_bricks", label: "RED BRICKS", img: imgOrPH("red_bricks", "RED BRICKS") },
-                  { key: "alpha_blocks", label: "ALPHA BLOCKS", img: imgOrPH("alpha-blocks", "ALPHA BLOCKS") },
+                  { key: "alpha_blocks", label: "ALPHA BLOCKS", img: imgOrPH("alpha_blocks", "ALPHA BLOCKS") },
                 ],
               };
             case "Sand":
@@ -648,7 +648,7 @@ const SubCategories = () => {
                 ...c,
                 subItems: [
                   { key: "lisa", label: "Lisa", img: imgOrPH("lisa", "Lisa") },
-                  { key: "hi_fi switches", label: "Hi-Fi Switches", img: imgOrPH("hi_fi switches", "Hi-Fi Switches") },
+                  { key: "hi_fi switches", label: "Hi-Fi Switches", img: imgOrPH("hi_fi_switches", "Hi-Fi Switches") },
                   { key: "gm", label: "GM", img: imgOrPH("gm", "GM Switches") },
                 ],
               };

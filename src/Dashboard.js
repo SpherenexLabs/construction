@@ -34,7 +34,7 @@ const Dashboard = ({ user }) => {
           <div className="logo-section">
             <div className="logo">
               <img
-                src={process.env.PUBLIC_URL + '/assests/vrm.png'}
+                src={process.env.PUBLIC_URL + '/assests/vrmlogo.png'}
                 alt="VRM Groups Logo"
                 className="company-logo"
                  loading="lazy" 

@@ -8,7 +8,7 @@
 .dashboard-header {
   width: 100%;
   /* Deep teal/blue gradient inspired by VRM logo */
-  background: linear-gradient(90deg, #0a2e3b 0%, #0c4055 100%);
+  background: #20b486;
   border-bottom: 3px solid var(--primary-yellow);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   position: sticky;
@@ -36,7 +36,7 @@
   gap: 12px; */
   width: 128px;
   height: 48px;
-  background: #fff;       /* white background tile */
+      /* white background tile */
   display: grid;
   place-items: center;     /* center the logo */
   border-radius: 6px;      /* optional */
@@ -44,8 +44,8 @@
 }
 
 .logo-icon {
-  width: 48px;
-  height: 48px;
+  width: 108px;
+  height: 108px;
   position: relative;
 }
 
