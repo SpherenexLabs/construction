@@ -7,7 +7,7 @@ const Categories = () => {
     {
       id: 1,
       title: 'Cement',
-      image: 'https://images.jdmagicbox.com/quickquotes/images_main/m25-grade-ready-mix-concrete-2221010526-4bgppls9.jpg',
+      image: 'https://5.imimg.com/data5/SELLER/Default/2024/12/470241748/RL/GK/QO/16423774/ultratech-cement-ppc.jpg',
       description: 'High-quality cement for construction'
     },
     {
@@ -31,7 +31,7 @@ const Categories = () => {
     {
       id: 5,
       title: 'Concrete',
-      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTS5jFQZUn2elqx-m2jhjmROFC48NXZtFf2eA&s',
+      image: 'https://images.jdmagicbox.com/quickquotes/images_main/m25-grade-ready-mix-concrete-2221010526-4bgppls9.jpg',
       description: 'Ready-mix concrete solutions'
     },
     {

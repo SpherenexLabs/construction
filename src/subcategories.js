@@ -1215,7 +1215,7 @@ const ITEM_IMAGES = {
 
   /* ============= 3) Blocks & Bricks ============= */
   blocks_8: "https://images.jdmagicbox.com/quickquotes/images_main/solid-blocks-8-inch-2217023591-2q2szmyx.jpg",
-  blocks_6: "Solid Block – 6 inch",
+  blocks_6: "https://th.bing.com/th/id/OIP.1CNj4F-rR1bjBELK7dRZggHaHa?w=172&h=180&c=7&r=0&o=5&pid=1.7",
   blocks_4: "Solid Block – 4 inch",
   bricks_wire: "Red Bricks (Wire Cutting)",
   bricks_solid: "Red Bricks (Solid Branded)",
@@ -1290,8 +1290,8 @@ const ITEM_IMAGES = {
     "https://5.imimg.com/data5/SELLER/Default/2022/5/HD/YT/XF/37663009/lisha-copper-bronze-lighting-switch.jpg",
   hifi_switch:
     "https://4.imimg.com/data4/FS/DG/NSDMERP-54382157/hifiswitches-250x250.png",
-  romen_switch: "Romen – Switch",
-  cona_switch: "Cona – Switch",
+  romen_switch: "https://th.bing.com/th/id/OIP.X2QRq720YIvQlDao2BjGMQHaHY?w=186&h=185&c=7&r=0&o=7&pid=1.7&rm=3",
+  cona_switch: "https://th.bing.com/th/id/OIP.9t_bq2f3A7_tlmdrQzJ0egHaHa?w=172&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
 
   /* ============= 12) Plumbing & Sanitary ============= */
   supreme:
@@ -1447,7 +1447,7 @@ const SubCategories = () => {
         id: 2,
         title: "Cement & Concrete Grades",
         image:
-          "https://images.jdmagicbox.com/quickquotes/images_main/m25-grade-ready-mix-concrete-2221010526-4bgppls9.jpg",
+          "https://5.imimg.com/data5/SELLER/Default/2024/12/470241748/RL/GK/QO/16423774/ultratech-cement-ppc.jpg",
         subItems: [
           { key: "birla_super_53", label: "Birla Super (53)", img: imgOrPH("birla_super_53", "Birla Super 53") },
           { key: "ultratech_ppc", label: "UltraTech (PPC)", img: imgOrPH("ultratech_ppc", "UltraTech PPC") },
