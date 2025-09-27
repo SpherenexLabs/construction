@@ -7,7 +7,7 @@ const Categories = () => {
     {
       id: 1,
       title: 'Cement',
-      image: 'https://5.imimg.com/data5/SELLER/Default/2024/12/470241748/RL/GK/QO/16423774/ultratech-cement-ppc.jpg',
+      image: 'https://lirp.cdn-website.com/bc4439fa/dms3rep/multi/opt/Portland+Cement-1920w.jpg',
       description: 'High-quality cement for construction'
     },
     {

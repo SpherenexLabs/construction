@@ -1174,9 +1174,9 @@ const ITEM_IMAGES = {
   jsw:
     "https://5.imimg.com/data5/SELLER/Default/2022/10/OH/MX/CG/43598357/jsw-neo-tmt-steel-fe-550-500x500.jpg",
   a_1_gold:
-    "https://www.buildmaadi.com/wp-content/uploads/2019/11/Aone-Steel.jpg",
+    "https://i.pinimg.com/736x/40/9b/e9/409be901ba8cf2049f7f9ee5202a9a58.jpg",
   sungold:
-    "https://media.istockphoto.com/id/1063784898/photo/building-armature-steel-bars-stack-on-white-background.jpg?s=612x612&w=0&k=20&c=fW1lo902dN0Oe_H3iSHKhuM9kS5pUOFJrO6Fp-EjH8Y=",
+    "https://th.bing.com/th/id/OIP.wcOIkl_fyc6UwTF7dFoPIAHaD1?w=319&h=179&c=7&r=0&o=5&pid=1.7",
   turbo:
     "https://5.imimg.com/data5/SELLER/Default/2023/3/MO/JI/MB/84139099/32-mm-turbosteel-tmt-bar-500x500.jpg",
   sunvik: "https://sunviksteels.com/wp-content/uploads/2025/04/image.png",
@@ -1216,9 +1216,9 @@ const ITEM_IMAGES = {
   /* ============= 3) Blocks & Bricks ============= */
   blocks_8: "https://images.jdmagicbox.com/quickquotes/images_main/solid-blocks-8-inch-2217023591-2q2szmyx.jpg",
   blocks_6: "https://th.bing.com/th/id/OIP.1CNj4F-rR1bjBELK7dRZggHaHa?w=172&h=180&c=7&r=0&o=5&pid=1.7",
-  blocks_4: "Solid Block – 4 inch",
-  bricks_wire: "Red Bricks (Wire Cutting)",
-  bricks_solid: "Red Bricks (Solid Branded)",
+  blocks_4: "https://th.bing.com/th/id/OIP.WtvODadZXWsGhAX19ingcAAAAA?w=142&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  bricks_wire: "https://th.bing.com/th/id/OIP.icvnXqeEcq-7rl7NuGrJJAHaE8?w=279&h=186&c=7&r=0&o=7&pid=1.7&rm=3",
+  bricks_solid: "https://th.bing.com/th/id/OIP.lpNgMazp7bT6InwEk6-CnwHaEJ?w=296&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
 
   /* (earlier keys kept) */
   solid_blocks:
@@ -1249,20 +1249,20 @@ const ITEM_IMAGES = {
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTZd5f8oyv_cfLHaO9dkacKKEldzUIAZs-nQ&s",
   teak_nati:
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5qdq6MBt9UfBWqrb3u_LCnSWycY8E3IlPww&s",
-  honne: "Honne Wood",
-  readsal: "Readsal Wood",
-  need_wood: "Need Wood",
+  honne: "https://th.bing.com/th/id/OIP.jtjtEcG6NHZ1Tx70GhHx_wHaDX?w=338&h=159&c=7&r=0&o=7&pid=1.7&rm=3",
+  readsal: "https://th.bing.com/th/id/OIP.2SzAjcxcXjf-GikmuEqFrAHaEK?w=332&h=187&c=7&r=0&o=5&pid=1.7",
+  need_wood: "https://th.bing.com/th/id/OIP.1AaOmrBxl29FH-x5lgVVoAHaDt?w=305&h=175&c=7&r=0&o=7&pid=1.7&rm=3",
   alum_grill:
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmBOUd2jBHDexRtSV0IEuEvRZJ7yoh7DbyePtk7xQA8cPGxS7WvAJFYDSaFO-fvD0PfjA&usqp=CAU",
-  upvc_window: "UPVC Window",
-  pooja_door: "Pooja Room Door (Teak Wood)",
-  main_door: "Main Door (Carving/Plain)",
-  room_door: "Room Door (32 mm)",
-  press_door: "Press Door (Veneer Top End)",
+  upvc_window: "https://th.bing.com/th/id/OIP.Aln9pr-YtIaBBgoSwX4IWwHaHa?w=181&h=181&c=7&r=0&o=5&pid=1.7",
+  pooja_door: "https://th.bing.com/th/id/OIP.vl5iJbIMf4swcGuzxPpLrAHaLe?w=198&h=308&c=7&r=0&o=7&pid=1.7&rm=3",
+  main_door: "https://th.bing.com/th/id/OIP.u0HgeZelSVJ9SaG834tjIQHaJ4?w=198&h=264&c=7&r=0&o=7&pid=1.7&rm=3",
+  room_door: "https://th.bing.com/th/id/OIP.aL7R51z94TN36WEA-6ESEwHaHa?w=202&h=202&c=7&r=0&o=7&pid=1.7&rm=3",
+  press_door: "https://th.bing.com/th/id/OIP.YfBX5TJxfyzYdTJylqOZ7gHaI_?w=115&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
 
   /* ============= 7) Bathroom Doors ============= */
   bath_pvc: "https://tse3.mm.bing.net/th/id/OIP.59Gj7hSYchfV8CgAiQeLdQAAAA?rs=1&pid=ImgDetMain&o=7&rm=3 Door – PVC",
-  bath_wpc: "Bathroom Door – WPC",
+  bath_wpc: "https://th.bing.com/th/id/OIP.LfWh5Ln1iA6Rweemtsvv_QHaJ4?w=198&h=264&c=7&r=0&o=7&pid=1.7&rm=3",
 
   /* ============= 8) Electrical (Wall Box) ============= */
   anchor: "https://m.media-amazon.com/images/I/71Dul7vevzL.jpg",
@@ -1271,7 +1271,7 @@ const ITEM_IMAGES = {
 
   /* ============= 9) Electrical Pipes ============= */
   vip_pipe: "https://en.lesso.com/blogs/wp-content/uploads/2021/06/why-use-conduit-for-electrical-wiring.jpg",
-  finolex_pipe: "Finolex – Electrical Pipe",
+  finolex_pipe: "https://th.bing.com/th/id/OIP.NtQTCuOYxAydiTIJF4KX_wHaEP?w=273&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
 
   /* ============= 10) Electrical Wires & Cables ============= */
   polycab_wire:
@@ -1280,8 +1280,8 @@ const ITEM_IMAGES = {
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbqj54jCqpsmT1MR-PdRNoXX157Q9dmliinw&s",
   havells_wire:
     "https://www.gauryog.in/image/cache/catalog/Havells/Wires/Lifeline-Yellow-Pic1-600x600.jpg",
-  kel_industries: "KEL Industries – Cable",
-  star_light: "Star Light – Cable",
+  kel_industries: "https://th.bing.com/th/id/OIP.c84mlD2CA9ZaevdSt5uq-QHaE7?w=283&h=189&c=7&r=0&o=7&pid=1.7&rm=3",
+  star_light: "https://th.bing.com/th?q=Wire+and+Cable+Box+Design&w=120&h=120&c=1&rs=1&qlt=70&o=7&cb=1&pid=InlineBlock&rm=3&mkt=en-IN&cc=IN&setlang=en&adlt=moderate&t=1&mw=247",
 
   /* ============= 11) Electrical Switches ============= */
   gm_switch:
@@ -1298,29 +1298,29 @@ const ITEM_IMAGES = {
     "https://www.bing.com/th/id/OIP.MkFhhKGNX9JSQKWKCfdjmAHaHa?w=205&h=211&c=8&rs=1&qlt=90&o=6&dpr=1.5&pid=3.1&rm=2",
   ashirvad:
     "https://www.bing.com/th/id/OIP.5Fn1_11i9EqjdiqtecRsuwHaGd?w=213&h=211&c=8&rs=1&qlt=90&o=6&dpr=1.5&pid=3.1&rm=2",
-  finolex_plumb: "Finolex – Plumbing",
+  finolex_plumb: "https://th.bing.com/th/id/OIP.NtQTCuOYxAydiTIJF4KX_wHaEP?w=273&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
   astral:
     "https://www.bing.com/th/id/OIP.i_wDCxyeThgbDaYFQOJz3AAAAA?w=216&h=211&c=8&rs=1&qlt=90&o=6&dpr=1.5&pid=3.1&rm=2",
 
   /* ============= 13) Water Proofing Chemicals (Branded) ============= */
-  fosroc: "Fosroc",
-  bostik: "Bostik",
-  star_proof: "Star Proof",
-  pidilite: "Pidilite",
-  myk: "MYK",
+  fosroc: "https://th.bing.com/th/id/OIP.lvbMUvX0EnAI_sgGszpeMgHaHa?w=200&h=200&c=7&r=0&o=7&pid=1.7&rm=3",
+  bostik: "https://th.bing.com/th/id/OIP.1gQTcS1oydYTlBaHvbQixQHaHa?w=166&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  star_proof: "https://th.bing.com/th/id/OIP.qnpW1Pp60_DgerSBjHoZNwAAAA?w=166&h=200&c=7&r=0&o=7&pid=1.7&rm=3",
+  pidilite: "https://th.bing.com/th/id/OIP.Rds6fDaH5XiBdR1DjffQ3gHaEK?w=305&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  myk: "https://th.bing.com/th/id/OIP.7CXkkpcjD3G0e-hBtQ2PCwHaD8?w=338&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
 
   /* ============= 14) Flooring ============= */
-  marble_flooring: "Marble Flooring",
-  granite_flooring: "Granite Flooring",
-  ceramic_tiles: "Ceramic / Vitrified Tiles",
+  marble_flooring: "https://th.bing.com/th/id/OIP.aBa_1oDZQPjmMmjWakEiGwHaE8?w=295&h=197&c=7&r=0&o=7&pid=1.7&rm=3",
+  granite_flooring: "https://th.bing.com/th/id/OIP.axGoUU4EweRUH9Ck2Mx4QAHaEK?w=308&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  ceramic_tiles: "https://th.bing.com/th/id/OIP.-FmQouqP8WUmhI933f0QbgAAAA?w=271&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
 
   /* ============= 15) Kitchen ============= */
-  kitchen_granite_black_20: "Granite – Black 20 mm",
-  kitchen_granite_black_40: "Granite – Black 40 mm",
-  kitchen_granite_green_20: "Granite – Green 20 mm",
-  kitchen_granite_green_40: "Granite – Green 40 mm",
-  kitchen_marble: "Kitchen Slab – Marble",
-  kitchen_tiles: "Kitchen Tiles",
+  kitchen_granite_black_20: "https://th.bing.com/th/id/OIP.oi8MSGWJdHDaPEKfXO0tKQHaEt?w=263&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  kitchen_granite_black_40: "https://th.bing.com/th/id/OIP.UogAsRvq6kxucUlfPiOlUAHaHa?w=216&h=216&c=7&r=0&o=7&pid=1.7&rm=3",
+  kitchen_granite_green_20: "https://th.bing.com/th/id/OIP.iqASOd2Hkw9PgyZ2m6mcJwHaE7?w=286&h=190&c=7&r=0&o=7&pid=1.7&rm=3",
+  kitchen_granite_green_40: "https://th.bing.com/th/id/OIP.jBKq8KC5OUo2U3oYJra5-QHaHa?w=156&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  kitchen_marble: "https://th.bing.com/th/id/OIP.DCaLRUv0Mj-HXnyjELVx3AHaEq?w=228&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  kitchen_tiles: "https://th.bing.com/th/id/OIP.QKNGsY_dweulez5wTY-6lwHaE8?w=195&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
 
   /* ============= 16) Bathroom Fittings & Toilets ============= */
   jaguar_wall_mixer:
@@ -1331,23 +1331,23 @@ const ITEM_IMAGES = {
     "https://www.bing.com/th/id/OIP.GhXfBRcnWBSEYXKtQZbnfQHaHa?w=222&h=211&c=8&rs=1&qlt=90&o=6&dpr=1.5&pid=3.1&rm=2",
   d_son_asian:
     "https://tse1.mm.bing.net/th/id/OIP.5yOr52qjjYwB0pd4KhkgqQAAAA?cb=ucfimgc2&pid=ImgDet&w=179&h=111&c=7&dpr=1.5&o=7&rm=3",
-  hindware: "Hindware",
-  cera: "Cera",
-  toilet_western: "Toilet – Western",
-  toilet_single_commode: "Toilet – Single Commode",
-  toilet_indian: "Toilet – Indian",
+  hindware: "https://th.bing.com/th/id/OIP.8gV0eMO6zQr2Zz8O3mTOOAHaEK?w=299&h=180&c=7&r=0&o=5&pid=1.7",
+  cera: "https://th.bing.com/th/id/OIP.7maRmV1bJm9TuklrkllYAAHaEn?w=231&h=180&c=7&r=0&o=5&pid=1.7",
+  toilet_western: "https://th.bing.com/th/id/OIP._92QFJNcGVW6JGg2X1G-ngHaD0?w=322&h=179&c=7&r=0&o=7&pid=1.7&rm=3",
+  toilet_single_commode: "https://th.bing.com/th/id/OIP.xCMCGbxVjtJNaFVJE1jouwAAAA?w=172&h=184&c=7&r=0&o=5&pid=1.7",
+  toilet_indian: "https://5.imimg.com/data5/SELLER/Default/2022/10/XM/WW/NL/99081048/cera-indian-toilet-sheet-500x500.jpg",
 
   /* ============= 17) POP (Plaster of Paris) ============= */
-  pvc_pop: "PVC POP",
-  pop_putty: "POP Putty",
+  pvc_pop: "https://th.bing.com/th/id/OIP.RmoaZ_2W_4uBsRamGswsUgHaEL?w=272&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  pop_putty: "https://th.bing.com/th/id/OIP.-e1XInLW9JLVw94ma0IpZQAAAA?w=172&h=176&c=7&r=0&o=5&pid=1.7",
 
   /* ============= 18) Railings & Gate ============= */
-  ms_hr: "MS – HR Grade",
-  ms_cr: "MS – CR Grade",
-  ss_304: "SS – 304 Grade",
-  ss_302: "SS – 302 Grade",
-  glass_etching: "Glass – Etching",
-  glass_toughened: "Glass – Toughened",
+  ms_hr: "https://th.bing.com/th/id/OIP.LhQFdSaNKAAt9P-23USlRwHaDe?w=335&h=164&c=7&r=0&o=7&pid=1.7&rm=3",
+  ms_cr: "https://th.bing.com/th/id/OIP.lQijEXLN1PCrCjavSotfrgHaFj?w=246&h=184&c=7&r=0&o=7&pid=1.7&rm=3",
+  ss_304: "https://th.bing.com/th/id/OIP.G2zdAoF-DfLn3liTf0C4rAHaFd?w=284&h=208&c=7&r=0&o=7&pid=1.7&rm=3",
+  ss_302: "https://th.bing.com/th/id/OIP.-5e5XfPg8eMmuQei_hkyZwHaDC?w=346&h=143&c=7&r=0&o=7&pid=1.7&rm=3",
+  glass_etching: "https://th.bing.com/th/id/OIP.n92qIz4gFdFVMjVpAjs-OQHaEI?w=306&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  glass_toughened: "https://th.bing.com/th/id/OIP.cPOQZHKTGRtAGollYgGdbwHaHk?w=185&h=189&c=7&r=0&o=7&pid=1.7&rm=3",
 
   /* ============= 19) Painting / Polish & Wall Putty ============= */
   asian_ultima:
@@ -1356,60 +1356,60 @@ const ITEM_IMAGES = {
     "https://thvnext.bing.com/th/id/OIP.GWh9ArJfQWWhKZZPKftXgQHaHa?w=185&h=185&c=7&r=0&o=7&cb=ucfimgc2&dpr=1.5&pid=1.7&rm=3",
   asian_emulsion:
     "https://thvnext.bing.com/th/id/OIP.sIeOyxAfaat4HkP3Cyp5XgHaHa?w=164&h=180&c=7&r=0&o=7&cb=ucfimgc2&dpr=1.5&pid=1.7&rm=3",
-  berger_ultima: "Berger – Ultima",
-  berger_apex: "Berger – Apex",
-  berger_emulsion: "Berger – Dr. Emulsion",
-  nerolac_ultima: "Nerolac – Ultima",
-  nerolac_apex: "Nerolac – Apex",
-  nerolac_emulsion: "Nerolac – Dr. Emulsion",
-  indigo_ultima: "Indigo – Ultima",
-  indigo_apex: "Indigo – Apex",
-  indigo_emulsion: "Indigo – Dr. Emulsion",
-  nippon_ultima: "Nippon – Ultima",
-  nippon_apex: "Nippon – Apex",
-  nippon_emulsion: "Nippon – Dr. Emulsion",
-  jsw_ultima: "JSW – Ultima",
-  jsw_apex: "JSW – Apex",
-  jsw_emulsion: "JSW – Dr. Emulsion",
-  wall_putty_birla: "Wall Putty – Birla Super",
-  wall_putty_jk: "Wall Putty – JK",
-  wall_putty_asian: "Wall Putty – Asian",
+  berger_ultima: "https://th.bing.com/th/id/OIP.Us9yz96P-h4SnNwwOXFv0AHaGG?w=200&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  berger_apex: "https://th.bing.com/th/id/OIP.r0WLDMCvxSm6ns-i3rLITgHaD2?w=327&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  berger_emulsion: "https://th.bing.com/th/id/OIP.3OSKoLdRTBayh8kjcYVk-gHaHe?w=185&h=187&c=7&r=0&o=7&pid=1.7&rm=3",
+  nerolac_ultima: "https://th.bing.com/th/id/OIP.2ppkBOYXjbRqEFXT_KCBqAHaHa?w=179&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  nerolac_apex: "https://th.bing.com/th/id/OIP.lw78Kzn-eeDxQk_NnWn3DAAAAA?w=124&h=180&c=7&r=0&o=5&pid=1.7",
+  nerolac_emulsion: "https://th.bing.com/th/id/OIP.Nz1KPJjmr6Db5vMfv_33tAHaFj?w=268&h=200&c=7&r=0&o=5&pid=1.7",
+  indigo_ultima: "https://th.bing.com/th/id/OIP.X-PkE0G80Ad9EpTRdbqjbQAAAA?w=148&h=185&c=7&r=0&o=7&pid=1.7&rm=3",
+  indigo_apex: "https://th.bing.com/th/id/OIP.X-PkE0G80Ad9EpTRdbqjbQAAAA?w=148&h=185&c=7&r=0&o=7&pid=1.7&rm=3",
+  indigo_emulsion: "https://th.bing.com/th/id/OIP.-DggS978JYy-pWapVcLLAAAAAA?w=198&h=248&c=7&r=0&o=7&pid=1.7&rm=3",
+  nippon_ultima: "https://th.bing.com/th/id/OIP.SPYDPGk5WXvNR78_qABSxgHaDL?w=308&h=180&c=7&r=0&o=5&pid=1.7",
+  nippon_apex: "https://th.bing.com/th/id/OIP.9Ek16gxno59AjjLWFKcbuwHaIy?w=148&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  nippon_emulsion: "https://5.imimg.com/data5/SELLER/Default/2024/10/457319044/AU/LZ/LH/10421392/nippon-roof-coating-emulsion-paint-1000x1000.jpg",
+  jsw_ultima: "https://th.bing.com/th/id/OIP.5CAsoEEGWVbGpZ9UmKO8SwHaJ4?w=95&h=180&c=7&r=0&o=5&pid=1.7",
+  jsw_apex: "https://th.bing.com/th/id/OIP.L16AkPFAlvn29mNlGrRQYAAAAA?w=234&h=148&c=7&r=0&o=7&pid=1.7&rm=3",
+  jsw_emulsion: "https://th.bing.com/th/id/OIP.rTp9WtHXz5UlTDmrh-gA5AHaFr?w=89&h=90&c=1&rs=1&qlt=70&r=0&o=7&pid=InlineBlock&rm=3",
+  wall_putty_birla: "https://th.bing.com/th/id/OIP.AU1yZgTHdhuja6TRMf7D7wHaHa?w=198&h=198&c=7&r=0&o=7&pid=1.7&rm=3",
+  wall_putty_jk: "https://th.bing.com/th/id/OIP.imbuTxRvpHha-XF4HgEe-wHaHa?w=202&h=203&c=7&r=0&o=7&pid=1.7&rm=3",
+  wall_putty_asian: "https://th.bing.com/th/id/OIP.JEcuDJiVxGZA9DBy71fazQHaJz?w=139&h=184&c=7&r=0&o=7&pid=1.7&rm=3",
 
   /* ============= 20) Interior Works ============= */
-  int_plywood: "Plywood (Branded)",
-  int_aluminium: "Aluminium (Branded)",
-  int_pvc: "PVC (Branded)",
-  int_modern_kitchen: "Modern Kitchen",
-  int_wardrobe: "Wardrobe",
-  int_tv_unit: "TV Unit",
-  int_dressing_unit: "Dressing Unit",
-  int_utility: "Utility Area",
+  int_plywood: "https://th.bing.com/th/id/OIP.50rjsbib2y7PKcapvb4EewHaGP?w=216&h=181&c=7&r=0&o=7&pid=1.7&rm=3",
+  int_aluminium: "https://th.bing.com/th/id/OIP.rAzQIe76IaAMwMNHH4TKGwHaFj?w=189&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  int_pvc: "https://th.bing.com/th/id/OIP.RnrYeSYgiGSc89PJFEj6VwHaFj?w=228&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  int_modern_kitchen: "https://th.bing.com/th/id/OIP.KAISbamM5CqfVNo_5T4TjgHaFP?w=258&h=183&c=7&r=0&o=7&pid=1.7&rm=3",
+  int_wardrobe: "https://th.bing.com/th/id/OIP.mEsllLUFghNpC2jihHJh7QHaEn?w=247&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  int_tv_unit: "https://th.bing.com/th/id/OIP.u6ACbEXs_LnvmszgGi-PAQHaFj?w=242&h=182&c=7&r=0&o=7&pid=1.7&rm=3",
+  int_dressing_unit: "https://th.bing.com/th/id/OIP.UJCgTuKv_i0BfOCPfWPPlAHaFj?w=219&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  int_utility: "https://th.bing.com/th/id/OIP.eTJKF0S-cOBJVaQK4wjT_AHaEK?w=300&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
 
   /* ============= 21) Truss Work ============= */
-  truss_work: "Truss Work",
+  truss_work: "https://th.bing.com/th/id/OIP.G-EPJvjCH0UiSdvnChit5AHaFL?w=216&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
 
   /* ============= 22) Elevation Cladding ============= */
-  clad_stone: "Stone",
-  clad_bricks: "Bricks",
-  clad_wood: "Wood",
-  clad_concrete: "Concrete",
-  clad_metal: "Metal",
-  clad_glass: "Glass",
-  clad_fiber_cement: "Fiber Cement",
+  clad_stone: "https://th.bing.com/th/id/OIP.Db5l9hpaZDh4s-rDifirYAHaE7?w=236&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  clad_bricks: "https://th.bing.com/th/id/OIP.CuvjTA8fSTWxDwJ4KiiX5AHaJ4?w=168&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  clad_wood: "https://th.bing.com/th/id/OIP.RHTtbkuM4YoRzWRxepNYDAHaHa?w=174&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  clad_concrete: "https://th.bing.com/th/id/OIP.YCFRPxPxlPe7Q44wDDXkjAHaE8?w=266&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  clad_metal: "https://th.bing.com/th/id/OIP.Nc58qQqu5w8cP65eOb0aNgHaDS?w=289&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  clad_glass: "https://th.bing.com/th/id/OIP.koMpbMo_vnYpYXCOL-_pmAHaDa?w=328&h=161&c=7&r=0&o=7&pid=1.7&rm=3",
+  clad_fiber_cement: "https://th.bing.com/th/id/OIP.f8hFSRBDo0DNchrIg5adQwHaE8?w=241&h=181&c=7&r=0&o=7&pid=1.7&rm=3",
 
   /* ============= 23) Extra Items ============= */
   extra_3d_wall_paint: "https://smooth-apricot-ooxv8mxdfo.edgeone.app/e15f51a2-7102-4973-b594-3e0a574b6031.jpg",
-  extra_wallpaper: "Wallpaper",
-  extra_geyser: "Geyser",
-  extra_solar_water_heater: "Solar Water Heater",
-  extra_lift: "Lift",
-  extra_generator: "Generator",
-  extra_ac: "Air Conditioner (AC)",
-  extra_ups: "UPS",
-  extra_bath_tub: "Bath Tub",
-  extra_light: "Light",
-  extra_fan: "Fan",
-  extra_cctv: "CCTV",
+  extra_wallpaper: "https://th.bing.com/th/id/OIP.G7ESB1PytO_HG1XWxwRsvwHaEK?w=375&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  extra_geyser: "https://th.bing.com/th/id/OIP.y7OZec_DSoHxj1yW4Ebo1QAAAA?w=121&h=180&c=7&r=0&o=5&pid=1.7",
+  extra_solar_water_heater: "https://th.bing.com/th/id/OIP.h3e8DaqatgKV39MvzOY57AHaFj?w=297&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  extra_lift: "https://th.bing.com/th/id/OIP.rjVAcLLJABeUz1zbSWjJ4wHaFg?w=235&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  extra_generator: "https://th.bing.com/th/id/OIP.5E-NjGKPfTSupl2XsZbCYAHaE5?w=286&h=189&c=7&r=0&o=7&pid=1.7&rm=3",
+  extra_ac: "https://th.bing.com/th/id/OIP.8LhJ0CaWyhQ7s2zxlZZ3hAHaE8?w=291&h=194&c=7&r=0&o=7&pid=1.7&rm=3",
+  extra_ups: "https://th.bing.com/th/id/OIP.qh4uimuFdbX0v3JUnFtgrQHaE7?w=249&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+  extra_bath_tub: "https://th.bing.com/th/id/OIP.sDL-Zl_6lc_PC3XyEDR3hAHaE8?w=232&h=181&c=7&r=0&o=5&pid=1.7",
+  extra_light: "https://th.bing.com/th/id/OIP.xT5n7NkLKQuIkAlLryyzuAHaHa?w=214&h=214&c=7&r=0&o=5&pid=1.7",
+  extra_fan: "https://th.bing.com/th/id/OIP.beGaajU6vdXG7wVrCqnRlwHaHa?w=212&h=212&c=7&r=0&o=7&pid=1.7&rm=3",
+  extra_cctv: "https://th.bing.com/th/id/OIP.tCwFYXxASfdVJ3WleeqWHwHaEg?w=259&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
 };
 
 /* Placeholders: if no HTTPS url, show a simple labeled placeholder */
@@ -1447,7 +1447,7 @@ const SubCategories = () => {
         id: 2,
         title: "Cement & Concrete Grades",
         image:
-          "https://5.imimg.com/data5/SELLER/Default/2024/12/470241748/RL/GK/QO/16423774/ultratech-cement-ppc.jpg",
+          "https://lirp.cdn-website.com/bc4439fa/dms3rep/multi/opt/Portland+Cement-1920w.jpg",
         subItems: [
           { key: "birla_super_53", label: "Birla Super (53)", img: imgOrPH("birla_super_53", "Birla Super 53") },
           { key: "ultratech_ppc", label: "UltraTech (PPC)", img: imgOrPH("ultratech_ppc", "UltraTech PPC") },
