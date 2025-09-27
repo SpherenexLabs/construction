@@ -7,49 +7,49 @@ const Categories = () => {
     {
       id: 1,
       title: 'Cement',
-      image: 'https://img.freepik.com/premium-photo/cement-plant-cement-production_406939-10898.jpg',
+      image: 'https://images.jdmagicbox.com/quickquotes/images_main/m25-grade-ready-mix-concrete-2221010526-4bgppls9.jpg',
       description: 'High-quality cement for construction'
     },
     {
       id: 2,
       title: 'Steel',
-      image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop',
+      image: 'https://media.istockphoto.com/id/1063784898/photo/building-armature-steel-bars-stack-on-white-background.jpg?s=612x612&w=0&k=20&c=fW1lo902dN0Oe_H3iSHKhuM9kS5pUOFJrO6Fp-EjH8Y=',
       description: 'Steel bars and structural materials'
     },
     {
       id: 3,
       title: 'Bricks',
-      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDuABcGH3vzhNtGZumkSotP7gdUDk_aX334A&s',
+      image: 'https://images.jdmagicbox.com/v2/comp/bangalore/y4/080pxx80.xx80.190212081002.c4y4/catalogue/alpha-sand-hessargatta-main-road-bangalore-solid-block-manufacturers-8dbjjry4ll.jpg',
       description: 'Premium quality construction bricks'
     },
     {
       id: 4,
       title: 'Sand',
-      image: 'https://static.vecteezy.com/system/resources/previews/042/654/226/non_2x/ai-generated-desert-sand-dunes-textured-landscape-free-png.png',
+      image: 'https://promaninfi.com/blog/wp-content/uploads/2023/05/blog1.jpg',
       description: 'Construction grade sand'
     },
     {
       id: 5,
       title: 'Concrete',
-      image: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=300&h=200&fit=crop',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTS5jFQZUn2elqx-m2jhjmROFC48NXZtFf2eA&s',
       description: 'Ready-mix concrete solutions'
     },
     {
       id: 6,
       title: 'Aggregates',
-      image: 'https://rockproducts.com/wp-content/uploads/2023/04/55jlbc_b78fc4f60cf5340e49d2e0637799cf187d016021-1.jpg',
+      image: 'https://5.imimg.com/data5/SELLER/Default/2024/12/473932942/YK/VU/PD/236367330/12mm-construction-aggregate-500x500.jpg',
       description: 'Stone and gravel aggregates'
     },
     {
       id: 7,
       title: 'Electrical Works',
-      image: 'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=300&h=200&fit=crop',
+      image: 'https://5.imimg.com/data5/SELLER/Default/2022/5/HD/YT/XF/37663009/lisha-copper-bronze-lighting-switch.jpg',
       description: 'Complete electrical solutions'
     },
     {
       id: 8,
       title: 'Wood',
-      image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=300&h=200&fit=crop',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5qdq6MBt9UfBWqrb3u_LCnSWycY8E3IlPww&s',
       description: 'Timber and wooden materials'
     },
     {
@@ -61,13 +61,13 @@ const Categories = () => {
     {
       id: 10,
       title: 'Switches',
-      image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop',
+      image: 'https://jainbazaar.in/uploads/850be799f385c90f8d8297d9de2fa34c.jpg',
       description: 'Electrical switches and controls'
     },
     {
       id: 11,
       title: 'Windows',
-      image: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=300&h=200&fit=crop',
+      image: 'https://th.bing.com/th/id/OIP.YoaAGum9vnkokJVImDez-QHaE8?w=279&h=186&c=7&r=0&o=5&pid=1.7',
       description: 'Window frames and installations'
     },
     {
@@ -79,13 +79,13 @@ const Categories = () => {
     {
       id: 13,
       title: 'Plumbing',
-      image: 'https://static.vecteezy.com/system/resources/previews/038/813/452/large_2x/ai-generated-beautifulgraphy-for-plumbing-services-advertising-free-photo.jpeg',
+      image: 'https://www.bing.com/th/id/OIP.MkFhhKGNX9JSQKWKCfdjmAHaHa?w=205&h=211&c=8&rs=1&qlt=90&o=6&dpr=1.5&pid=3.1&rm=2',
       description: 'Plumbing fixtures and fittings'
     },
     {
       id: 14,
       title: 'Electrical',
-      image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=300&h=200&fit=crop',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbqj54jCqpsmT1MR-PdRNoXX157Q9dmliinw&s',
       description: 'Electrical components and systems'
     },
     {
@@ -115,7 +115,7 @@ const Categories = () => {
     {
       id: 19,
       title: 'Glass',
-      image: 'https://img.freepik.com/premium-photo/contemporary-riverfront-home-glass-walls-stone-steps-leading-water-sunny-reflection_1342292-9395.jpg',
+      image: 'https://th.bing.com/th/id/OIP.sk0LW7QQBJ66ghQMKyaqNgHaE2?w=277&h=182&c=7&r=0&o=7&pid=1.7&rm=3',
       description: 'Glass panels and installations'
     },
     {
