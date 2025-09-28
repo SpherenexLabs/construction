@@ -1,4 +1,4 @@
-.splash-container {
+.slow-splash-container {
   position: fixed;
   top: 0;
   left: 0;
@@ -11,64 +11,129 @@
   z-index: 9999;
 }
 
-.splash-content {
+.slow-splash-content {
   text-align: center;
   color: white;
 }
 
-.splash-logo {
-  width: 120px;
+.slow-logo {
+  width: 0px;
   height: auto;
-  margin-bottom: 24px;
-  animation: slideUp 1s ease-out;
+  margin-bottom: 32px;
+  opacity: 0;
+  transform: scale(0.5) translateY(40px) rotate(-10deg);
+  animation: 
+    slowLogoGrow 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards,
+    slowLogoFade 2.5s ease-out 0.3s forwards,
+    slowLogoMove 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
 }
 
-.splash-title {
-  font-size: 28px;
+.slow-title {
+  font-size: 0px;
   font-weight: bold;
-  margin: 0 0 8px 0;
-  animation: slideUp 1s ease-out 0.2s both;
+  margin: 0 0 16px 0;
+  opacity: 0;
+  transform: translateX(-50px);
+  animation: 
+    slowTitleGrow 2s ease-out 2s forwards,
+    slowTitleSlide 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) 2s forwards,
+    slowTitleFade 2s ease-out 2s forwards;
 }
 
-.splash-subtitle {
-  font-size: 16px;
-  margin: 0 0 32px 0;
-  opacity: 0.9;
-  animation: slideUp 1s ease-out 0.4s both;
+.slow-subtitle {
+  font-size: 0px;
+  margin: 0 0 48px 0;
+  opacity: 0;
+  transform: translateX(50px);
+  animation: 
+    slowSubtitleGrow 1.8s ease-out 3s forwards,
+    slowSubtitleSlide 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 3s forwards,
+    slowSubtitleFade 1.8s ease-out 3s forwards;
 }
 
-.loading-dots {
+.slow-loading {
   display: flex;
   justify-content: center;
-  gap: 8px;
+  gap: 12px;
+  opacity: 0;
+  animation: slowLoadingAppear 1s ease-out 4.5s forwards;
 }
 
-.loading-dots span {
-  width: 8px;
-  height: 8px;
+.slow-dot {
+  width: 10px;
+  height: 10px;
   background: white;
   border-radius: 50%;
-  animation: bounce 1.4s infinite ease-in-out both;
+  animation: slowBounce 2s infinite ease-in-out;
 }
 
-.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
-.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+.slow-dot:nth-child(1) { animation-delay: 0s; }
+.slow-dot:nth-child(2) { animation-delay: 0.3s; }
+.slow-dot:nth-child(3) { animation-delay: 0.6s; }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+/* Logo Slow Animations */
+@keyframes slowLogoGrow {
+  0% { width: 0px; }
+  100% { width: 120px; }
+}
+
+@keyframes slowLogoFade {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes slowLogoMove {
+  0% { 
+    transform: scale(0.5) translateY(40px) rotate(-10deg);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  100% { 
+    transform: scale(1) translateY(0px) rotate(0deg);
   }
 }
 
-@keyframes bounce {
+/* Text Slow Animations */
+@keyframes slowTitleGrow {
+  0% { font-size: 0px; }
+  100% { font-size: 32px; }
+}
+
+@keyframes slowTitleSlide {
+  0% { transform: translateX(-50px); }
+  100% { transform: translateX(0px); }
+}
+
+@keyframes slowTitleFade {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes slowSubtitleGrow {
+  0% { font-size: 0px; }
+  100% { font-size: 18px; }
+}
+
+@keyframes slowSubtitleSlide {
+  0% { transform: translateX(50px); }
+  100% { transform: translateX(0px); }
+}
+
+@keyframes slowSubtitleFade {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes slowLoadingAppear {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes slowBounce {
   0%, 80%, 100% {
-    transform: scale(0);
-  } 40% {
-    transform: scale(1);
+    transform: scale(0.8);
+    opacity: 0.5;
+  } 
+  40% {
+    transform: scale(1.2);
+    opacity: 1;
   }
 }

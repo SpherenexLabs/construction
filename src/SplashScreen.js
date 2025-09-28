@@ -1,33 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import './SplashScreen.css';
+import './SlowSplashScreen.css';
 
-const SplashScreen = ({ onComplete }) => {
+const SlowSplashScreen = ({ onComplete }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       onComplete();
-    }, 3000); // Show for 3 seconds
+    }, 6000); // Show for 6 seconds total
 
     return () => clearTimeout(timer);
   }, [onComplete]);
 
   return (
-    <div className="splash-container">
-      <div className="splash-content">
+    <div className="slow-splash-container">
+      <div className="slow-splash-content">
         <img 
           src={`${process.env.PUBLIC_URL}/logo.png`} 
           alt="VRM Groups" 
-          className="splash-logo"
+          className="slow-logo"
         />
-        <h1 className="splash-title">VRM GROUPS</h1>
-        <p className="splash-subtitle">Construction Materials & Quotations</p>
-        <div className="loading-dots">
-          <span></span>
-          <span></span>
-          <span></span>
+        <h1 className="slow-title">VRM GROUPS</h1>
+        <p className="slow-subtitle">Construction Materials & Quotations</p>
+        <div className="slow-loading">
+          <div className="slow-dot"></div>
+          <div className="slow-dot"></div>
+          <div className="slow-dot"></div>
         </div>
       </div>
     </div>
   );
 };
 
-export default SplashScreen;
+export default SlowSplashScreen;

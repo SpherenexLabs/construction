@@ -13,7 +13,7 @@
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <title>VRM Groups</title>
     
-    <!-- Splash Screen CSS -->
+    <!-- Slow Elegant Splash Screen CSS -->
     <style>
       .splash-screen {
         position: fixed;
@@ -27,54 +27,145 @@
         justify-content: center;
         align-items: center;
         z-index: 9999;
+        opacity: 1;
+        animation: splashFadeOut 6s ease-in-out 3s forwards;
       }
       
       .splash-logo {
-        width: 150px;
+        width: 0px;
         height: auto;
         margin-bottom: 20px;
-        animation: fadeIn 1s ease-in-out;
+        opacity: 0;
+        transform: scale(0.3) translateY(50px);
+        animation: 
+          logoSlowGrow 2s ease-out 0.5s forwards,
+          logoSlowFade 2s ease-out 0.5s forwards,
+          logoSlowSlide 2s ease-out 0.5s forwards;
       }
       
       .splash-title {
         color: white;
-        font-size: 24px;
+        font-size: 0px;
         font-weight: bold;
         margin-bottom: 10px;
-        font-family: Arial, sans-serif;
+        font-family: 'Arial', sans-serif;
+        opacity: 0;
+        transform: translateY(30px);
+        animation: 
+          textSlowAppear 2s ease-out 2s forwards,
+          textSlowGrow 2s ease-out 2s forwards;
       }
       
       .splash-subtitle {
         color: rgba(255,255,255,0.8);
-        font-size: 16px;
-        font-family: Arial, sans-serif;
+        font-size: 0px;
+        font-family: 'Arial', sans-serif;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: 
+          subtitleSlowAppear 1.5s ease-out 2.5s forwards,
+          subtitleSlowGrow 1.5s ease-out 2.5s forwards;
       }
       
       .loading-spinner {
         width: 40px;
         height: 40px;
-        border: 4px solid rgba(255,255,255,0.3);
+        border: 4px solid rgba(255,255,255,0.2);
         border-left: 4px solid white;
         border-radius: 50%;
-        animation: spin 1s linear infinite;
         margin-top: 30px;
+        opacity: 0;
+        animation: 
+          spinnerSlowAppear 1s ease-out 4s forwards,
+          gentleSpin 2s linear 4s infinite;
       }
       
-      @keyframes spin {
+      /* Slow Logo Animations */
+      @keyframes logoSlowGrow {
+        0% { 
+          width: 0px;
+          transform: scale(0.3) translateY(50px);
+        }
+        100% { 
+          width: 150px;
+          transform: scale(1) translateY(0px);
+        }
+      }
+      
+      @keyframes logoSlowFade {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+      }
+      
+      @keyframes logoSlowSlide {
+        0% { transform: scale(0.3) translateY(50px); }
+        100% { transform: scale(1) translateY(0px); }
+      }
+      
+      /* Slow Text Animations */
+      @keyframes textSlowAppear {
+        0% { 
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        100% { 
+          opacity: 1;
+          transform: translateY(0px);
+        }
+      }
+      
+      @keyframes textSlowGrow {
+        0% { font-size: 0px; }
+        100% { font-size: 28px; }
+      }
+      
+      @keyframes subtitleSlowAppear {
+        0% { 
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        100% { 
+          opacity: 1;
+          transform: translateY(0px);
+        }
+      }
+      
+      @keyframes subtitleSlowGrow {
+        0% { font-size: 0px; }
+        100% { font-size: 16px; }
+      }
+      
+      /* Spinner Slow Animation */
+      @keyframes spinnerSlowAppear {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+      }
+      
+      @keyframes gentleSpin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
       }
       
-      @keyframes fadeIn {
-        0% { opacity: 0; transform: scale(0.8); }
-        100% { opacity: 1; transform: scale(1); }
+      /* Splash Screen Slow Fade Out */
+      @keyframes splashFadeOut {
+        0% { 
+          opacity: 1;
+          visibility: visible;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% { 
+          opacity: 0;
+          visibility: hidden;
+        }
       }
     </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root">
-      <!-- Splash Screen - Shows while React loads -->
+      <!-- Slow Elegant Splash Screen -->
       <div class="splash-screen">
         <img src="%PUBLIC_URL%/logo.png" alt="VRM Groups" class="splash-logo">
         <div class="splash-title">VRM GROUPS</div>
