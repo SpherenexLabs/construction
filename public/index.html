@@ -8,21 +8,20 @@
     <meta name="description" content="VRM Groups - Construction Material Quotation System" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <title>VRM Groups</title>
+    <div id="splash-title">
+  <span class="brand-vrm">VRM</span>
+  <span class="brand-groups">GROUPS</span>
+</div>
+
 
     <style>
-      :root {
-        --brand-navy: #072e4a;
-        --brand-gold: #f8bd5f;
-      }
-
       /* Splash Screen (white background) */
       #splash {
         position: fixed;
         inset: 0;
         width: 100vw;
         height: 100vh;
-        background: #ffffff; /* white bg */
+        background: #ffffff;              /* changed to white */
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -30,12 +29,12 @@
         z-index: 99999;
       }
 
-      /* Larger, responsive logo wrapper with gentle zoom-in */
+      /* Wrapper to apply extra zoom independently */
       #splash-logo-wrap {
-        width: clamp(180px, 24vw, 300px);
-        height: clamp(180px, 24vw, 300px);
+        width: clamp(180px, 24vw, 280px); /* bigger, responsive */
+        height: clamp(180px, 24vw, 280px);
         margin-bottom: 20px;
-        animation: logoZoomIn 2.2s ease-out 0.3s forwards;
+        animation: logoZoomIn 2.2s ease-out 0.3s forwards; /* smooth zoom-in */
         transform-origin: center;
       }
 
@@ -46,37 +45,23 @@
         object-fit: contain;
         opacity: 0;
         clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
-        animation: logoSlashReveal 1.5s ease-out 0.3s forwards;
+        animation: logoSlashReveal 1.5s ease-out 0.3s forwards; /* reveal */
       }
 
-      /* Title container (animation + layout only) */
+      /* Titles — dark colors for white bg */
       #splash-title {
-        font-family: Arial, sans-serif;
-        font-weight: 800;
+        color: #0f172a;                   /* slate-900 */
         font-size: clamp(26px, 3vw, 36px);
+        font-weight: 800;
         margin-bottom: 8px;
-        letter-spacing: 0.5px;
+        font-family: Arial, sans-serif;
         opacity: 0;
         clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
         animation: titleSlashReveal 1.2s ease-out 1.0s forwards;
-        color: inherit; /* colors set by inner spans */
-        display: inline-block;
       }
 
-      /* Per-word brand colors */
-      #splash-title .brand-vrm {
-        color: var(--brand-gold);
-        -webkit-text-stroke: 0.4px rgba(0,0,0,0.08);
-        text-shadow: 0 0.5px 0 rgba(0,0,0,0.06);
-        margin-right: 8px;
-      }
-      #splash-title .brand-groups {
-        color: var(--brand-navy);
-      }
-
-      /* Subtitle on white */
       #splash-subtitle {
-        color: #334155; /* slate-ish for readability */
+        color: #334155;                   /* slate-600 */
         font-size: clamp(14px, 1.6vw, 18px);
         font-family: Arial, sans-serif;
         opacity: 0;
@@ -84,12 +69,12 @@
         animation: subtitleSlashReveal 1s ease-out 1.6s forwards;
       }
 
-      /* Spinner in brand colors */
+      /* Loading Spinner — visible on white */
       .spinner {
         width: 40px;
         height: 40px;
-        border: 3px solid rgba(8, 38, 59, 0.15);
-        border-top: 3px solid var(--brand-navy);
+        border: 3px solid rgba(15,23,42,0.15); /* light slate */
+        border-top: 3px solid #0f172a;         /* dark slate */
         border-radius: 50%;
         margin-top: 30px;
         opacity: 0;
@@ -100,6 +85,34 @@
 
       /* Hide main content initially */
       #root > *:not(#splash) { display: none; }
+:root{
+  --brand-navy: #08263b;
+  --brand-gold: #f8bd5f;
+}
+
+/* Remove any fixed color set on #splash-title */
+#splash-title {
+  /* keep your existing font, size, animation, etc. */
+  color: inherit;            /* let the spans control the colors */
+  letter-spacing: 0.5px;     /* optional: slightly crisper caps */
+}
+
+/* Per-word colors */
+#splash-title .brand-vrm {
+  color: var(--brand-gold);
+  -webkit-text-stroke: 0.4px rgba(0,0,0,0.1); /* subtle outline on white bg */
+  text-shadow: 0 0.5px 0 rgba(0,0,0,0.06);    /* optional: tiny depth */
+}
+
+#splash-title .brand-groups {
+  color: var(--brand-navy);
+}
+
+/* (Optional) Match spinner with brand colors on white background */
+.spinner {
+  border: 3px solid rgba(8, 38, 59, 0.15);
+  border-top: 3px solid var(--brand-navy);
+}
 
       /* Keyframes */
       @keyframes logoSlashReveal {
@@ -120,9 +133,10 @@
         }
       }
 
+      /* Extra zoom effect on the wrapper */
       @keyframes logoZoomIn {
         0%   { transform: scale(1); }
-        100% { transform: scale(1.12); }
+        100% { transform: scale(1.12); } /* gentle zoom-in */
       }
 
       @keyframes titleSlashReveal {
@@ -187,16 +201,11 @@
     <!-- Splash Screen -->
     <div id="splash">
       <div id="splash-logo-wrap">
-        <!-- If your folder is "assets", ensure the path is correct (not 'assests') -->
-        <img id="splash-logo" src="/assets/vrmlogo.png" alt="VRM Groups Logo">
+        <!-- If your folder is "assets", fix the path below -->
+        <img id="splash-logo" src="/assests/vrmlogo.png" alt="VRM Groups Logo">
       </div>
-
-      <div id="splash-title">
-        <span class="brand-vrm">VRM</span>
-        <span class="brand-groups">GROUPS</span>
-      </div>
-
-      <div id="splash-subtitle">Building, Construction and Infrastructure</div>
+      <div id="splash-title">VRM GROUPS</div>
+      <div id="splash-subtitle">Construction Materials</div>
       <div class="spinner"></div>
     </div>
 
