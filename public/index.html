@@ -5,17 +5,14 @@
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="VRM Groups - Construction Material Quotation System"
-    />
+    <meta name="description" content="VRM Groups - Construction Material Quotation System" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <title>VRM Groups</title>
     
-    <!-- Slow Elegant Splash Screen CSS -->
     <style>
-      .splash-screen {
+      /* Splash Screen - Shows immediately when page loads */
+      #splash {
         position: fixed;
         top: 0;
         left: 0;
@@ -26,152 +23,120 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        z-index: 9999;
-        opacity: 1;
-        animation: splashFadeOut 6s ease-in-out 3s forwards;
+        z-index: 99999;
       }
       
-      .splash-logo {
-        width: 0px;
-        height: auto;
+      #splash-logo {
+        width: 150px;
+        height: 150px;
         margin-bottom: 20px;
-        opacity: 0;
-        transform: scale(0.3) translateY(50px);
-        animation: 
-          logoSlowGrow 2s ease-out 0.5s forwards,
-          logoSlowFade 2s ease-out 0.5s forwards,
-          logoSlowSlide 2s ease-out 0.5s forwards;
+        animation: logoAppear 2s ease-out;
       }
       
-      .splash-title {
+      #splash-title {
         color: white;
-        font-size: 0px;
+        font-size: 28px;
         font-weight: bold;
         margin-bottom: 10px;
-        font-family: 'Arial', sans-serif;
-        opacity: 0;
-        transform: translateY(30px);
-        animation: 
-          textSlowAppear 2s ease-out 2s forwards,
-          textSlowGrow 2s ease-out 2s forwards;
+        font-family: Arial, sans-serif;
+        animation: textAppear 2s ease-out 0.5s both;
       }
       
-      .splash-subtitle {
-        color: rgba(255,255,255,0.8);
-        font-size: 0px;
-        font-family: 'Arial', sans-serif;
-        opacity: 0;
-        transform: translateY(20px);
-        animation: 
-          subtitleSlowAppear 1.5s ease-out 2.5s forwards,
-          subtitleSlowGrow 1.5s ease-out 2.5s forwards;
+      #splash-subtitle {
+        color: rgba(255,255,255,0.9);
+        font-size: 16px;
+        font-family: Arial, sans-serif;
+        animation: textAppear 2s ease-out 1s both;
       }
       
-      .loading-spinner {
+      .spinner {
         width: 40px;
         height: 40px;
-        border: 4px solid rgba(255,255,255,0.2);
-        border-left: 4px solid white;
+        border: 3px solid rgba(255,255,255,0.3);
+        border-top: 3px solid white;
         border-radius: 50%;
         margin-top: 30px;
-        opacity: 0;
-        animation: 
-          spinnerSlowAppear 1s ease-out 4s forwards,
-          gentleSpin 2s linear 4s infinite;
+        animation: spin 1s linear infinite, spinnerAppear 2s ease-out 1.5s both;
       }
       
-      /* Slow Logo Animations */
-      @keyframes logoSlowGrow {
+      /* Hide main content initially */
+      #root > *:not(#splash) {
+        display: none;
+      }
+      
+      @keyframes logoAppear {
         0% { 
-          width: 0px;
-          transform: scale(0.3) translateY(50px);
+          opacity: 0; 
+          transform: scale(0.5) translateY(50px); 
         }
         100% { 
-          width: 150px;
-          transform: scale(1) translateY(0px);
+          opacity: 1; 
+          transform: scale(1) translateY(0); 
         }
       }
       
-      @keyframes logoSlowFade {
+      @keyframes textAppear {
+        0% { 
+          opacity: 0; 
+          transform: translateY(20px); 
+        }
+        100% { 
+          opacity: 1; 
+          transform: translateY(0); 
+        }
+      }
+      
+      @keyframes spinnerAppear {
         0% { opacity: 0; }
         100% { opacity: 1; }
       }
       
-      @keyframes logoSlowSlide {
-        0% { transform: scale(0.3) translateY(50px); }
-        100% { transform: scale(1) translateY(0px); }
-      }
-      
-      /* Slow Text Animations */
-      @keyframes textSlowAppear {
-        0% { 
-          opacity: 0;
-          transform: translateY(30px);
-        }
-        100% { 
-          opacity: 1;
-          transform: translateY(0px);
-        }
-      }
-      
-      @keyframes textSlowGrow {
-        0% { font-size: 0px; }
-        100% { font-size: 28px; }
-      }
-      
-      @keyframes subtitleSlowAppear {
-        0% { 
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        100% { 
-          opacity: 1;
-          transform: translateY(0px);
-        }
-      }
-      
-      @keyframes subtitleSlowGrow {
-        0% { font-size: 0px; }
-        100% { font-size: 16px; }
-      }
-      
-      /* Spinner Slow Animation */
-      @keyframes spinnerSlowAppear {
-        0% { opacity: 0; }
-        100% { opacity: 1; }
-      }
-      
-      @keyframes gentleSpin {
+      @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
       }
       
-      /* Splash Screen Slow Fade Out */
-      @keyframes splashFadeOut {
-        0% { 
-          opacity: 1;
-          visibility: visible;
-        }
-        90% {
-          opacity: 1;
-        }
-        100% { 
-          opacity: 0;
-          visibility: hidden;
-        }
+      /* Fade out splash screen */
+      .splash-fade-out {
+        animation: fadeOut 1s ease-out forwards;
+      }
+      
+      @keyframes fadeOut {
+        0% { opacity: 1; visibility: visible; }
+        100% { opacity: 0; visibility: hidden; }
       }
     </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root">
-      <!-- Slow Elegant Splash Screen -->
-      <div class="splash-screen">
-        <img src="%PUBLIC_URL%/logo.png" alt="VRM Groups" class="splash-logo">
-        <div class="splash-title">VRM GROUPS</div>
-        <div class="splash-subtitle">Construction Materials</div>
-        <div class="loading-spinner"></div>
-      </div>
+    
+    <!-- Splash Screen - Shows first thing when page loads -->
+    <div id="splash">
+      <img id="splash-logo" src="%PUBLIC_URL%/logo.jpg" alt="VRM Groups Logo">
+      <div id="splash-title">VRM GROUPS</div>
+      <div id="splash-subtitle">Construction Materials</div>
+      <div class="spinner"></div>
     </div>
+    
+    <div id="root"></div>
+    
+    <script>
+      // Hide splash screen after React loads
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          const splash = document.getElementById('splash');
+          splash.classList.add('splash-fade-out');
+          
+          setTimeout(function() {
+            splash.style.display = 'none';
+            // Show main app content
+            const rootChildren = document.getElementById('root').children;
+            for (let i = 0; i < rootChildren.length; i++) {
+              rootChildren[i].style.display = 'block';
+            }
+          }, 1000);
+        }, 3000); // Show splash for 3 seconds
+      });
+    </script>
   </body>
 </html>
