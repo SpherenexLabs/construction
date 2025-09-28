@@ -516,3 +516,36 @@
     font-size: 15px;
   }
 }
+/* Brand colors for VRM GROUPS */
+:root {
+  --brand-navy: #08263b;
+  --brand-gold: #f8bd5f;
+}
+
+/* Brand title above banner heading */
+.brand-title {
+  margin: 0 0 6px 0;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  font-size: clamp(18px, 2vw, 24px);
+  color: #111; /* container color; spans set actual brand colors */
+}
+
+.brand-title .brand-vrm { color: var(--brand-gold); }
+.brand-title .brand-groups { color: var(--brand-navy); }
+
+/* If using the logo as banner, keep it clean on wide screens */
+.banner-img--logo {
+  object-fit: contain;          /* keep logo aspect */
+  background: #ffffff;          /* white behind any transparent logo parts */
+  padding: 24px;                /* breathing room so logo isn’t stuck to edges */
+}
+
+/* Optional: make overlay slightly stronger for text contrast if needed */
+.banner-overlay {
+  background: linear-gradient(
+    to right,
+    rgba(0,0,0,0.45),
+    rgba(0,0,0,0.20)
+  );
+}
