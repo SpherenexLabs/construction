@@ -6,12 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta name="description" content="VRM Groups - Construction Material Quotation System" />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/vrmlogo.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <title>VRM Groups</title>
     
     <style>
-      /* Splash Screen - Shows immediately when page loads */
+      /* Splash Screen */
       #splash {
         position: fixed;
         top: 0;
@@ -26,29 +26,39 @@
         z-index: 99999;
       }
       
+      /* Logo with Diagonal Slash Effect */
       #splash-logo {
         width: 150px;
         height: 150px;
         margin-bottom: 20px;
-        animation: logoAppear 2s ease-out;
+        opacity: 0;
+        clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
+        animation: logoSlashReveal 1.5s ease-out 0.3s forwards;
       }
       
+      /* Title with Diagonal Slash Effect */
       #splash-title {
         color: white;
-        font-size: 28px;
+        font-size: 32px;
         font-weight: bold;
         margin-bottom: 10px;
         font-family: Arial, sans-serif;
-        animation: textAppear 2s ease-out 0.5s both;
+        opacity: 0;
+        clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
+        animation: titleSlashReveal 1.2s ease-out 1.2s forwards;
       }
       
+      /* Subtitle with Diagonal Slash Effect */
       #splash-subtitle {
         color: rgba(255,255,255,0.9);
-        font-size: 16px;
+        font-size: 18px;
         font-family: Arial, sans-serif;
-        animation: textAppear 2s ease-out 1s both;
+        opacity: 0;
+        clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
+        animation: subtitleSlashReveal 1s ease-out 1.8s forwards;
       }
       
+      /* Loading Spinner */
       .spinner {
         width: 40px;
         height: 40px;
@@ -56,7 +66,10 @@
         border-top: 3px solid white;
         border-radius: 50%;
         margin-top: 30px;
-        animation: spin 1s linear infinite, spinnerAppear 2s ease-out 1.5s both;
+        opacity: 0;
+        animation: 
+          spinnerAppear 0.8s ease-out 2.5s forwards,
+          spin 1s linear 2.5s infinite;
       }
       
       /* Hide main content initially */
@@ -64,31 +77,64 @@
         display: none;
       }
       
-      @keyframes logoAppear {
+      /* Diagonal Slash Reveal Animations */
+      @keyframes logoSlashReveal {
         0% { 
-          opacity: 0; 
-          transform: scale(0.5) translateY(50px); 
+          opacity: 0;
+          clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
+          transform: scale(0.8) rotate(-5deg);
+        }
+        50% {
+          opacity: 1;
+          clip-path: polygon(0 0, 60% 0, 40% 100%, 0% 100%);
+          transform: scale(0.9) rotate(-2deg);
         }
         100% { 
-          opacity: 1; 
-          transform: scale(1) translateY(0); 
+          opacity: 1;
+          clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+          transform: scale(1) rotate(0deg);
         }
       }
       
-      @keyframes textAppear {
+      @keyframes titleSlashReveal {
         0% { 
-          opacity: 0; 
-          transform: translateY(20px); 
+          opacity: 0;
+          clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
+          transform: translateX(-20px);
+        }
+        40% {
+          opacity: 1;
+          clip-path: polygon(0 0, 70% 0, 30% 100%, 0% 100%);
+          transform: translateX(-10px);
         }
         100% { 
-          opacity: 1; 
-          transform: translateY(0); 
+          opacity: 1;
+          clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+          transform: translateX(0px);
+        }
+      }
+      
+      @keyframes subtitleSlashReveal {
+        0% { 
+          opacity: 0;
+          clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
+          transform: translateX(20px);
+        }
+        50% {
+          opacity: 1;
+          clip-path: polygon(0 0, 80% 0, 20% 100%, 0% 100%);
+          transform: translateX(10px);
+        }
+        100% { 
+          opacity: 1;
+          clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+          transform: translateX(0px);
         }
       }
       
       @keyframes spinnerAppear {
-        0% { opacity: 0; }
-        100% { opacity: 1; }
+        0% { opacity: 0; transform: scale(0.5); }
+        100% { opacity: 1; transform: scale(1); }
       }
       
       @keyframes spin {
@@ -96,23 +142,31 @@
         100% { transform: rotate(360deg); }
       }
       
-      /* Fade out splash screen */
+      /* Splash Screen Fade Out */
       .splash-fade-out {
         animation: fadeOut 1s ease-out forwards;
       }
       
       @keyframes fadeOut {
-        0% { opacity: 1; visibility: visible; }
-        100% { opacity: 0; visibility: hidden; }
+        0% { 
+          opacity: 1; 
+          visibility: visible;
+          transform: scale(1);
+        }
+        100% { 
+          opacity: 0; 
+          visibility: hidden;
+          transform: scale(1.1);
+        }
       }
     </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     
-    <!-- Splash Screen - Shows first thing when page loads -->
+    <!-- Splash Screen with Diagonal Slash Effects -->
     <div id="splash">
-      <img id="splash-logo" src="/assests/logoC.png" alt="VRM Groups Logo">
+      <img id="splash-logo" src="%PUBLIC_URL%/logo.jpg" alt="VRM Groups Logo">
       <div id="splash-title">VRM GROUPS</div>
       <div id="splash-subtitle">Construction Materials</div>
       <div class="spinner"></div>
@@ -135,7 +189,7 @@
               rootChildren[i].style.display = 'block';
             }
           }, 1000);
-        }, 3000); // Show splash for 3 seconds
+        }, 4000); // Show splash for 4 seconds total
       });
     </script>
   </body>
