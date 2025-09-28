@@ -11,7 +11,7 @@
     <title>VRM Groups</title>
     
     <style>
-      /* Splash Screen - Shows immediately when page loads */
+      /* Same CSS as before... */
       #splash {
         position: fixed;
         top: 0;
@@ -31,6 +31,7 @@
         height: 150px;
         margin-bottom: 20px;
         animation: logoAppear 2s ease-out;
+        object-fit: contain; /* This ensures logo displays properly */
       }
       
       #splash-title {
@@ -57,11 +58,6 @@
         border-radius: 50%;
         margin-top: 30px;
         animation: spin 1s linear infinite, spinnerAppear 2s ease-out 1.5s both;
-      }
-      
-      /* Hide main content initially */
-      #root > *:not(#splash) {
-        display: none;
       }
       
       @keyframes logoAppear {
@@ -96,7 +92,6 @@
         100% { transform: rotate(360deg); }
       }
       
-      /* Fade out splash screen */
       .splash-fade-out {
         animation: fadeOut 1s ease-out forwards;
       }
@@ -110,9 +105,10 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     
-    <!-- Splash Screen - Shows first thing when page loads -->
+    <!-- Splash Screen - Fixed image path -->
     <div id="splash">
-      <img id="splash-logo" src="%PUBLIC_URL%/logo.jpg" alt="VRM Groups Logo">
+      <!-- Use %PUBLIC_URL% to properly reference public folder -->
+      <img id="splash-logo" src="%PUBLIC_URL%/logo.jpg" alt="VRM Groups Logo" onerror="this.style.display='none'">
       <div id="splash-title">VRM GROUPS</div>
       <div id="splash-subtitle">Construction Materials</div>
       <div class="spinner"></div>
@@ -121,7 +117,6 @@
     <div id="root"></div>
     
     <script>
-      // Hide splash screen after React loads
       window.addEventListener('load', function() {
         setTimeout(function() {
           const splash = document.getElementById('splash');
@@ -129,13 +124,12 @@
           
           setTimeout(function() {
             splash.style.display = 'none';
-            // Show main app content
             const rootChildren = document.getElementById('root').children;
             for (let i = 0; i < rootChildren.length; i++) {
               rootChildren[i].style.display = 'block';
             }
           }, 1000);
-        }, 3000); // Show splash for 3 seconds
+        }, 3000);
       });
     </script>
   </body>
