@@ -181,7 +181,7 @@ const Dashboard = ({ user }) => {
                 className="company-logo"
                  loading="lazy" 
               />
-              <span className="logo-text">VRM Groups</span>
+              {/* <span className="logo-text">VRM Groups</span> */}
             </div>
           </div>
 
