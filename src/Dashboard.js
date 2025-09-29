@@ -385,24 +385,7 @@ const Dashboard = ({ user }) => {
                 alt="VRM Groups Banner"
                 className="banner-img banner-img--logo"
               />
-              <div className="banner-overlay">
-                <div className="banner-content">
-                  {/* Added VRM GROUPS above the main heading */}
-                  <h1 className="brand-title">
-                    <span className="brand-vrm">VRM</span>{' '}
-                    <span className="brand-groups">GROUPS</span>
-                  </h1>
-
-                  <h1 className="banner-title">Building, Construction and Infrastructure</h1>
-                  <p className="banner-subtitle">Sustainable Design Freedom</p>
-                  <button
-                    className="generate-quotation-btn"
-                    onClick={() => navigate('/subcategories')}
-                  >
-                    Generate Quotation
-                  </button>
-                </div>
-              </div>
+              {/* Removed overlay text per request */}
             </div>
           </section>
 
@@ -415,6 +398,23 @@ const Dashboard = ({ user }) => {
               View Quotation
             </button>
           </div>
+          {/* Moved the banner text and CTA below the View Quotation button */}
+          <section className="info-section">
+            <div className="info-content">
+              <h1 className="brand-title">
+                <span className="brand-vrm">VRM</span>{' '}
+                <span className="brand-groups">GROUPS</span>
+              </h1>
+              <h1 className="banner-title">Building, Construction and Infrastructure</h1>
+              <p className="banner-subtitle">Sustainable Design Freedom</p>
+              <button
+                className="generate-quotation-btn"
+                onClick={() => navigate('/subcategories')}
+              >
+                Generate Quotation
+              </button>
+            </div>
+          </section>
             {/* Place Footer outside main so it sits at the bottom of the page */}
             {/* <Footer /> */}
 

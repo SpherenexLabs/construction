@@ -393,6 +393,27 @@
   overflow: hidden;
 }
 
+/* New section for relocated banner text and CTA */
+.info-section {
+  width: 100%;
+  background: #ffffff;
+  padding: 24px 20px 32px;
+}
+
+.info-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Ensure text is dark on white background for readability */
+.info-content .brand-title { color: #111; }
+.info-content .banner-title { color: #0b2137; }
+.info-content .banner-subtitle { color: #334155; }
+
+@media (max-width: 768px) {
+  .info-section { padding: 20px 16px 28px; }
+}
+
 .banner-img {
   width: 100%;
   height: 100%;
