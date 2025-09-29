@@ -28,7 +28,7 @@
 .invoice-sheet::after{content:"";position:absolute;inset:-3px;border:3px solid var(--border);pointer-events:none;z-index:-1}
 
 /* ===== HEADER ===== */
-.modern-header{background:var(--primary-green);padding:18px 22px;border-bottom:3px solid var(--border)}
+.modern-header{background:var(--bg);padding:18px 22px;border-bottom:3px solid var(--border)}
 .header-grid-3{display:grid;grid-template-columns:260px 1fr 340px;gap:16px;align-items:start}
 
 /* Left (title + contacts) */
@@ -43,7 +43,7 @@
 
 /* Center (logo + brand) */
 .header-center{display:flex;flex-direction:column;align-items:center;gap:10px}
-.logo-image{max-width:120px;max-height:120px;object-fit:contain;filter:drop-shadow(0 1px 0 rgba(0,0,0,.06))}
+.logo-image{max-width:150px;max-height:150px;object-fit:contain;filter:drop-shadow(0 1px 0 rgba(0,0,0,.06))}
 .brand-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:10px;}
 .brand-vrm{font-size:25px;font-weight:900;letter-spacing:.4px;color:var(--brand-yellow)}
 .brand-groups{font-size:25px;font-weight:900;letter-spacing:.4px;color:var(--brand-deep-blue)}
@@ -249,6 +249,59 @@
     text-rendering: optimizeLegibility !important;
     color: #000 !important;
   }
+}
+
+/* Multi-page PDF support */
+.page-break {
+  page-break-before: always;
+  break-before: page;
+}
+
+.materials-table {
+  page-break-inside: avoid;
+}
+
+.table-row {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.header-section {
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+.bottom-section {
+  page-break-before: avoid;
+  break-before: avoid;
+}
+
+/* PDF generation specific styles */
+.pdf-page {
+  width: 794px;
+  min-height: auto;
+  background: white;
+  font-family: Arial, sans-serif;
+  color: #000;
+  margin-bottom: 20px;
+}
+
+.pdf-page .materials-table {
+  margin-bottom: 20px;
+}
+
+.pdf-page .table-row, 
+.pdf-page .table-total-row {
+  grid-template-columns: 35px 1fr 65px 50px 55px 85px 50px 50px 85px;
+}
+
+.pdf-page input, 
+.pdf-page select, 
+.pdf-page textarea {
+  background: transparent !important;
+  border: none !important;
+  color: #000 !important;
+  font-family: Arial, sans-serif !important;
 }
 
 /* Responsive (preview only) */
