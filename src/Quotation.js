@@ -1241,6 +1241,9 @@ export default function TaxQuotation() {
   const sheetRef = useRef(null);
   const [preview, setPreview] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  useEffect(() => {
+    console.log('[Quotation] mounted');
+  }, []);
 
   // Company
   const [company, setCompany] = useState({

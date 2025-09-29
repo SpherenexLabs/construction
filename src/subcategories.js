@@ -97,6 +97,48 @@
 //   ITEM_IMAGES[key] && ITEM_IMAGES[key].startsWith("https") ? ITEM_IMAGES[key] : ph(label);
 
 // const SubCategories = () => {
+//   const navigate = useNavigate();
+
+//   const baseCategories = useMemo(
+//     () => [
+//       { id: 1,  title: "Cement",   image: "https://img.freepik.com/premium-photo/cement-plant-cement-production_406939-10898.jpg" },
+//       { id: 2,  title: "Steel",    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop" },
+//       { id: 3,  title: "Bricks",   image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDuABcGH3vzhNtGZumkSotP7gdUDk_aX334A&s" },
+//       { id: 4,  title: "Sand",     image: "https://static.vecteezy.com/system/resources/previews/042/654/226/non_2x/ai-generated-desert-sand-dunes-textured-landscape-free-png.png" },
+//       { id: 5,  title: "Concrete", image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=300&h=200&fit=crop" },
+//       { id: 6,  title: "Aggregates", image: "https://rockproducts.com/wp-content/uploads/2023/04/55jlbc_b78fc4f60cf5340e49d2e0637799cf187d016021-1.jpg" },
+//       { id: 7,  title: "Electrical Works", image: "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=300&h=200&fit=crop" },
+//       { id: 8,  title: "Wood", image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=300&h=200&fit=crop" },
+//       { id: 9,  title: "Wires", image: "https://thumbs.dreamstime.com/b/sparking-electrical-wires-ai-generated-image-two-disconnected-sparks-flying-them-382802919.jpg" },
+//       { id: 10, title: "Switches", image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop" },
+//       { id: 11, title: "Windows", image: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=300&h=200&fit=crop" },
+//       { id: 12, title: "uPVC Windows", image: "https://img.freepik.com/premium-photo/outdoor-upvc-windows_636493-8.jpg" },
+//       { id: 13, title: "Plumbing", image: "https://static.vecteezy.com/system/resources/previews/038/813/452/large_2x/ai-generated-beautifulgraphy-for-plumbing-services-advertising-free-photo.jpeg" },
+//       { id: 14, title: "Electrical", image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=300&h=200&fit=crop" },
+//       { id: 15, title: "Fitting Items", image: "https://thumbs.dreamstime.com/b/plomo-profesional-que-fija-tuber%C3%ADas-de-suelo-ba%C3%B1o-con-herramientas-en-el-ajuste-servicio-ia-generativa-369170262.jpg" },
+//       { id: 16, title: "Painting", image: "https://media.istockphoto.com/id/1384317531/photo/before-and-after-of-man-painting-roller-to-reveal-newly-remodeled-room-with-fresh-light-green.jpg?s=612x612&w=0&k=20&c=wF448uWLu7btrsbZedGiIHqHbeu6KxA-YxZOiTkfcMY=" },
+//       { id: 17, title: "Connection", image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop" },
+//       { id: 18, title: "Waterproof (Exterior Works)", image: "https://img.freepik.com/premium-photo/worker-applying-waterproofing-membrane-rooftop_815570-8045.jpg" },
+//       { id: 19, title: "Glass", image: "https://img.freepik.com/premium-photo/contemporary-riverfront-home-glass-walls-stone-steps-leading-water-sunny-reflection_1342292-9395.jpg" },
+//       { id: 20, title: "Waterproof (Interior Work)", image: "https://content-management-files.canva.com/cbd06f5b-e7f3-4537-8e68-72ef597fd668/ai-interior-design_ogimage_2x.png" }
+//     ],
+//     []
+//   );
+
+//     const categories = useMemo(
+//       () =>
+//         baseCategories.map((c) => {
+//           switch (c.title) {
+//             case "Cement":
+//               return {
+//                 ...c,
+//                 subItems: [
+//                   { key: "birla_super_53", label: "Birla Super 53 Grade", img: imgOrPH("birla_super_53", "Birla Super 53 Grade") },
+//                   { key: "ultratech_ppc", label: "Ultratech PPC", img: imgOrPH("ultratech_ppc", "Ultratech PPC") },
+//                   { key: "ramco_53_43", label: "Ramco 53 & 43", img: imgOrPH("ramco_53_43", "Ramco 53 & 43") },
+//                   { key: "dalmia", label: "Dalmia", img: imgOrPH("dalmia", "Dalmia") },
+//                   { key: "acc", label: "ACC", img: imgOrPH("acc", "ACC") },
+//                   { key: "jsw_53_43", label: "JSW 53 & 43", img: imgOrPH("jsw_53_43", "JSW 53 & 43") },
 //                 ],
 //               };
 //             case "Steel":
@@ -1382,11 +1424,15 @@ const imgOrPH = (key, label) =>
 
 const SubCategories = () => {
   const navigate = useNavigate();
+  useEffect(() => {
+    // Debug mount log to verify first navigation renders the component
+    console.log('[SubCategories] mounted');
+  }, []);
 
   /** Category list ordered exactly like your document (1 → 23). */
   const categories = useMemo(
     () => [
-  /* 1 */ {
+      /* 1 */ {
         id: 1,
         title: "Steel 550 Grade Bars",
         image:
@@ -1401,9 +1447,9 @@ const SubCategories = () => {
         ],
       },
 
-  /* 2 */ {
+      /* 2 */ {
         id: 2,
-        title: "Cement",
+        title: "Cement & Concrete Grades",
         image:
           "https://lirp.cdn-website.com/bc4439fa/dms3rep/multi/opt/Portland+Cement-1920w.jpg",
         subItems: [
@@ -1413,18 +1459,10 @@ const SubCategories = () => {
           { key: "jsw_53_43", label: "JSW (53/43)", img: imgOrPH("jsw_53_43", "JSW 53/43") },
           { key: "acc", label: "ACC", img: imgOrPH("acc", "ACC") },
           { key: "dalmia", label: "Dalmia", img: imgOrPH("dalmia", "Dalmia") },
-        ],
-      },
-  /* 3 */ {
-        id: 3,
-        title: "Concrete Grade",
-        image:
-          "https://5.imimg.com/data5/SELLER/Default/2023/12/372643534/UD/ZS/KK/22826239/concrete-admixture.jpg",
-        subItems: [
-          { key: "concrete_m25_footing", label: "M25 - Footing", img: imgOrPH("concrete_m25_footing", "M25 Footing") },
-          { key: "concrete_m25_column", label: "M25 - Column", img: imgOrPH("concrete_m25_column", "M25 Column") },
-          { key: "concrete_m25_slab", label: "M25 - Slab", img: imgOrPH("concrete_m25_slab", "M25 Slab") },
-          { key: "pcc_m10", label: "PCC Bed - M10", img: imgOrPH("pcc_m10", "PCC M10") },
+          { key: "concrete_m25_footing", label: "M25 — Footing", img: imgOrPH("concrete_m25_footing", "M25 Footing") },
+          { key: "concrete_m25_column", label: "M25 — Column", img: imgOrPH("concrete_m25_column", "M25 Column") },
+          { key: "concrete_m25_slab", label: "M25 — Slab", img: imgOrPH("concrete_m25_slab", "M25 Slab") },
+          { key: "pcc_m10", label: "PCC Bed — M10", img: imgOrPH("pcc_m10", "PCC M10") },
         ],
       },
 
@@ -1446,7 +1484,7 @@ const SubCategories = () => {
         id: 4,
         title: "Sand",
         image:
-          "https://5.imimg.com/data5/SELLER/Default/2025/5/515211047/DK/XF/IE/55609496/construction-river-sand-250x250.jpg",
+          "https://promaninfi.com/blog/wp-content/uploads/2023/05/blog1.jpg",
         subItems: [
           { key: "m_sand", label: "M-Sand", img: imgOrPH("m_sand", "M-Sand") },
           { key: "p_sand", label: "P-Sand", img: imgOrPH("p_sand", "P-Sand") },
@@ -1475,7 +1513,7 @@ const SubCategories = () => {
           { key: "teak_nati", label: "Teak Wood – Nati", img: imgOrPH("teak_nati", "Nati Teak") },
           { key: "honne", label: "Honne Wood", img: imgOrPH("honne", "Honne Wood") },
           { key: "readsal", label: "Readsal Wood", img: imgOrPH("readsal", "Readsal Wood") },
-          { key: "need_wood", label: "Neem Wood", img: imgOrPH("need_wood", "Need Wood") },
+          { key: "need_wood", label: "Need Wood", img: imgOrPH("need_wood", "Need Wood") },
           { key: "alum_grill", label: "Aluminium Window Grill (MS 12 mm)", img: imgOrPH("alum_grill", "MS 12mm Grill") },
           { key: "upvc_window", label: "uPVC Window", img: imgOrPH("upvc_window", "uPVC Window") },
           { key: "pooja_door", label: "Pooja Room Door (Teak)", img: imgOrPH("pooja_door", "Pooja Room Door") },
@@ -1558,7 +1596,7 @@ const SubCategories = () => {
         id: 13,
         title: "Water Proofing Chemicals (Branded)",
         image:
-          "https://cpimg.tistatic.com/07262755/b/4/extra-07262755.jpg",
+          "https://img.freepik.com/premium-photo/worker-applying-waterproofing-membrane-rooftop_815570-8045.jpg",
         subItems: [
           { key: "fosroc", label: "Fosroc", img: imgOrPH("fosroc", "Fosroc") },
           { key: "bostik", label: "Bostik", img: imgOrPH("bostik", "Bostik") },
@@ -1572,7 +1610,7 @@ const SubCategories = () => {
         id: 14,
         title: "Flooring",
         image:
-          "https://th.bing.com/th/id/OIP.axGoUU4EweRUH9Ck2Mx4QAHaEK?w=308&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+          "https://www.raisedfloor.co.uk/wp-content/uploads/elementor/thumbs/insitu-concrete-floor-slabs-p3qax9xej6wi7kcfr2szi1rsrdnp1tyxncxj195h6w.jpg",
         subItems: [
           { key: "marble_flooring", label: "Marble Flooring", img: imgOrPH("marble_flooring", "Marble Flooring") },
           { key: "granite_flooring", label: "Granite Flooring", img: imgOrPH("granite_flooring", "Granite Flooring") },
@@ -1584,7 +1622,7 @@ const SubCategories = () => {
         id: 15,
         title: "Kitchen",
         image:
-          "https://th.bing.com/th/id/OIP.DCaLRUv0Mj-HXnyjELVx3AHaEq?w=228&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+          "https://thvnext.bing.com/th/id/OIP.9-dCHPfKCAw7YvkmMNNgaQHaE7?w=263&h=180&c=7&r=0&o=7&cb=ucfimgc2&dpr=1.5&pid=1.7&rm=3",
         subItems: [
           { key: "kitchen_granite_black_20", label: "Granite – Black 20 mm", img: imgOrPH("kitchen_granite_black_20", "Granite Black 20mm") },
           { key: "kitchen_granite_black_40", label: "Granite – Black 40 mm", img: imgOrPH("kitchen_granite_black_40", "Granite Black 40mm") },
@@ -1599,7 +1637,7 @@ const SubCategories = () => {
         id: 16,
         title: "Bathroom Fittings & Toilets",
         image:
-          "https://www.bing.com/th/id/OIP.U-Jif2SYF8G6eeiN_8cYsQHaJ5?w=160&h=211&c=8&rs=1&qlt=90&o=6&dpr=1.5&pid=3.1&rm=2",
+          "https://thumbs.dreamstime.com/b/plomo-profesional-que-fija-tuber%C3%ADas-de-suelo-ba%C3%B1o-con-herramientas-en-el-ajuste-servicio-ia-generativa-369170262.jpg",
         subItems: [
           { key: "jaguar_wall_mixer", label: "Jaquar – Wall Mixer", img: imgOrPH("jaguar_wall_mixer", "Jaquar Wall Mixer") },
           { key: "jaguar_single_tap", label: "Jaquar – Single Tap (Basic)", img: imgOrPH("jaguar_single_tap", "Jaquar Single Tap") },
@@ -1643,7 +1681,7 @@ const SubCategories = () => {
         id: 19,
         title: "Painting / Polish & Wall Putty",
         image:
-          "https://thvnext.bing.com/th/id/OIP.rFLI3flf941JMYhlJN0DBwHaIN?w=191&h=212&c=7&r=0&o=7&cb=ucfimgc2&dpr=1.5&pid=1.7&rm=3",
+          "https://media.istockphoto.com/id/1384317531/photo/before-and-after-of-man-painting-roller-to-reveal-newly-remodeled-room-with-fresh-light-green.jpg?s=612x612&w=0&k=20&c=wF448uWLu7btrsbZedGiIHqHbeu6KxA-YxZOiTkfcMY=",
         subItems: [
           { key: "asian_ultima", label: "Asian Paints – Ultima", img: imgOrPH("asian_ultima", "Asian Ultima") },
           { key: "asian_apex", label: "Asian Paints – Apex", img: imgOrPH("asian_apex", "Asian Apex") },
@@ -1689,7 +1727,7 @@ const SubCategories = () => {
       /* 21 */ {
         id: 21,
         title: "Truss Work",
-        image: "https://th.bing.com/th/id/OIP.G-EPJvjCH0UiSdvnChit5AHaFL?w=216&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
+        image: "https://th.bing.com/th/id/OIP.bZcRXNHSOzxaTnplcV3ISQHaFj?w=232&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
         subItems: [{ key: "truss_work", label: "As per structural drawing", img: imgOrPH("truss_work", "Truss Work") }],
       },
 
@@ -1787,7 +1825,8 @@ const SubCategories = () => {
   );
 
   return (
-    <section className="subcats-section">
+    <section className="subcats-section" style={{minHeight:'100vh'}}>
+      {/* Page header is rendered by SubCategories.css */}
       {/* Top-right decorative image (letterhead) */}
       <div className="subcats-topimage">
         <img
@@ -1815,6 +1854,11 @@ const SubCategories = () => {
         </div>
 
         <div className="categories-grid">
+          {categories.length === 0 && (
+            <div style={{padding:16, background:'#fff', border:'1px solid #e5e7eb', borderRadius:8}}>
+              No categories found. Please reload the page.
+            </div>
+          )}
           {categories.map((cat) => (
             <div className="category-card" key={cat.id}>
               <div className="category-image">
