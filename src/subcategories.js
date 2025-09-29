@@ -1424,6 +1424,10 @@ const imgOrPH = (key, label) =>
 
 const SubCategories = () => {
   const navigate = useNavigate();
+  useEffect(() => {
+    // Debug mount log to verify first navigation renders the component
+    console.log('[SubCategories] mounted');
+  }, []);
 
   /** Category list ordered exactly like your document (1 → 23). */
   const categories = useMemo(
@@ -1821,7 +1825,8 @@ const SubCategories = () => {
   );
 
   return (
-    <section className="subcats-section">
+    <section className="subcats-section" style={{minHeight:'100vh'}}>
+      {/* Page header is rendered by SubCategories.css */}
       {/* Top-right decorative image (letterhead) */}
       <div className="subcats-topimage">
         <img
@@ -1849,6 +1854,11 @@ const SubCategories = () => {
         </div>
 
         <div className="categories-grid">
+          {categories.length === 0 && (
+            <div style={{padding:16, background:'#fff', border:'1px solid #e5e7eb', borderRadius:8}}>
+              No categories found. Please reload the page.
+            </div>
+          )}
           {categories.map((cat) => (
             <div className="category-card" key={cat.id}>
               <div className="category-image">

@@ -388,10 +388,10 @@ const Dashboard = ({ user }) => {
               <div className="banner-overlay">
                 <div className="banner-content">
                   {/* Added VRM GROUPS above the main heading */}
-                  <h2 className="brand-title">
+                  <h1 className="brand-title">
                     <span className="brand-vrm">VRM</span>{' '}
                     <span className="brand-groups">GROUPS</span>
-                  </h2>
+                  </h1>
 
                   <h1 className="banner-title">Building, Construction and Infrastructure</h1>
                   <p className="banner-subtitle">Sustainable Design Freedom</p>
@@ -417,7 +417,7 @@ const Dashboard = ({ user }) => {
           </div>
 
           {/* Categories section */}
-          <Categories />
+          {/* <Categories /> */}
           <Footer />
         </div>
       </main>

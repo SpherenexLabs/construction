@@ -89,10 +89,7 @@
         spin 1s linear 2.2s infinite;
     }
 
-    /* Hide main content initially */
-    #root>*:not(#splash) {
-      display: none;
-    }
+    /* Remove hidden main content rule so routed pages are visible behind splash */
 
     :root {
       --brand-navy: #08263b;
@@ -266,19 +263,16 @@
   <script>
     // Hide splash screen after React loads
     window.addEventListener('load', function () {
+      // Keep splash visible briefly so users can see it, then fade out
       setTimeout(function () {
         const splash = document.getElementById('splash');
+        if (!splash) return;
         splash.classList.add('splash-fade-out');
 
         setTimeout(function () {
           splash.style.display = 'none';
-          // Show main app content
-          const rootChildren = document.getElementById('root').children;
-          for (let i = 0; i < rootChildren.length; i++) {
-            rootChildren[i].style.display = 'block';
-          }
-        }, 1000);
-      }, 4000); // Show splash for ~4 seconds total
+        }, 800); // fade duration
+      }, 1800); // visible duration before fade
     });
   </script>
 </body>
