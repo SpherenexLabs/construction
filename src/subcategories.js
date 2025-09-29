@@ -1827,13 +1827,27 @@ const SubCategories = () => {
   return (
     <section className="subcats-section" style={{minHeight:'100vh'}}>
       {/* Page header is rendered by SubCategories.css */}
-      {/* Top-right decorative image (letterhead) */}
+      {/* Top header with VRM brand on the left and decorative image on the right */}
       <div className="subcats-topimage">
-        <img
-          src={process.env.PUBLIC_URL + "/assests/img2.png"}
-          alt="Decoration"
-          loading="lazy"
-        />
+        <div className="subcats-brand">
+          <img
+            src={process.env.PUBLIC_URL + "/assests/vrmlogo.png"}
+            alt="VRM Groups Logo"
+            className="subcats-logo"
+            loading="lazy"
+          />
+          <h1 className="subcats-brand-title">
+            <span className="brand-vrm">VRM</span>{' '}
+            <span className="brand-groups">GROUPS</span>
+          </h1>
+        </div>
+        <div className="subcats-decor">
+          <img
+            src={process.env.PUBLIC_URL + "/assests/img2.png"}
+            alt="Decoration"
+            loading="lazy"
+          />
+        </div>
       </div>
 
       <div className="subcats-container">

@@ -31,14 +31,40 @@
 .subcats-topimage{
   width: 100%;
   display: flex;
-  justify-content: flex-end; /* push to the right */
-  background: #fff; /* match page background at the very top */
+  align-items: center;
+  justify-content: space-between; /* brand left, decor right */
+  background: #fff;
+  padding-right: 8px;
 }
-.subcats-topimage img{
-  height: 120px;           /* adjust as needed */
+
+/* VRM Logo + Text row */
+.subcats-brand{
+  display:flex; align-items:center; gap:10px;
+  padding:8px 14px;
+}
+.subcats-logo{
+  height:48px; width:auto; object-fit:contain; display:block;
+}
+.subcats-brand-title{
+  margin:0; font-weight:900; letter-spacing:.5px;
+  font-size:clamp(18px, 2.4vw, 24px);
+  color:#0b2137; /* dark navy */
+}
+/* reuse existing brand colors from Dashboard.css semantics */
+.brand-vrm{ color:#f8bd5f; }
+.brand-groups{ color:#08263b; }
+
+/* right-side decorative image */
+.subcats-decor img{
+  height: 90px;
   width: auto;
   object-fit: contain;
   display: block;
+}
+
+@media (max-width: 600px) {
+  .subcats-decor img{ height: 70px; }
+  .subcats-logo{ height: 42px; }
 }
 
 /* Page background image (top-right letterhead + watermark) */
