@@ -416,7 +416,7 @@ const Dashboard = ({ user }) => {
             </button>
           </div>
             {/* Place Footer outside main so it sits at the bottom of the page */}
-            <Footer />
+            {/* <Footer /> */}
 
         </div>
       </main>
