@@ -1,13 +1,16 @@
-/* Dashboard.css - Improved Mobile Responsive Header */
+/* Dashboard.css */
 .dashboard-container {
   width: 100%;
   min-height: 100vh;
   background-color: var(--light-gray);
+  display: flex;
+  flex-direction: column;
 }
 
 .dashboard-header {
   width: 100%;
-  background: white;
+  /* Deep teal/blue gradient inspired by VRM logo */
+  background: #20b486;
   border-bottom: 3px solid var(--primary-yellow);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   position: sticky;
@@ -22,36 +25,134 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
 }
 
 /* Logo Section */
 .logo-section {
   flex-shrink: 0;
-  min-width: 120px;
 }
 
 .logo {
-  display: flex;
+  /* display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 4px;
+  gap: 12px; */
+  width: 128px;
+  height: 48px;
+      /* white background tile */
+  display: grid;
+  place-items: center;     /* center the logo */
+  border-radius: 6px;      /* optional */
+  overflow: hidden;  
 }
 
+.logo-icon {
+  width: 108px;
+  height: 108px;
+  position: relative;
+}
+
+/* Company logo image */
 .company-logo {
-  width: 40px;
-  height: 40px;
+  /* height: 48px;
+  width: auto;
   object-fit: contain;
+  display: block; */
+  width: 50px;
+   max-width: 100%;
+  max-height: 100%;
   display: block;
+  object-fit: contain;    
+}
+
+.building-icon {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.crane {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 16px;
+  height: 8px;
+  background-color: var(--primary-orange);
+  border-radius: 2px;
+}
+
+.crane::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  right: 2px;
+  width: 2px;
+  height: 8px;
+  background-color: var(--primary-orange);
+}
+
+.buildings {
+  display: flex;
+  align-items: end;
+  position: absolute;
+  bottom: 15px;
+  left: 8px;
+  gap: 2px;
+}
+
+.building {
+  background-color: #1e7aa8;
+  border-radius: 1px;
+}
+
+.building.tall {
+  width: 8px;
+  height: 20px;
+}
+
+.building.medium {
+  width: 6px;
+  height: 15px;
+}
+
+.building.short {
+  width: 5px;
+  height: 10px;
+}
+
+.houses {
+  display: flex;
+  position: absolute;
+  bottom: 4px;
+  left: 5px;
+  gap: 3px;
+}
+
+.house {
+  width: 8px;
+  height: 8px;
+  background-color: var(--primary-orange);
+  position: relative;
+}
+
+.house::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 4px solid var(--primary-orange);
 }
 
 .logo-text {
-  font-size: 18px;
-  font-weight: 700;
-  color: #1e3a8a;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--white);
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
 }
 
 /* Search Section */
@@ -74,22 +175,22 @@
 .search-input {
   width: 100%;
   padding: 12px 50px 12px 16px;
-  border: 2px solid rgba(0, 0, 0, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.25);
   border-radius: 25px;
-  background-color: rgba(0, 0, 0, 0.03);
-  color: #333;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--white);
   font-size: 14px;
   transition: all 0.3s ease;
 }
 
 .search-input::placeholder {
-  color: rgba(0, 0, 0, 0.5);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .search-input:focus {
   outline: none;
   border-color: var(--primary-yellow);
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(255, 255, 255, 0.16);
 }
 
 .search-btn {
@@ -97,21 +198,16 @@
   right: 8px;
   background: none;
   border: none;
-  color: rgba(0, 0, 0, 0.6);
+  color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
   padding: 8px;
   border-radius: 50%;
   transition: all 0.3s ease;
-  min-height: 44px;
-  min-width: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .search-btn:hover {
   color: var(--primary-yellow);
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Profile Section */
@@ -130,16 +226,15 @@
   gap: 12px;
   background: none;
   border: none;
-  color: #333;
+  color: var(--white);
   cursor: pointer;
   padding: 8px 12px;
   border-radius: 8px;
   transition: all 0.3s ease;
-  min-height: 44px;
 }
 
 .profile-btn:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .profile-avatar {
@@ -153,7 +248,6 @@
   font-weight: 600;
   font-size: 16px;
   color: var(--white);
-  flex-shrink: 0;
 }
 
 .profile-email {
@@ -166,7 +260,6 @@
 
 .profile-arrow {
   transition: transform 0.3s ease;
-  flex-shrink: 0;
 }
 
 .profile-btn:hover .profile-arrow {
@@ -197,7 +290,6 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
   text-align: left;
-  min-height: 44px;
 }
 
 .profile-menu-item:hover {
@@ -214,173 +306,27 @@
   color: var(--primary-red);
 }
 
-/* Mobile Responsive - Tablet */
-@media (max-width: 768px) {
-  .header-content {
-    padding: 12px 16px;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  
-  .logo-section {
-    min-width: auto;
-    order: 1;
-  }
-  
-  .logo {
-    gap: 6px;
-  }
-  
-  .company-logo {
-    width: 36px;
-    height: 36px;
-  }
-  
-  .logo-text {
-    font-size: 16px;
-  }
-  
-  .profile-section {
-    order: 2;
-  }
-  
-  .profile-email {
-    display: none;
-  }
-  
-  .search-section {
-    order: 3;
-    flex-basis: 100%;
-    margin: 0;
-    max-width: 100%;
-  }
-  
-  .search-input {
-    padding: 12px 50px 12px 16px;
-    font-size: 16px; /* Prevents zoom on iOS */
-  }
-}
-
-/* Mobile Responsive - Small Screens */
-@media (max-width: 480px) {
-  .header-content {
-    padding: 10px 12px;
-    gap: 10px;
-  }
-  
-  .logo-section {
-    flex: 1;
-  }
-  
-  .logo {
-    gap: 4px;
-    justify-content: flex-start;
-  }
-  
-  .company-logo {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .logo-text {
-    font-size: 14px;
-    font-weight: 600;
-  }
-  
-  .profile-section {
-    flex-shrink: 0;
-  }
-  
-  .profile-btn {
-    padding: 4px 8px;
-    gap: 0;
-    min-height: 40px;
-    min-width: 40px;
-  }
-  
-  .profile-avatar {
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
-  }
-  
-  .profile-arrow {
-    display: none;
-  }
-  
-  .search-section {
-    margin-top: 8px;
-  }
-  
-  .search-input {
-    padding: 12px 50px 12px 14px;
-    font-size: 16px;
-    border-radius: 20px;
-  }
-  
-  .search-btn {
-    right: 6px;
-    padding: 6px;
-    min-height: 40px;
-    min-width: 40px;
-  }
-}
-
-/* Extra Small Screens */
-@media (max-width: 360px) {
-  .header-content {
-    padding: 8px 10px;
-  }
-  
-  .logo-text {
-    font-size: 12px;
-    display: none; /* Hide text on very small screens */
-  }
-  
-  .company-logo {
-    width: 28px;
-    height: 28px;
-  }
-  
-  .search-input {
-    padding: 10px 45px 10px 12px;
-    font-size: 16px;
-  }
-  
-  .profile-avatar {
-    width: 28px;
-    height: 28px;
-    font-size: 12px;
-  }
-  
-  .profile-btn {
-    min-height: 36px;
-    min-width: 36px;
-  }
-  
-  .search-btn {
-    min-height: 36px;
-    min-width: 36px;
-  }
-}
-
-/* Rest of your existing CSS for banner and other sections... */
+/* Main Content */
 .dashboard-main {
   width: 100%;
   background-color: var(--white);
-  min-height: calc(100vh - 80px);
+  flex: 1 0 auto;
 }
 
 .dashboard-content {
   width: 100%;
   padding: 0;
 }
+/* Ensure footer stays at the bottom */
+.dashboard-container > .Footer {
+  flex-shrink: 0;
+}
 
 /* Banner Section */
 .banner-section {
   width: 100%;
-  height: 60vh;
-  min-height: 420px;
+  height: 60vh; /* reduced from full viewport height */
+  min-height: 420px; /* keep a decent presence on small screens */
   position: relative;
 }
 
@@ -460,11 +406,41 @@
   transform: translateY(-1px);
 }
 
-/* Banner Mobile Responsive */
+/* Mobile Responsive */
 @media (max-width: 768px) {
-  .banner-section {
-    height: 50vh;
-    min-height: 350px;
+  .header-content {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+  }
+  
+  .company-logo {
+    height: 40px;
+  }
+  
+  .search-section {
+    order: 3;
+    max-width: 100%;
+    margin: 0;
+  }
+  
+  .profile-section {
+    order: 2;
+    align-self: flex-end;
+  }
+  
+  .logo-section {
+    order: 1;
+    align-self: flex-start;
+  }
+  
+  .profile-email {
+    display: none;
+  }
+  
+  .logo-text {
+    font-size: 18px;
+    font-weight: 800;
   }
   
   .banner-overlay {
@@ -494,9 +470,17 @@
 }
 
 @media (max-width: 480px) {
-  .banner-section {
-    height: 40vh;
-    min-height: 300px;
+  .header-content {
+    padding: 10px;
+  }
+  
+  .logo-text {
+    font-size: 20px;
+  }
+  
+  .search-input {
+    padding: 10px 40px 10px 14px;
+    font-size: 13px;
   }
   
   .banner-overlay {
@@ -515,37 +499,4 @@
     padding: 12px 24px;
     font-size: 15px;
   }
-}
-/* Brand colors for VRM GROUPS */
-:root {
-  --brand-navy: #08263b;
-  --brand-gold: #f8bd5f;
-}
-
-/* Brand title above banner heading */
-.brand-title {
-  margin: 0 0 6px 0;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  font-size: clamp(18px, 2vw, 24px);
-  color: #111; /* container color; spans set actual brand colors */
-}
-
-.brand-title .brand-vrm { color: var(--brand-gold); }
-.brand-title .brand-groups { color: var(--brand-navy); }
-
-/* If using the logo as banner, keep it clean on wide screens */
-.banner-img--logo {
-  object-fit: contain;          /* keep logo aspect */
-  background: #ffffff;          /* white behind any transparent logo parts */
-  padding: 24px;                /* breathing room so logo isn’t stuck to edges */
-}
-
-/* Optional: make overlay slightly stronger for text contrast if needed */
-.banner-overlay {
-  background: linear-gradient(
-    to right,
-    rgba(0,0,0,0.45),
-    rgba(0,0,0,0.20)
-  );
 }

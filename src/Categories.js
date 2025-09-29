@@ -8,31 +8,31 @@ const Categories = () => {
       id: 1,
       title: 'Cement',
       image: 'https://lirp.cdn-website.com/bc4439fa/dms3rep/multi/opt/Portland+Cement-1920w.jpg',
-      description: 'High-quality cement for construction'
+      description: 'Birla Super, UltraTech, Ramco, JSW, ACC, Dalmia, etc.'
     },
     {
       id: 2,
+      title: 'Concrete Grade',
+      image: 'https://images.jdmagicbox.com/quickquotes/images_main/m25-grade-ready-mix-concrete-2221010526-4bgppls9.jpg',
+      description: 'M25 (Footing/Column/Slab), PCC Bed M10, etc.'
+    },
+    {
+      id: 3,
       title: 'Steel',
       image: 'https://media.istockphoto.com/id/1063784898/photo/building-armature-steel-bars-stack-on-white-background.jpg?s=612x612&w=0&k=20&c=fW1lo902dN0Oe_H3iSHKhuM9kS5pUOFJrO6Fp-EjH8Y=',
       description: 'Steel bars and structural materials'
     },
     {
-      id: 3,
+      id: 4,
       title: 'Bricks',
       image: 'https://images.jdmagicbox.com/v2/comp/bangalore/y4/080pxx80.xx80.190212081002.c4y4/catalogue/alpha-sand-hessargatta-main-road-bangalore-solid-block-manufacturers-8dbjjry4ll.jpg',
       description: 'Premium quality construction bricks'
     },
     {
-      id: 4,
+      id: 5,
       title: 'Sand',
       image: 'https://promaninfi.com/blog/wp-content/uploads/2023/05/blog1.jpg',
       description: 'Construction grade sand'
-    },
-    {
-      id: 5,
-      title: 'Concrete',
-      image: 'https://images.jdmagicbox.com/quickquotes/images_main/m25-grade-ready-mix-concrete-2221010526-4bgppls9.jpg',
-      description: 'Ready-mix concrete solutions'
     },
     {
       id: 6,
@@ -45,12 +45,7 @@ const Categories = () => {
       title: 'Electrical Works',
       image: 'https://5.imimg.com/data5/SELLER/Default/2022/5/HD/YT/XF/37663009/lisha-copper-bronze-lighting-switch.jpg',
       description: 'Complete electrical solutions'
-    },
-    {
-      id: 8,
-      title: 'Wood',
-      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5qdq6MBt9UfBWqrb3u_LCnSWycY8E3IlPww&s',
-      description: 'Timber and wooden materials'
+  // ...existing code for other categories...
     },
     {
       id: 9,
