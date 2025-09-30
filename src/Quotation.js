@@ -432,6 +432,10 @@ export default function TaxQuotation() {
       if (bottomSection) {
         bottomSection.style.display = 'none';
       }
+      const termsSection = clone.querySelector('.terms-conditions');
+      if (termsSection) {
+        termsSection.style.display = 'none';
+      }
     }
 
     return clone;
@@ -690,6 +694,16 @@ export default function TaxQuotation() {
             </div>
             <div className="total-row grand-total"><span className="label">Total:</span><span className="value">₹{fmt(calculations.grandTotal)}</span></div>
             <div className="total-row"><span className="label">Balance:</span><span className="value">₹{fmt(calculations.grandTotal)}</span></div>
+          </div>
+        </div>
+
+        {/* Terms and Conditions */}
+        <div className="terms-conditions">
+          <div className="terms-title">Terms & Conditions:</div>
+          <div className="terms-list">
+            <div className="term-item">• Once quotation is given it is valid for 15 days of time duration from given date</div>
+            <div className="term-item">• If any changes in prices may applicable date on agreement</div>
+            <div className="term-item">• Further details will be stored in agreement</div>
           </div>
         </div>
       </div>

@@ -144,6 +144,12 @@
 .total-row .value{font-weight:800;min-width:90px;text-align:right}
 .discount-input{width:64px;margin-left:8px;padding:3px 6px;border:1px solid #ccc;border-radius:3px;font-size:12px}
 
+/* Terms and Conditions */
+.terms-conditions{border-top:2px solid var(--border);padding:15px 20px;margin-top:10px;background:#f9f9f9}
+.terms-title{font-weight:800;font-size:13px;color:var(--brand-teal);margin-bottom:10px;text-transform:uppercase}
+.terms-list{display:flex;flex-direction:column;gap:6px}
+.term-item{font-size:11px;line-height:1.4;color:#333;padding-left:5px}
+
 /* Static text used in PDF clone - ENHANCED */
 .control-static{
   color: #000 !important;
@@ -256,6 +262,11 @@
   input,select,textarea{background:transparent !important;border:none !important;color:var(--text) !important}
   .invoice-title,.table-header,.total-row.grand-total,.table-total-row{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .remove-btn, .col-action{display:none !important}
+  
+  /* Terms and conditions print styles */
+  .terms-conditions{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .terms-title{color:#000 !important}
+  .term-item{color:#000 !important}
   
   /* Enhanced print text rendering */
   * {
