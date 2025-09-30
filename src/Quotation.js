@@ -109,6 +109,7 @@ export default function TaxQuotation() {
 
   // Materials
   const [materials, setMaterials] = useState([]);
+  
   useEffect(() => {
     try {
       const raw = localStorage.getItem("quotationItems");
@@ -116,7 +117,8 @@ export default function TaxQuotation() {
         const arr = JSON.parse(raw);
         const rows = arr.map((it, i) => ({
           id: i + 1, 
-          description: it.label || it.name || "",
+          category: it.label || it.name || "",
+          subcategory: "",
           hsn: "", 
           qty: 1, 
           unit: "Nos", 
@@ -124,20 +126,21 @@ export default function TaxQuotation() {
           discount: 0, 
           gst: 18
         }));
-        setMaterials(rows.length ? rows : [{ id: 1, description: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 }]);
+        setMaterials(rows.length ? rows : [{ id: 1, category: "", subcategory: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 }]);
       } else {
-        setMaterials([{ id: 1, description: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 }]);
+        setMaterials([{ id: 1, category: "", subcategory: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 }]);
       }
     } catch {
-      setMaterials([{ id: 1, description: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 }]);
+      setMaterials([{ id: 1, category: "", subcategory: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 }]);
     }
   }, []);
 
-  const taxRates = { sgst: 9, cgst: 9 };
+  // Tax rates editable (manual input). Start at 0 so GST applies only if user enters a value
+  const [taxRates, setTaxRates] = useState({ sgst: 0, cgst: 0 });
   const [discountPercent, setDiscountPercent] = useState(0);
 
   const addMaterial = () =>
-    setMaterials((m) => [...m, { id: Date.now(), description: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 }]);
+    setMaterials((m) => [...m, { id: Date.now(), category: "", subcategory: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 }]);
 
   const removeMaterial = (id) =>
     setMaterials((m) => (m.length > 1 ? m.filter((x) => x.id !== id) : m));
@@ -146,7 +149,7 @@ export default function TaxQuotation() {
     setMaterials((m) =>
       m.map((row) =>
         row.id === id
-          ? { ...row, [field]: ["description", "hsn", "unit"].includes(field) ? value : Number(value || 0) }
+          ? { ...row, [field]: ["category", "subcategory", "hsn", "unit"].includes(field) ? value : Number(value || 0) }
           : row
       )
     );
@@ -170,10 +173,34 @@ export default function TaxQuotation() {
   const LOGO_FALLBACK = (process.env.PUBLIC_URL || "") + "/assests/vrmlogo.png";
   const [logoSrc, setLogoSrc] = useState(LOGO_PRIMARY);
 
-  // Multi-page PDF generation
-  const downloadPDF = async () => {
+  // Download both PDFs function (first: Construction QUOTATION + Tax Quotation, second: Construction INVOICE + Tax Invoice)
+  const downloadBothPDFs = async () => {
     if (isGenerating) return;
     setIsGenerating(true);
+    
+    try {
+      // First variant: quotation
+      await downloadPDF('quotation', true);
+      
+      // Wait a moment between downloads
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Second variant: invoice
+      await downloadPDF('invoice', true);
+      
+    } catch (error) {
+      console.error('Error downloading both PDFs:', error);
+      alert('Error downloading PDFs. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Multi-page PDF generation
+  // variant: 'quotation' | 'invoice'
+  const downloadPDF = async (variant = 'quotation', skipLoadingState = false) => {
+    if (isGenerating && !skipLoadingState) return;
+    if (!skipLoadingState) setIsGenerating(true);
 
     try {
       const sourceElement = sheetRef.current;
@@ -225,7 +252,8 @@ export default function TaxQuotation() {
           pageIndex + 1, 
           materialChunks.length,
           isFirstPage, 
-          isLastPage
+          isLastPage,
+          variant
         );
 
         // Create wrapper for the page
@@ -291,19 +319,28 @@ export default function TaxQuotation() {
         pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
       }
 
-      pdf.save(`${invoice.number}.pdf`);
+  // Determine titles & filename based on variant
+  const isInvoice = variant === 'invoice';
+  const mainHeadingWord = isInvoice ? 'INVOICE' : 'QUOTATION';
+  const barTitle = isInvoice ? 'Tax Invoice' : 'Tax Quotation';
+  const filenameBase = isInvoice ? 'Tax-Invoice' : 'Construction-Quotation';
+  // We cannot easily alter already-rendered pages here; titles are applied per page clone in createPageElement using variant.
+  pdf.save(`${filenameBase}-${invoice.number || new Date().toISOString().split('T')[0]}.pdf`);
 
     } catch (error) {
       console.error('PDF Generation Error:', error);
       alert(`Failed to generate PDF: ${error.message}`);
     } finally {
-      setIsGenerating(false);
+      if (!skipLoadingState) setIsGenerating(false);
     }
   };
 
   // Helper function to create page element
-  const createPageElement = async (sourceElement, materialsForPage, pageNum, totalPages, isFirstPage, isLastPage) => {
+  const createPageElement = async (sourceElement, materialsForPage, pageNum, totalPages, isFirstPage, isLastPage, variant) => {
     const clone = sourceElement.cloneNode(true);
+    const isInvoice = variant === 'invoice';
+    const mainHeadingWord = isInvoice ? 'INVOICE' : 'QUOTATION';
+    const barTitle = isInvoice ? 'Tax Invoice' : 'Tax Quotation';
     
     // Style the clone
     clone.style.cssText = `
@@ -320,7 +357,7 @@ export default function TaxQuotation() {
     // Update table headers to remove action column
     const tableHeaders = clone.querySelectorAll('.table-header');
     tableHeaders.forEach(header => {
-      header.style.gridTemplateColumns = '35px 1fr 65px 50px 55px 85px 50px 50px 85px';
+      header.style.gridTemplateColumns = '35px 200px 65px 50px 55px 85px 50px 50px 85px';
     });
 
     // Handle materials table
@@ -335,11 +372,15 @@ export default function TaxQuotation() {
         const globalIndex = materials.findIndex(m => m.id === material.id);
         const row = document.createElement('div');
         row.className = 'table-row';
-        row.style.gridTemplateColumns = '35px 1fr 65px 50px 55px 85px 50px 50px 85px';
+        row.style.gridTemplateColumns = '35px 200px 65px 50px 55px 85px 50px 50px 85px';
+        
+        const categoryDisplay = material.category && material.subcategory 
+          ? `${material.category} > ${material.subcategory}`
+          : material.category || material.subcategory || '';
         
         row.innerHTML = `
           <div class="col-num">${globalIndex + 1}</div>
-          <div class="col-desc"><span>${material.description}</span></div>
+          <div class="col-category"><span class="category-text">${categoryDisplay}</span></div>
           <div class="col-hsn"><span>${material.hsn}</span></div>
           <div class="col-qty"><span>${material.qty}</span></div>
           <div class="col-unit"><span>${material.unit}</span></div>
@@ -356,26 +397,33 @@ export default function TaxQuotation() {
       if (isLastPage) {
         const totalRow = document.createElement('div');
         totalRow.className = 'table-total-row';
-        totalRow.style.gridTemplateColumns = '35px 1fr 65px 50px 55px 85px 50px 50px 85px';
+        totalRow.style.gridTemplateColumns = '35px 200px 65px 50px 55px 85px 50px 50px 85px';
         totalRow.innerHTML = `
-          <div class="col-desc total-label">Total</div>
+          <div class="col-category total-label">Total</div>
           <div class="col-amount">₹${fmt(calculations.subtotal + calculations.discount)}</div>
         `;
         materialsTable.appendChild(totalRow);
       }
     }
 
+    // Always set heading strong for variant
+    const headingStrong = clone.querySelector('.construction-heading strong');
+    if (headingStrong) headingStrong.textContent = mainHeadingWord;
+
+    // Set invoice (tax) title bar text (with page numbering for subsequent pages)
+    const invoiceTitle = clone.querySelector('.invoice-title');
+    if (invoiceTitle) {
+      if (pageNum === 1) {
+        invoiceTitle.textContent = barTitle;
+      } else {
+        invoiceTitle.textContent = `${barTitle} (Page ${pageNum} of ${totalPages})`;
+      }
+    }
+
     // Hide bill-to section on non-first pages
     if (!isFirstPage) {
       const billSiteSection = clone.querySelector('.bill-site-section');
-      if (billSiteSection) {
-        billSiteSection.style.display = 'none';
-      }
-      
-      const invoiceTitle = clone.querySelector('.invoice-title');
-      if (invoiceTitle) {
-        invoiceTitle.innerHTML = `Tax Quotation (Page ${pageNum} of ${totalPages})`;
-      }
+      if (billSiteSection) billSiteSection.style.display = 'none';
     }
 
     // Hide bottom section on non-last pages
@@ -407,10 +455,10 @@ export default function TaxQuotation() {
         <div className="spacer" />
         <button 
           className="btn ghost" 
-          onClick={downloadPDF} 
+          onClick={downloadBothPDFs}
           disabled={isGenerating}
         >
-          {isGenerating ? "Generating..." : "Download PDF"}
+          {isGenerating ? "Generating..." : "📥 Download PDFs"}
         </button>
         <button className="btn primary" onClick={printInvoice}>Print</button>
       </div>
@@ -515,7 +563,7 @@ export default function TaxQuotation() {
         <div className="materials-table">
           <div className="table-header">
             <div className="col-num">#</div>
-            <div className="col-desc">Description</div>
+            <div className="col-category">Category</div>
             <div className="col-hsn">HSN</div>
             <div className="col-qty">QTY</div>
             <div className="col-unit">Unit</div>
@@ -529,7 +577,24 @@ export default function TaxQuotation() {
           {materials.map((row, i) => (
             <div key={row.id} className="table-row">
               <div className="col-num">{i + 1}</div>
-              <div className="col-desc"><input value={row.description} onChange={(e)=>updateMaterial(row.id,"description",e.target.value)} placeholder="Enter description" readOnly={preview}/></div>
+              <div className="col-category">
+                <div className="category-inputs">
+                  <input 
+                    value={row.category} 
+                    onChange={(e)=>updateMaterial(row.id,"category",e.target.value)} 
+                    placeholder="Main Category" 
+                    readOnly={preview}
+                    className="category-input main-category"
+                  />
+                  <input 
+                    value={row.subcategory} 
+                    onChange={(e)=>updateMaterial(row.id,"subcategory",e.target.value)} 
+                    placeholder="Subcategory" 
+                    readOnly={preview}
+                    className="category-input sub-category"
+                  />
+                </div>
+              </div>
               <div className="col-hsn"><input value={row.hsn} onChange={(e)=>updateMaterial(row.id,"hsn",e.target.value)} placeholder="HSN" readOnly={preview}/></div>
               <div className="col-qty"><input type="number" value={row.qty} onChange={(e)=>updateMaterial(row.id,"qty",e.target.value)} min="0" readOnly={preview}/></div>
               <div className="col-unit">
@@ -551,7 +616,7 @@ export default function TaxQuotation() {
 
           {/* compact total row */}
           <div className="table-total-row">
-            <div className="col-desc total-label">Total</div>
+            <div className="col-category total-label">Total</div>
             <div className="col-amount">₹{fmt(calculations.subtotal + calculations.discount)}</div>
           </div>
         </div>
@@ -567,6 +632,13 @@ export default function TaxQuotation() {
           <div className="amount-words">
             <div className="label">Amount in words:</div>
             <div className="words-value">{numberToWords(Math.floor(calculations.grandTotal))}</div>
+            <div className="bank-details">
+              <div><strong>Account Number:</strong> 1672102000027186</div>
+              <div><strong>Bank Name:</strong> IDBI Bank</div>
+              <div><strong>A/c Holder Name:</strong> VRM GROUPS</div>
+              <div><strong>IFSC Code:</strong> IBKL0001672</div>
+              <div><strong>MMID:</strong> 9259362</div>
+            </div>
             <div className="signature-area"><div className="signature-label">Company seal and Sign</div></div>
           </div>
 
@@ -586,8 +658,36 @@ export default function TaxQuotation() {
               </span>
               <span className="value">₹{fmt(calculations.discount)}</span>
             </div>
-            <div className="total-row"><span className="label">SGST ({taxRates.sgst}%):</span><span className="value">₹{fmt(calculations.sgst)}</span></div>
-            <div className="total-row"><span className="label">CGST ({taxRates.cgst}%):</span><span className="value">₹{fmt(calculations.cgst)}</span></div>
+            <div className="total-row">
+              <span className="label">
+                SGST ({taxRates.sgst}%):
+                {!preview && (
+                  <input
+                    className="discount-input tax-input"
+                    type="number"
+                    value={taxRates.sgst}
+                    onChange={(e)=>setTaxRates(r=>({...r, sgst:Number(e.target.value || 0)}))}
+                    min="0" max="100" step="0.1"
+                  />
+                )}
+              </span>
+              <span className="value">₹{fmt(calculations.sgst)}</span>
+            </div>
+            <div className="total-row">
+              <span className="label">
+                CGST ({taxRates.cgst}%):
+                {!preview && (
+                  <input
+                    className="discount-input tax-input"
+                    type="number"
+                    value={taxRates.cgst}
+                    onChange={(e)=>setTaxRates(r=>({...r, cgst:Number(e.target.value || 0)}))}
+                    min="0" max="100" step="0.1"
+                  />
+                )}
+              </span>
+              <span className="value">₹{fmt(calculations.cgst)}</span>
+            </div>
             <div className="total-row grand-total"><span className="label">Total:</span><span className="value">₹{fmt(calculations.grandTotal)}</span></div>
             <div className="total-row"><span className="label">Balance:</span><span className="value">₹{fmt(calculations.grandTotal)}</span></div>
           </div>
