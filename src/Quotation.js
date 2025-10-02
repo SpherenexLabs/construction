@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import History from "./History";
+import { uploadPDFToStorage, getAllPDFs, updatePDFMetadata, deletePDF } from "./firebase";
 import "./Quotation.css";
 
 const fmt = (n) =>
@@ -75,6 +77,8 @@ export default function TaxQuotation() {
   const sheetRef = useRef(null);
   const [preview, setPreview] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  
   useEffect(() => {
     console.log('[Quotation] mounted');
   }, []);
@@ -173,6 +177,116 @@ export default function TaxQuotation() {
   const LOGO_FALLBACK = (process.env.PUBLIC_URL || "") + "/assests/vrmlogo.png";
   const [logoSrc, setLogoSrc] = useState(LOGO_PRIMARY);
 
+  // History functionality with Firebase Storage
+  const saveToHistory = async (type, pdfBlob = null) => {
+    try {
+      console.log('Saving to Firebase Storage:', type, 'PDF size:', pdfBlob ? pdfBlob.size : 'No PDF');
+      
+      const timestamp = Date.now();
+      const filename = `${type}_${invoice.number || 'Unknown'}_${timestamp}.pdf`;
+      
+      const metadata = {
+        type: type, // 'quotation' or 'invoice'
+        quotationNumber: invoice.number || 'Unknown',
+        customerName: billTo.name || 'Unknown Customer',
+        siteLocationName: siteLocation.name || '',
+        totalAmount: calculations.grandTotal || 0,
+        materials: materials || [],
+        billTo: billTo,
+        siteLocation: siteLocation,
+        company: company,
+        invoice: invoice,
+        taxRates: taxRates,
+        discountPercent: discountPercent,
+        status: 'active'
+      };
+
+      if (pdfBlob) {
+        // Upload PDF to Firebase Storage and save metadata to Firestore
+        const result = await uploadPDFToStorage(pdfBlob, filename, metadata);
+        console.log(`${type} saved to Firebase successfully:`, result.id);
+        return result;
+      } else {
+        console.log('No PDF blob provided, skipping upload');
+        return null;
+      }
+      
+    } catch (error) {
+      console.error('Error saving to Firebase:', error);
+      // Fallback to localStorage for offline functionality
+      try {
+        console.log('Falling back to localStorage...');
+        const historyItem = {
+          id: Date.now().toString(),
+          type: type,
+          quotationNumber: invoice.number || 'Unknown',
+          customerName: billTo.name || 'Unknown Customer',
+          siteLocationName: siteLocation.name || '',
+          totalAmount: calculations.grandTotal || 0,
+          createdAt: new Date().toISOString(),
+          materials: materials || [],
+          billTo: billTo,
+          siteLocation: siteLocation,
+          company: company,
+          invoice: invoice,
+          taxRates: taxRates,
+          discountPercent: discountPercent,
+          pdfInfo: pdfBlob ? {
+            size: pdfBlob.size,
+            type: pdfBlob.type,
+            generated: true,
+            offline: true
+          } : null
+        };
+
+        const existingHistory = localStorage.getItem('quotationHistory');
+        const history = existingHistory ? JSON.parse(existingHistory) : [];
+        history.unshift(historyItem);
+        
+        if (history.length > 50) {
+          history.splice(50);
+        }
+        
+        localStorage.setItem('quotationHistory', JSON.stringify(history));
+        console.log('Saved to localStorage as fallback');
+        return { id: historyItem.id, offline: true };
+      } catch (fallbackError) {
+        console.error('Failed to save even to localStorage:', fallbackError);
+        throw fallbackError;
+      }
+    }
+  };
+
+  const blobToBase64 = (blob) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  };
+
+  const loadFromHistory = (historyItem) => {
+    // Load all the data from history item
+    setBillTo(historyItem.billTo);
+    setSiteLocation(historyItem.siteLocation);
+    setCompany(historyItem.company);
+    setMaterials(historyItem.materials);
+    setTaxRates(historyItem.taxRates);
+    setDiscountPercent(historyItem.discountPercent);
+    
+    // Generate new quotation number to avoid conflicts
+    const newInvoiceNumber = "QTN-" + new Date().getTime().toString().slice(-6);
+    setInvoice({
+      ...historyItem.invoice,
+      number: newInvoiceNumber,
+      date: new Date().toISOString().slice(0, 10) // Update to current date
+    });
+    
+    // Exit history view
+    setShowHistory(false);
+  };
+
   // Download both PDFs function (first: Construction QUOTATION + Tax Quotation, second: Construction INVOICE + Tax Invoice)
   const downloadBothPDFs = async () => {
     if (isGenerating) return;
@@ -221,12 +335,21 @@ export default function TaxQuotation() {
       const contentWidth = pageWidth - (margin * 2);
       const contentHeight = pageHeight - (margin * 2);
 
-      // Calculate items per page (approximate)
-      const headerHeight = 100; // Estimated height for header + bill-to section in mm
-      const footerHeight = 60;  // Estimated height for totals section in mm
-      const rowHeight = 8;      // Estimated height per material row in mm
+      // A4 dimensions: 210mm x 297mm
+      // Calculate items per page with accurate measurements
+      const headerHeight = 120; // Header + bill-to section (including company info, logo, customer details)
+      const footerHeight = 100; // Totals + bank details + terms & conditions + signature
+      const rowHeight = 13;     // Height per material row (accounting for subcategory inputs - 50px CSS min-height)
       const availableHeight = contentHeight - headerHeight - footerHeight;
-      const maxItemsPerPage = Math.floor(availableHeight / rowHeight);
+      const maxItemsPerPage = Math.max(1, Math.floor(availableHeight / rowHeight)); // Minimum 1 item per page
+      
+      console.log('PDF Pagination Info:', {
+        pageHeight: pageHeight + 'mm',
+        contentHeight: contentHeight + 'mm', 
+        availableHeight: availableHeight + 'mm',
+        maxItemsPerPage,
+        totalMaterials: materials.length
+      });
 
       // Split materials into chunks for each page
       const materialChunks = [];
@@ -256,15 +379,18 @@ export default function TaxQuotation() {
           variant
         );
 
-        // Create wrapper for the page
+        // Create wrapper for the page with A4 constraints
         const wrapper = document.createElement('div');
         wrapper.style.cssText = `
           position: absolute;
           top: -9999px;
           left: 0;
           width: 794px;
+          max-height: 1123px;
           background: white;
           font-family: Arial, sans-serif;
+          overflow: hidden;
+          box-sizing: border-box;
         `;
         
         document.body.appendChild(wrapper);
@@ -280,10 +406,17 @@ export default function TaxQuotation() {
         // Wait for changes to take effect
         await rAF();
         await rAF();
+        
+        // Log actual dimensions for debugging
+        console.log(`Page ${pageIndex + 1} dimensions:`, {
+          width: pageElement.offsetWidth + 'px',
+          height: pageElement.offsetHeight + 'px',
+          itemsOnPage: currentChunk.length
+        });
 
-        // Generate canvas for this page
+        // Generate canvas optimized for A4 dimensions
         const canvas = await html2canvas(pageElement, {
-          scale: 1.5,
+          scale: 1.2,
           useCORS: true,
           backgroundColor: '#ffffff',
           logging: false,
@@ -291,8 +424,8 @@ export default function TaxQuotation() {
           allowTaint: false,
           imageTimeout: 0,
           removeContainer: true,
-          width: pageElement.offsetWidth,
-          height: pageElement.offsetHeight
+          width: 794,
+          height: Math.min(pageElement.offsetHeight, 1123)
         });
 
         // Clean up
@@ -305,15 +438,23 @@ export default function TaxQuotation() {
 
         const imgData = canvas.toDataURL('image/png', 1.0);
         
-        // Calculate dimensions to fit A4
+        // Calculate dimensions to properly fit A4 page
         const imgWidth = canvas.width;
         const imgHeight = canvas.height;
-        const ratio = Math.min(contentWidth / (imgWidth * 0.264583), contentHeight / (imgHeight * 0.264583));
+        
+        // Convert pixels to mm (1 pixel = 0.264583 mm at 96 DPI)
+        const imgWidthMM = imgWidth * 0.264583;
+        const imgHeightMM = imgHeight * 0.264583;
+        
+        // Ensure content fits within A4 boundaries
+        const scaleX = contentWidth / imgWidthMM;
+        const scaleY = contentHeight / imgHeightMM;
+        const scale = Math.min(scaleX, scaleY, 1); // Never scale up, only down
+        
+        const finalWidth = imgWidthMM * scale;
+        const finalHeight = imgHeightMM * scale;
 
-        const finalWidth = (imgWidth * 0.264583) * ratio;
-        const finalHeight = (imgHeight * 0.264583) * ratio;
-
-        const x = margin + (contentWidth - finalWidth) / 2;
+        const x = margin;
         const y = margin;
 
         pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
@@ -324,8 +465,14 @@ export default function TaxQuotation() {
   const mainHeadingWord = isInvoice ? 'INVOICE' : 'QUOTATION';
   const barTitle = isInvoice ? 'Tax Invoice' : 'Tax Quotation';
   const filenameBase = isInvoice ? 'Tax-Invoice' : 'Construction-Quotation';
-  // We cannot easily alter already-rendered pages here; titles are applied per page clone in createPageElement using variant.
-  pdf.save(`${filenameBase}-${invoice.number || new Date().toISOString().split('T')[0]}.pdf`);
+  const filename = `${filenameBase}-${invoice.number || new Date().toISOString().split('T')[0]}.pdf`;
+  
+  // Save PDF and also save to history
+  pdf.save(filename);
+  
+  // Convert PDF to blob for history storage
+  const pdfBlob = pdf.output('blob');
+  await saveToHistory(variant, pdfBlob);
 
     } catch (error) {
       console.error('PDF Generation Error:', error);
@@ -342,13 +489,20 @@ export default function TaxQuotation() {
     const mainHeadingWord = isInvoice ? 'INVOICE' : 'QUOTATION';
     const barTitle = isInvoice ? 'Tax Invoice' : 'Tax Quotation';
     
-    // Style the clone
+    // Style the clone with A4 page constraints
     clone.style.cssText = `
       width: 794px;
+      max-height: 1123px;
       transform: none;
       font-family: Arial, sans-serif;
       background: white;
+      overflow: hidden;
+      box-sizing: border-box;
+      padding: 8px;
     `;
+    
+    // Add PDF mode class for better styling
+    clone.classList.add('pdf-mode');
 
     // Remove elements that shouldn't appear in PDF
     const elementsToHide = clone.querySelectorAll('.col-action, .remove-btn, .add-material-section, .no-print');
@@ -452,20 +606,30 @@ export default function TaxQuotation() {
 
   return (
     <div className="quotation-container">
-      <div className="toolbar no-print">
-        <button className="btn ghost" onClick={() => setPreview(!preview)}>
-          {preview ? "Exit Preview" : "Preview"}
-        </button>
-        <div className="spacer" />
-        <button 
-          className="btn ghost" 
-          onClick={downloadBothPDFs}
-          disabled={isGenerating}
-        >
-          {isGenerating ? "Generating..." : "📥 Download PDFs"}
-        </button>
-        <button className="btn primary" onClick={printInvoice}>Print</button>
-      </div>
+      {showHistory ? (
+        <History 
+          onLoadQuotation={loadFromHistory}
+          onBack={() => setShowHistory(false)}
+        />
+      ) : (
+        <>
+          <div className="toolbar no-print">
+            <button className="btn ghost" onClick={() => setPreview(!preview)}>
+              {preview ? "Exit Preview" : "Preview"}
+            </button>
+            <button className="btn ghost" onClick={() => setShowHistory(true)}>
+              📋 History
+            </button>
+            <div className="spacer" />
+            <button 
+              className="btn ghost" 
+              onClick={downloadBothPDFs}
+              disabled={isGenerating}
+            >
+              {isGenerating ? "Generating..." : "📥 Download PDFs"}
+            </button>
+            <button className="btn primary" onClick={printInvoice}>Print</button>
+          </div>
 
       <div className={`invoice-sheet ${preview ? "preview" : ""}`} ref={sheetRef}>
         {/* ===== HEADER ===== */}
@@ -707,6 +871,8 @@ export default function TaxQuotation() {
           </div>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 }

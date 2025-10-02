@@ -1,0 +1,79 @@
+// Firebase Storage Security Rules for Development
+// Place this in your Firebase Console under Storage > Rules
+
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // DEVELOPMENT RULES - Allow all access (Use for testing)
+    match /{allPaths=**} {
+      allow read, write: if true;
+    }
+  }
+}
+
+// PRODUCTION RULES (Comment out the above and use these for production):
+/*
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Rules for PDF files in the pdfs folder
+    match /pdfs/{pdfId} {
+      // Allow read access to all users
+      allow read: if true;
+      
+      // Allow write (create, update, delete) access with size limits
+      allow write: if resource.size < 10 * 1024 * 1024  // Max file size: 10MB
+        && resource.contentType.matches('application/pdf'); // Only PDF files
+    }
+    
+    // Rules for other files (images, documents, etc.)
+    match /{allPaths=**} {
+      // Allow read access to all users
+      allow read: if true;
+      
+      // Allow write access with size restrictions
+      allow write: if resource.size < 5 * 1024 * 1024; // Max file size: 5MB for other files
+    }
+  }
+}
+*/
+    }
+  }
+}
+
+// Alternative rules for public access (less secure but easier for development):
+/*
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      // Allow read and write access to all users
+      allow read, write: if true;
+    }
+  }
+}
+*/
+
+// Alternative rules for specific user access:
+/*
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /pdfs/{userId}/{pdfId} {
+      // Users can only access their own files
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    match /shared/{allPaths=**} {
+      // Shared files accessible to all authenticated users
+      allow read: if request.auth != null;
+      allow write: if request.auth != null 
+        && resource.size < 10 * 1024 * 1024
+        && resource.contentType.matches('application/pdf|image/.*');
+    }
+  }
+}
+*/

@@ -1,0 +1,79 @@
+// Firestore Security Rules for Development
+// Place this in your Firebase Console under Firestore Database > Rules
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // DEVELOPMENT RULES - Allow all access (Use for testing)
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
+
+// PRODUCTION RULES (Comment out the above and use these for production):
+/*
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Rules for quotations collection
+    match /quotations/{documentId} {
+      // Allow read access to all users
+      allow read: if true;
+      
+      // Allow create and update with data validation
+      allow create: if isValidQuotationData(request.resource.data);
+      
+      allow update: if isValidQuotationData(request.resource.data)
+        && resource.data.keys().hasAll(['createdAt']) // Ensure createdAt is not modified
+        && request.resource.data.createdAt == resource.data.createdAt;
+      
+      // Allow delete
+      allow delete: if true;
+    }
+    
+    // Helper function to validate quotation data
+    function isValidQuotationData(data) {
+      return data.keys().hasAll(['type', 'quotationNumber', 'customerName', 'totalAmount'])
+        && data.type in ['quotation', 'invoice']
+        && data.quotationNumber is string
+        && data.customerName is string
+        && data.totalAmount is number
+        && data.totalAmount >= 0;
+    }
+  }
+}
+
+// Alternative rules for public access (less secure but easier for development):
+/*
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
+*/
+
+// Alternative rules for user-specific access:
+/*
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can only access their own quotations
+    match /users/{userId}/quotations/{quotationId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Shared quotations (readable by all authenticated users)
+    match /shared_quotations/{quotationId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == resource.data.createdBy;
+    }
+  }
+}
+*/
