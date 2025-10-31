@@ -5,14 +5,13 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'fire
 import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, where } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAOFbpbOwdren9NlNtWvRVyf4DsDf9-2H4",
-  authDomain: "procart-8d2f6.firebaseapp.com",
-  databaseURL: "https://procart-8d2f6-default-rtdb.firebaseio.com",
-  projectId: "procart-8d2f6",
-  storageBucket: "procart-8d2f6.firebasestorage.app",
-  messagingSenderId: "1026838026898",
-  appId: "1:1026838026898:web:56b3889e347862ca37a44b",
-  measurementId: "G-RW7V299RPY"
+  apiKey: "AIzaSyDCtqaHkwMMnGLU7NGeITbPzTTQpK22mMs",
+  authDomain: "vrmgroups-48319.firebaseapp.com",
+  projectId: "vrmgroups-48319",
+  storageBucket: "vrmgroups-48319.firebasestorage.app",
+  messagingSenderId: "646911616967",
+  appId: "1:646911616967:web:ce1d5f5a42ffe83e279be2",
+  measurementId: "G-S0LR2G7SML"
 };
 
 // Initialize Firebase
@@ -26,20 +25,26 @@ export const db = getFirestore(app);
 // PDF Storage functions
 export const uploadPDFToStorage = async (pdfBlob, filename, metadata) => {
   try {
-    console.log('Uploading PDF to Firebase Storage:', filename);
+    console.log('📤 Uploading PDF to Firebase Storage:', filename);
+    console.log('PDF Blob size:', pdfBlob.size, 'bytes');
+    console.log('Metadata:', metadata);
     
     // Create a reference to the file location
     const storageRef = ref(storage, `pdfs/${filename}`);
+    console.log('Storage reference created:', storageRef.fullPath);
     
     // Upload the file
+    console.log('Starting upload...');
     const snapshot = await uploadBytes(storageRef, pdfBlob);
-    console.log('PDF uploaded successfully:', snapshot);
+    console.log('✅ PDF uploaded successfully:', snapshot.metadata);
     
     // Get download URL
+    console.log('Getting download URL...');
     const downloadURL = await getDownloadURL(snapshot.ref);
-    console.log('PDF download URL:', downloadURL);
+    console.log('✅ PDF download URL:', downloadURL);
     
     // Save metadata to Firestore
+    console.log('Saving metadata to Firestore...');
     const docRef = await addDoc(collection(db, 'quotations'), {
       ...metadata,
       filename,
@@ -49,7 +54,7 @@ export const uploadPDFToStorage = async (pdfBlob, filename, metadata) => {
       updatedAt: new Date().toISOString()
     });
     
-    console.log('PDF metadata saved to Firestore:', docRef.id);
+    console.log('✅ PDF metadata saved to Firestore with ID:', docRef.id);
     
     return {
       id: docRef.id,
@@ -57,7 +62,9 @@ export const uploadPDFToStorage = async (pdfBlob, filename, metadata) => {
       storageRef: snapshot.ref.fullPath
     };
   } catch (error) {
-    console.error('Error uploading PDF:', error);
+    console.error('❌ Error uploading PDF to Firebase:', error);
+    console.error('Error code:', error.code);
+    console.error('Error message:', error.message);
     throw error;
   }
 };
@@ -65,7 +72,7 @@ export const uploadPDFToStorage = async (pdfBlob, filename, metadata) => {
 // Get all PDFs from Firestore
 export const getAllPDFs = async () => {
   try {
-    console.log('Fetching all PDFs from Firestore...');
+    console.log('📥 Fetching all PDFs from Firestore...');
     const q = query(collection(db, 'quotations'), orderBy('createdAt', 'desc'));
     const querySnapshot = await getDocs(q);
     
@@ -77,10 +84,15 @@ export const getAllPDFs = async () => {
       });
     });
     
-    console.log('Fetched PDFs:', pdfs.length);
+    console.log('✅ Fetched', pdfs.length, 'PDFs from Firebase');
+    if (pdfs.length > 0) {
+      console.log('First PDF:', pdfs[0]);
+    }
     return pdfs;
   } catch (error) {
-    console.error('Error fetching PDFs:', error);
+    console.error('❌ Error fetching PDFs from Firestore:', error);
+    console.error('Error code:', error.code);
+    console.error('Error message:', error.message);
     throw error;
   }
 };

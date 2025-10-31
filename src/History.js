@@ -141,7 +141,7 @@ const History = ({ onLoadQuotation, onBack }) => {
         console.log('Deleting item:', item.id);
         
         if (item.id && item.storageRef) {
-          // Delete from Firebase
+          // Delete from Firebase Storage and Firestore
           await deletePDF(item.id, item.storageRef);
           console.log('Deleted from Firebase');
         } else {
@@ -344,7 +344,7 @@ const History = ({ onLoadQuotation, onBack }) => {
                 </button>
                 <button
                   className="btn btn-danger"
-                  onClick={() => deleteHistoryItem(item.id)}
+                  onClick={() => deleteHistoryItem(item)}
                 >
                   🗑️ Delete
                 </button>

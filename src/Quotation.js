@@ -180,8 +180,13 @@ export default function TaxQuotation() {
   // History functionality with Firebase Storage
   const saveToHistory = async (type, pdfBlob = null) => {
     try {
-      console.log('Saving to Firebase Storage:', type, 'PDF size:', pdfBlob ? pdfBlob.size : 'No PDF');
+      console.log('💾 Saving to Firebase Storage:', type, 'PDF size:', pdfBlob ? pdfBlob.size : 'No PDF');
       
+      if (!pdfBlob) {
+        console.log('⚠️ No PDF blob provided, skipping upload');
+        return null;
+      }
+
       const timestamp = Date.now();
       const filename = `${type}_${invoice.number || 'Unknown'}_${timestamp}.pdf`;
       
@@ -201,21 +206,19 @@ export default function TaxQuotation() {
         status: 'active'
       };
 
-      if (pdfBlob) {
-        // Upload PDF to Firebase Storage and save metadata to Firestore
-        const result = await uploadPDFToStorage(pdfBlob, filename, metadata);
-        console.log(`${type} saved to Firebase successfully:`, result.id);
-        return result;
-      } else {
-        console.log('No PDF blob provided, skipping upload');
-        return null;
-      }
+      // Upload PDF to Firebase Storage and save metadata to Firestore
+      console.log('🚀 Uploading to Firebase...');
+      const result = await uploadPDFToStorage(pdfBlob, filename, metadata);
+      console.log(`✅ ${type} saved to Firebase successfully:`, result.id);
+      return result;
       
     } catch (error) {
-      console.error('Error saving to Firebase:', error);
+      console.error('❌ Error saving to Firebase:', error);
+      alert(`⚠️ Firebase upload failed: ${error.message}\n\nSaving to localStorage as fallback...`);
+      
       // Fallback to localStorage for offline functionality
       try {
-        console.log('Falling back to localStorage...');
+        console.log('💾 Falling back to localStorage...');
         const historyItem = {
           id: Date.now().toString(),
           type: type,
@@ -248,10 +251,11 @@ export default function TaxQuotation() {
         }
         
         localStorage.setItem('quotationHistory', JSON.stringify(history));
-        console.log('Saved to localStorage as fallback');
+        console.log('✅ Saved to localStorage as fallback');
         return { id: historyItem.id, offline: true };
       } catch (fallbackError) {
-        console.error('Failed to save even to localStorage:', fallbackError);
+        console.error('❌ Failed to save even to localStorage:', fallbackError);
+        alert('❌ Failed to save quotation history!');
         throw fallbackError;
       }
     }
