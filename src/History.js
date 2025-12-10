@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAllPDFs, deletePDF, updatePDFMetadata } from './firebase';
+import { getAllPDFs, deletePDF } from './firebase';
 import './History.css';
 
 const History = ({ onLoadQuotation, onBack }) => {
@@ -95,46 +95,6 @@ const History = ({ onLoadQuotation, onBack }) => {
     setFilteredHistory(filtered);
   };
 
-  const addTestData = async () => {
-    try {
-      console.log('Adding test data to Firebase...');
-      
-      // Create a simple test PDF blob
-      const testPdfContent = '%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\n2 0 obj\n<<\n/Type /Pages\n/Kids [3 0 R]\n/Count 1\n>>\nendobj\n3 0 obj\n<<\n/Type /Page\n/Parent 2 0 R\n/MediaBox [0 0 612 792]\n>>\nendobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000074 00000 n \n0000000120 00000 n \ntrailer\n<<\n/Size 4\n/Root 1 0 R\n>>\nstartxref\n179\n%%EOF';
-      const testBlob = new Blob([testPdfContent], { type: 'application/pdf' });
-      
-      const testMetadata = {
-        type: 'quotation',
-        quotationNumber: 'TEST-' + Date.now(),
-        customerName: 'Test Customer',
-        siteLocationName: 'Test Site',
-        totalAmount: 10000,
-        materials: [
-          { description: 'Test Material 1', quantity: 10, rate: 500 },
-          { description: 'Test Material 2', quantity: 5, rate: 800 }
-        ],
-        billTo: { name: 'Test Customer', address: 'Test Address' },
-        siteLocation: { name: 'Test Site', address: 'Test Site Address' },
-        company: { name: 'Test Company' },
-        invoice: { number: 'TEST-' + Date.now(), date: new Date().toISOString().slice(0, 10) },
-        taxRates: { sgst: 9, cgst: 9 },
-        discountPercent: 0,
-        status: 'active'
-      };
-      
-      const { uploadPDFToStorage } = await import('./firebase');
-      const result = await uploadPDFToStorage(testBlob, `test_${Date.now()}.pdf`, testMetadata);
-      console.log('Test data added successfully:', result);
-      
-      // Reload history
-      await loadHistory();
-      alert('Test data added successfully!');
-    } catch (error) {
-      console.error('Error adding test data:', error);
-      alert('Error adding test data: ' + error.message);
-    }
-  };
-
   const deleteHistoryItem = async (item) => {
     try {
       if (window.confirm(`Are you sure you want to delete this ${item.type}?`)) {
@@ -224,9 +184,6 @@ const History = ({ onLoadQuotation, onBack }) => {
         <button className="btn btn-secondary" onClick={loadHistory}>
           🔄 Refresh
         </button>
-        <button className="btn btn-warning" onClick={addTestData}>
-          🧪 Add Test Data
-        </button>
       </div>
 
       <div className="history-controls">
@@ -291,6 +248,19 @@ const History = ({ onLoadQuotation, onBack }) => {
                 <div className="item-info">
                   {getStatusBadge(item.type)}
                   <h3>{item.quotationNumber}</h3>
+                  {item.documentTitle && (
+                    <span className="document-title" style={{
+                      marginLeft: '8px',
+                      padding: '2px 8px',
+                      background: '#e3f2fd',
+                      borderRadius: '4px',
+                      fontSize: '12px',
+                      color: '#1976d2',
+                      fontWeight: 600
+                    }}>
+                      {item.documentTitle}
+                    </span>
+                  )}
                   <span className="item-date">{formatDate(item.createdAt)}</span>
                 </div>
                 <div className="item-amount">{formatCurrency(item.totalAmount)}</div>
@@ -300,6 +270,11 @@ const History = ({ onLoadQuotation, onBack }) => {
                 <div className="customer-info">
                   <strong>Customer:</strong> {item.customerName || 'Not specified'}
                 </div>
+                {item.filename && (
+                  <div className="filename-info">
+                    <strong>File:</strong> {item.filename}
+                  </div>
+                )}
                 <div className="materials-summary">
                   <strong>Items:</strong> {(item.materials || []).length} materials
                   {(item.materials || []).length > 0 && (
@@ -332,16 +307,24 @@ const History = ({ onLoadQuotation, onBack }) => {
                 >
                   📝 Edit & Use
                 </button>
-                <button
-                  className="btn btn-secondary"
-                  onClick={() => {
-                    // Since we're not storing PDF data anymore, show a message
-                    alert('PDF data is not stored to save space. Please regenerate the PDF by clicking "Edit & Use" and then "Download PDFs".');
-                  }}
-                  title="PDF data not stored to save space"
-                >
-                  � Regenerate PDF
-                </button>
+                {item.downloadURL ? (
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => downloadPDFFile(item)}
+                  >
+                    📥 Download PDF
+                  </button>
+                ) : (
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => {
+                      alert('PDF data is not stored to save space. Please regenerate the PDF by clicking "Edit & Use" and then "Download PDFs".');
+                    }}
+                    title="PDF data not stored to save space"
+                  >
+                    📄 Regenerate PDF
+                  </button>
+                )}
                 <button
                   className="btn btn-danger"
                   onClick={() => deleteHistoryItem(item)}

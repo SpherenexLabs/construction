@@ -1,8 +1,8 @@
 // firebase.js
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, where } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject, listAll } from 'firebase/storage';
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: "AIzaSyDCtqaHkwMMnGLU7NGeITbPzTTQpK22mMs",
@@ -130,6 +130,137 @@ export const deletePDF = async (docId, storageRefPath) => {
     console.log('PDF metadata deleted from Firestore');
   } catch (error) {
     console.error('Error deleting PDF:', error);
+    throw error;
+  }
+};
+
+// Sync existing Storage files to Firestore
+export const syncStorageToFirestore = async () => {
+  try {
+    console.log('🔄 Starting sync of Storage files to Firestore...');
+    
+    // List all files in the pdfs folder
+    const pdfsRef = ref(storage, 'pdfs/');
+    const listResult = await listAll(pdfsRef);
+    console.log(`📂 Found ${listResult.items.length} files in Storage`);
+    
+    // Get existing Firestore documents
+    const existingDocs = await getAllPDFs();
+    const existingFilenames = new Set(existingDocs.map(doc => doc.filename));
+    console.log(`📄 Found ${existingDocs.length} documents in Firestore`);
+    
+    let syncedCount = 0;
+    let skippedCount = 0;
+    
+    // Process each file
+    for (const itemRef of listResult.items) {
+      const filename = itemRef.name;
+      
+      // Skip if already in Firestore
+      if (existingFilenames.has(filename)) {
+        console.log(`⏭️  Skipping ${filename} - already in Firestore`);
+        skippedCount++;
+        continue;
+      }
+      
+      try {
+        // Get download URL
+        const downloadURL = await getDownloadURL(itemRef);
+        
+        // Parse filename to extract information
+        // Possible formats:
+        // 1. quotation_QTN-068046_1764924071752.pdf
+        // 2. Tax-Quotation-QTN-068046.pdf
+        // 3. Invoice-Quotation-QTN-068046.pdf
+        // 4. Construction-Quotation-QTN-068046.pdf
+        
+        let quotationNumber = 'Unknown';
+        let timestamp = Date.now();
+        let documentTitle = 'Quotation';
+        let type = 'quotation';
+        
+        // Try pattern 1: quotation_QTN-XXX_timestamp.pdf
+        let matches = filename.match(/quotation_(.+?)_(\d+)\.pdf/);
+        if (matches) {
+          quotationNumber = matches[1];
+          timestamp = parseInt(matches[2]);
+        } else {
+          // Try pattern 2: Tax-Quotation-QTN-XXX.pdf or Invoice-Quotation-QTN-XXX.pdf
+          matches = filename.match(/(Tax|Invoice|Construction)-Quotation-(.+?)\.pdf/);
+          if (matches) {
+            documentTitle = `${matches[1]} Quotation`;
+            quotationNumber = matches[2];
+            type = matches[1].toLowerCase() === 'invoice' ? 'invoice' : 'quotation';
+          } else {
+            // Try to extract QTN number
+            matches = filename.match(/QTN-(\d+)/i);
+            if (matches) {
+              quotationNumber = `QTN-${matches[1]}`;
+            } else {
+              quotationNumber = filename.replace('.pdf', '');
+            }
+          }
+        }
+        
+        // Create metadata from filename
+        const metadata = {
+          type: type,
+          documentTitle: documentTitle,
+          quotationNumber: quotationNumber,
+          customerName: 'Unknown Customer',
+          siteLocationName: '',
+          totalAmount: 0,
+          materials: [],
+          billTo: { name: 'Unknown Customer', address: '', contactNo: '', gstin: '', state: '' },
+          siteLocation: { name: '', address: '', contactNo: '' },
+          company: {
+            name: "VRM GROUPS",
+            phone: "+91 9900315454",
+            email: "info@vrmgroups.com",
+            website: "www.vrmgroups.com",
+            address1: "15th Cross, A Block No.27",
+            address2: "Ground Floor, Bhuvaneshwari Nagar",
+            address3: "Magadi Main Road, Bangalore - 560091",
+            gstin: "29ATHPV3440K1Z5"
+          },
+          invoice: { 
+            number: quotationNumber, 
+            date: new Date(timestamp).toISOString().slice(0, 10) 
+          },
+          taxRates: { sgst: 9, cgst: 9 },
+          discountPercent: 0,
+          status: 'active',
+          filename: filename,
+          downloadURL: downloadURL,
+          storageRef: itemRef.fullPath,
+          createdAt: new Date(timestamp).toISOString(),
+          updatedAt: new Date().toISOString(),
+          syncedFromStorage: true
+        };
+        
+        // Add to Firestore
+        const docRef = await addDoc(collection(db, 'quotations'), metadata);
+        console.log(`✅ Synced ${filename} to Firestore with ID: ${docRef.id}`);
+        syncedCount++;
+        
+      } catch (error) {
+        console.error(`❌ Error syncing ${filename}:`, error);
+      }
+    }
+    
+    console.log(`\n📊 Sync Complete:`);
+    console.log(`   ✅ Synced: ${syncedCount} files`);
+    console.log(`   ⏭️  Skipped: ${skippedCount} files (already in Firestore)`);
+    console.log(`   📁 Total Storage files: ${listResult.items.length}`);
+    
+    return {
+      synced: syncedCount,
+      skipped: skippedCount,
+      total: listResult.items.length
+    };
+    
+  } catch (error) {
+    console.error('❌ Error syncing Storage to Firestore:', error);
     throw error;
   }
 };

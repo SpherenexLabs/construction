@@ -239,6 +239,15 @@
   color: #155d50;
 }
 
+.filename-info {
+  word-break: break-all;
+  font-family: monospace;
+  background: #fff3cd;
+  padding: 8px;
+  border-radius: 4px;
+  border-left: 3px solid #ffc107;
+}
+
 .materials-preview {
   margin-top: 8px;
   display: flex;

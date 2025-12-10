@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import History from "./History";
-import { uploadPDFToStorage, getAllPDFs, updatePDFMetadata, deletePDF } from "./firebase";
+import { uploadPDFToStorage } from "./firebase";
 import "./Quotation.css";
 
 const fmt = (n) =>
@@ -78,10 +78,23 @@ export default function TaxQuotation() {
   const [preview, setPreview] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
   
   useEffect(() => {
     console.log('[Quotation] mounted');
   }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showDownloadMenu && !event.target.closest('.download-dropdown-wrapper')) {
+        setShowDownloadMenu(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showDownloadMenu]);
 
   // Company
   const [company, setCompany] = useState({
@@ -111,8 +124,8 @@ export default function TaxQuotation() {
     name: "", address: "", contactNo: ""
   });
 
-  // Materials
-  const [materials, setMaterials] = useState([]);
+  // Combined items list (materials, subjects, and page breaks)
+  const [items, setItems] = useState([]);
   
   useEffect(() => {
     try {
@@ -120,7 +133,8 @@ export default function TaxQuotation() {
       if (raw) {
         const arr = JSON.parse(raw);
         const rows = arr.map((it, i) => ({
-          id: i + 1, 
+          id: i + 1,
+          type: 'material',
           category: it.label || it.name || "",
           subcategory: "",
           hsn: "", 
@@ -130,12 +144,12 @@ export default function TaxQuotation() {
           discount: 0, 
           gst: 18
         }));
-        setMaterials(rows.length ? rows : [{ id: 1, category: "", subcategory: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 }]);
+        setItems(rows.length ? rows : [{ id: 1, type: 'material', category: "", subcategory: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 }]);
       } else {
-        setMaterials([{ id: 1, category: "", subcategory: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 }]);
+        setItems([{ id: 1, type: 'material', category: "", subcategory: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 }]);
       }
     } catch {
-      setMaterials([{ id: 1, category: "", subcategory: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 }]);
+      setItems([{ id: 1, type: 'material', category: "", subcategory: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 }]);
     }
   }, []);
 
@@ -143,24 +157,40 @@ export default function TaxQuotation() {
   const [taxRates, setTaxRates] = useState({ sgst: 0, cgst: 0 });
   const [discountPercent, setDiscountPercent] = useState(0);
 
-  const addMaterial = () =>
-    setMaterials((m) => [...m, { id: Date.now(), category: "", subcategory: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 }]);
+  const addMaterial = () => {
+    const newId = Date.now() + Math.random(); // Ensure unique ID
+    setItems((m) => [...m, { id: newId, type: 'material', category: "", subcategory: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 }]);
+  };
 
-  const removeMaterial = (id) =>
-    setMaterials((m) => (m.length > 1 ? m.filter((x) => x.id !== id) : m));
+  const addSubject = () => {
+    const newId = Date.now() + Math.random(); // Ensure unique ID
+    setItems((m) => [...m, { id: newId, type: 'subject', content: '' }]);
+  };
+
+  const addPageBreak = () => {
+    const newId = Date.now() + Math.random(); // Ensure unique ID
+    setItems((m) => [...m, { id: newId, type: 'pagebreak' }]);
+  };
+
+  const removeItem = (id) =>
+    setItems((m) => m.length > 1 ? m.filter((x) => x.id !== id) : m);
 
   const updateMaterial = (id, field, value) =>
-    setMaterials((m) =>
+    setItems((m) =>
       m.map((row) =>
-        row.id === id
+        row.id === id && row.type === 'material'
           ? { ...row, [field]: ["category", "subcategory", "hsn", "unit"].includes(field) ? value : Number(value || 0) }
           : row
       )
     );
 
+  const updateSubject = (id, content) =>
+    setItems((m) => m.map((item) => item.id === id && item.type === 'subject' ? { ...item, content } : item));
+
   const calculations = useMemo(() => {
     let subtotal = 0;
-    materials.forEach((m) => {
+    // Only calculate materials, not subjects or page breaks
+    items.filter(item => item.type === 'material').forEach((m) => {
       const amt = m.qty * m.pricePerUnit;
       subtotal += (amt - (amt * m.discount) / 100);
     });
@@ -170,7 +200,7 @@ export default function TaxQuotation() {
     const cgst = (finalSubtotal * taxRates.cgst) / 100;
     const grandTotal = finalSubtotal + sgst + cgst;
     return { subtotal: finalSubtotal, discount: overallDiscount, sgst, cgst, grandTotal };
-  }, [materials, discountPercent, taxRates.sgst, taxRates.cgst]);
+  }, [items, discountPercent, taxRates.sgst, taxRates.cgst]);
 
   // Logo
   const LOGO_PRIMARY = (process.env.PUBLIC_URL || "") + "/assets/vrmlogo.png";
@@ -178,7 +208,7 @@ export default function TaxQuotation() {
   const [logoSrc, setLogoSrc] = useState(LOGO_PRIMARY);
 
   // History functionality with Firebase Storage
-  const saveToHistory = async (type, pdfBlob = null) => {
+  const saveToHistory = async (type, pdfBlob = null, customTitle = null, displayFilename = null) => {
     try {
       console.log('💾 Saving to Firebase Storage:', type, 'PDF size:', pdfBlob ? pdfBlob.size : 'No PDF');
       
@@ -188,15 +218,17 @@ export default function TaxQuotation() {
       }
 
       const timestamp = Date.now();
-      const filename = `${type}_${invoice.number || 'Unknown'}_${timestamp}.pdf`;
+      const filename = displayFilename || `${type}_${invoice.number || 'Unknown'}_${timestamp}.pdf`;
+      const documentType = customTitle || type;
       
       const metadata = {
         type: type, // 'quotation' or 'invoice'
+        documentTitle: documentType, // Display title like 'Tax Quotation' or 'Invoice Quotation'
         quotationNumber: invoice.number || 'Unknown',
         customerName: billTo.name || 'Unknown Customer',
         siteLocationName: siteLocation.name || '',
         totalAmount: calculations.grandTotal || 0,
-        materials: materials || [],
+        items: items || [],
         billTo: billTo,
         siteLocation: siteLocation,
         company: company,
@@ -222,12 +254,13 @@ export default function TaxQuotation() {
         const historyItem = {
           id: Date.now().toString(),
           type: type,
+          documentTitle: customTitle || type,
           quotationNumber: invoice.number || 'Unknown',
           customerName: billTo.name || 'Unknown Customer',
           siteLocationName: siteLocation.name || '',
           totalAmount: calculations.grandTotal || 0,
           createdAt: new Date().toISOString(),
-          materials: materials || [],
+          items: items || [],
           billTo: billTo,
           siteLocation: siteLocation,
           company: company,
@@ -261,21 +294,12 @@ export default function TaxQuotation() {
     }
   };
 
-  const blobToBase64 = (blob) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  };
-
   const loadFromHistory = (historyItem) => {
     // Load all the data from history item
     setBillTo(historyItem.billTo);
     setSiteLocation(historyItem.siteLocation);
     setCompany(historyItem.company);
-    setMaterials(historyItem.materials);
+    setItems(historyItem.items || []);
     setTaxRates(historyItem.taxRates);
     setDiscountPercent(historyItem.discountPercent);
     
@@ -291,24 +315,33 @@ export default function TaxQuotation() {
     setShowHistory(false);
   };
 
-  // Download both PDFs function (first: Construction QUOTATION + Tax Quotation, second: Construction INVOICE + Tax Invoice)
-  const downloadBothPDFs = async () => {
+  // Download Tax Quotation
+  const downloadTaxQuotation = async () => {
     if (isGenerating) return;
+    setShowDownloadMenu(false);
     setIsGenerating(true);
     
     try {
-      // First variant: quotation
-      await downloadPDF('quotation', true);
-      
-      // Wait a moment between downloads
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Second variant: invoice
-      await downloadPDF('invoice', true);
-      
+      await downloadPDF('quotation', true, 'Tax Quotation');
     } catch (error) {
-      console.error('Error downloading both PDFs:', error);
-      alert('Error downloading PDFs. Please try again.');
+      console.error('Error downloading Tax Quotation:', error);
+      alert('Error downloading Tax Quotation. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Download Invoice Quotation
+  const downloadInvoiceQuotation = async () => {
+    if (isGenerating) return;
+    setShowDownloadMenu(false);
+    setIsGenerating(true);
+    
+    try {
+      await downloadPDF('invoice', true, 'Invoice Quotation');
+    } catch (error) {
+      console.error('Error downloading Invoice Quotation:', error);
+      alert('Error downloading Invoice Quotation. Please try again.');
     } finally {
       setIsGenerating(false);
     }
@@ -316,7 +349,8 @@ export default function TaxQuotation() {
 
   // Multi-page PDF generation
   // variant: 'quotation' | 'invoice'
-  const downloadPDF = async (variant = 'quotation', skipLoadingState = false) => {
+  // customTitle: optional custom title for the PDF
+  const downloadPDF = async (variant = 'quotation', skipLoadingState = false, customTitle = null) => {
     if (isGenerating && !skipLoadingState) return;
     if (!skipLoadingState) setIsGenerating(true);
 
@@ -352,16 +386,35 @@ export default function TaxQuotation() {
         contentHeight: contentHeight + 'mm', 
         availableHeight: availableHeight + 'mm',
         maxItemsPerPage,
-        totalMaterials: materials.length
+        totalMaterials: items.filter(item => item.type === 'material').length
       });
 
-      // Split materials into chunks for each page
+      // Split items into chunks respecting page breaks
       const materialChunks = [];
-      for (let i = 0; i < materials.length; i += maxItemsPerPage) {
-        materialChunks.push(materials.slice(i, i + maxItemsPerPage));
+      let currentChunk = [];
+      
+      items.forEach(item => {
+        if (item.type === 'pagebreak') {
+          // Save current chunk and start new page
+          if (currentChunk.length > 0) {
+            materialChunks.push(currentChunk);
+            currentChunk = [];
+          } else {
+            // If no content before page break, still create a page
+            materialChunks.push([]);
+          }
+        } else if (item.type === 'material' || item.type === 'subject') {
+          // Add all items to current chunk - manual page breaks control pagination
+          currentChunk.push(item);
+        }
+      });
+      
+      // Add remaining items
+      if (currentChunk.length > 0) {
+        materialChunks.push(currentChunk);
       }
 
-      // If no materials, create at least one chunk
+      // If no materials at all, create at least one chunk
       if (materialChunks.length === 0) {
         materialChunks.push([]);
       }
@@ -380,7 +433,8 @@ export default function TaxQuotation() {
           materialChunks.length,
           isFirstPage, 
           isLastPage,
-          variant
+          variant,
+          customTitle
         );
 
         // Create wrapper for the page with A4 constraints
@@ -464,19 +518,20 @@ export default function TaxQuotation() {
         pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
       }
 
-  // Determine titles & filename based on variant
+  // Determine titles & filename based on variant and customTitle
   const isInvoice = variant === 'invoice';
-  const mainHeadingWord = isInvoice ? 'INVOICE' : 'QUOTATION';
-  const barTitle = isInvoice ? 'Tax Invoice' : 'Tax Quotation';
-  const filenameBase = isInvoice ? 'Tax-Invoice' : 'Construction-Quotation';
-  const filename = `${filenameBase}-${invoice.number || new Date().toISOString().split('T')[0]}.pdf`;
+  const filenameBase = customTitle ? customTitle.replace(/ /g, '-') : (isInvoice ? 'Tax-Invoice' : 'Tax-Quotation');
+  const customerName = billTo.name ? billTo.name.replace(/[^a-zA-Z0-9]/g, '-') : '';
+  const filename = customerName 
+    ? `${filenameBase}-${customerName}-${invoice.number || new Date().toISOString().split('T')[0]}.pdf`
+    : `${filenameBase}-${invoice.number || new Date().toISOString().split('T')[0]}.pdf`;
   
   // Save PDF and also save to history
   pdf.save(filename);
   
   // Convert PDF to blob for history storage
   const pdfBlob = pdf.output('blob');
-  await saveToHistory(variant, pdfBlob);
+  await saveToHistory(variant, pdfBlob, customTitle, filename);
 
     } catch (error) {
       console.error('PDF Generation Error:', error);
@@ -487,11 +542,11 @@ export default function TaxQuotation() {
   };
 
   // Helper function to create page element
-  const createPageElement = async (sourceElement, materialsForPage, pageNum, totalPages, isFirstPage, isLastPage, variant) => {
+  const createPageElement = async (sourceElement, materialsForPage, pageNum, totalPages, isFirstPage, isLastPage, variant, customTitle = null) => {
     const clone = sourceElement.cloneNode(true);
     const isInvoice = variant === 'invoice';
-    const mainHeadingWord = isInvoice ? 'INVOICE' : 'QUOTATION';
-    const barTitle = isInvoice ? 'Tax Invoice' : 'Tax Quotation';
+    const mainHeadingWord = customTitle ? customTitle.split(' ')[1] : (isInvoice ? 'INVOICE' : 'QUOTATION');
+    const barTitle = customTitle || (isInvoice ? 'Tax Invoice' : 'Tax Quotation');
     
     // Style the clone with A4 page constraints
     clone.style.cssText = `
@@ -521,34 +576,51 @@ export default function TaxQuotation() {
     // Handle materials table
     const materialsTable = clone.querySelector('.materials-table');
     if (materialsTable) {
-      // Remove existing rows except header
-      const existingRows = materialsTable.querySelectorAll('.table-row, .table-total-row');
-      existingRows.forEach(row => row.remove());
+      // Remove ALL existing content except header (including subjects, materials, page breaks)
+      const children = Array.from(materialsTable.children);
+      children.forEach(child => {
+        if (!child.classList.contains('table-header')) {
+          child.remove();
+        }
+      });
 
       // Add rows for this page
-      materialsForPage.forEach((material, index) => {
-        const globalIndex = materials.findIndex(m => m.id === material.id);
-        const row = document.createElement('div');
-        row.className = 'table-row';
-        row.style.gridTemplateColumns = '35px 200px 65px 50px 55px 85px 50px 50px 85px';
-        
-        const categoryDisplay = material.category && material.subcategory 
-          ? `${material.category} > ${material.subcategory}`
-          : material.category || material.subcategory || '';
-        
-        row.innerHTML = `
-          <div class="col-num">${globalIndex + 1}</div>
-          <div class="col-category"><span class="category-text">${categoryDisplay}</span></div>
-          <div class="col-hsn"><span>${material.hsn}</span></div>
-          <div class="col-qty"><span>${material.qty}</span></div>
-          <div class="col-unit"><span>${material.unit}</span></div>
-          <div class="col-price"><span>${material.pricePerUnit}</span></div>
-          <div class="col-disc"><span>${material.discount}%</span></div>
-          <div class="col-gst"><span>${material.gst}%</span></div>
-          <div class="col-amount">₹${fmt(material.qty * material.pricePerUnit * (1 - material.discount/100))}</div>
-        `;
-        
-        materialsTable.appendChild(row);
+      const allMaterials = items.filter(item => item.type === 'material');
+      materialsForPage.forEach((item, index) => {
+        if (item.type === 'subject') {
+          // Render subject
+          const subjectRow = document.createElement('div');
+          subjectRow.style.cssText = 'padding: 10px; background: #f0f8ff; border-bottom: 1px solid #ddd; margin-bottom: 5px;';
+          subjectRow.innerHTML = `
+            <strong style="color: #155d50; margin-bottom: 5px; display: block;">Subject/Note:</strong>
+            <div style="font-family: Arial; font-size: 14px; line-height: 1.4; white-space: pre-wrap;">${item.content || ''}</div>
+          `;
+          materialsTable.appendChild(subjectRow);
+        } else if (item.type === 'material') {
+          // Render material
+          const globalIndex = allMaterials.findIndex(m => m.id === item.id);
+          const row = document.createElement('div');
+          row.className = 'table-row';
+          row.style.gridTemplateColumns = '35px 200px 65px 50px 55px 85px 50px 50px 85px';
+          
+          const categoryDisplay = item.category && item.subcategory 
+            ? `${item.category} > ${item.subcategory}`
+            : item.category || item.subcategory || '';
+          
+          row.innerHTML = `
+            <div class="col-num">${globalIndex + 1}</div>
+            <div class="col-category"><span class="category-text">${categoryDisplay}</span></div>
+            <div class="col-hsn"><span>${item.hsn}</span></div>
+            <div class="col-qty"><span>${item.qty}</span></div>
+            <div class="col-unit"><span>${item.unit}</span></div>
+            <div class="col-price"><span>${item.pricePerUnit}</span></div>
+            <div class="col-disc"><span>${item.discount}%</span></div>
+            <div class="col-gst"><span>${item.gst}%</span></div>
+            <div class="col-amount">₹${fmt(item.qty * item.pricePerUnit * (1 - item.discount/100))}</div>
+          `;
+          
+          materialsTable.appendChild(row);
+        }
       });
 
       // Add total row only on last page
@@ -568,14 +640,10 @@ export default function TaxQuotation() {
     const headingStrong = clone.querySelector('.construction-heading strong');
     if (headingStrong) headingStrong.textContent = mainHeadingWord;
 
-    // Set invoice (tax) title bar text (with page numbering for subsequent pages)
+    // Set invoice (tax) title bar text (same on all pages, no page numbering)
     const invoiceTitle = clone.querySelector('.invoice-title');
     if (invoiceTitle) {
-      if (pageNum === 1) {
-        invoiceTitle.textContent = barTitle;
-      } else {
-        invoiceTitle.textContent = `${barTitle} (Page ${pageNum} of ${totalPages})`;
-      }
+      invoiceTitle.textContent = barTitle;
     }
 
     // Hide bill-to section on non-first pages
@@ -618,6 +686,9 @@ export default function TaxQuotation() {
       ) : (
         <>
           <div className="toolbar no-print">
+            <button className="btn ghost" onClick={() => window.history.back()}>
+              ← Back
+            </button>
             <button className="btn ghost" onClick={() => setPreview(!preview)}>
               {preview ? "Exit Preview" : "Preview"}
             </button>
@@ -625,13 +696,33 @@ export default function TaxQuotation() {
               📋 History
             </button>
             <div className="spacer" />
-            <button 
-              className="btn ghost" 
-              onClick={downloadBothPDFs}
-              disabled={isGenerating}
-            >
-              {isGenerating ? "Generating..." : "📥 Download PDFs"}
-            </button>
+            <div className="download-dropdown-wrapper">
+              <button 
+                className="btn ghost" 
+                onClick={() => setShowDownloadMenu(!showDownloadMenu)}
+                disabled={isGenerating}
+              >
+                {isGenerating ? "Generating..." : "📥 Download PDFs"}
+              </button>
+              {showDownloadMenu && (
+                <div className="download-dropdown-menu">
+                  <button 
+                    className="dropdown-item" 
+                    onClick={downloadTaxQuotation}
+                    disabled={isGenerating}
+                  >
+                    📄 Generate Tax Quotation
+                  </button>
+                  <button 
+                    className="dropdown-item" 
+                    onClick={downloadInvoiceQuotation}
+                    disabled={isGenerating}
+                  >
+                    📋 Generate Invoice Quotation
+                  </button>
+                </div>
+              )}
+            </div>
             <button className="btn primary" onClick={printInvoice}>Print</button>
           </div>
 
@@ -658,7 +749,7 @@ export default function TaxQuotation() {
             </div>
             <div className="contact-line">
               <span className="ic">
-                <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 2c2.5 0 4.7 1 6.3 2.6A8 8 0 714.7 6.6 8 8 0 0112 4zm0 16a8 8 0 01-7.3-5h14.6A8 8 0 0112 20z"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 2c2.5 0 4.7 1 6.3 2.6A8 8 0 0 1 14.7 6.6 8 8 0 0 1 12 4zm0 16a8 8 0 01-7.3-5h14.6A8 8 0 0112 20z"/></svg>
               </span>
               <input value={company.website} onChange={(e)=>setCompany({...company, website:e.target.value})} readOnly={preview}/>
             </div>
@@ -746,45 +837,92 @@ export default function TaxQuotation() {
             {!preview && <div className="col-action">Action</div>}
           </div>
 
-          {materials.map((row, i) => (
-            <div key={row.id} className="table-row">
-              <div className="col-num">{i + 1}</div>
-              <div className="col-category">
-                <div className="category-inputs">
-                  <input 
-                    value={row.category} 
-                    onChange={(e)=>updateMaterial(row.id,"category",e.target.value)} 
-                    placeholder="Main Category" 
-                    readOnly={preview}
-                    className="category-input main-category"
-                  />
-                  <input 
-                    value={row.subcategory} 
-                    onChange={(e)=>updateMaterial(row.id,"subcategory",e.target.value)} 
-                    placeholder="Subcategory" 
-                    readOnly={preview}
-                    className="category-input sub-category"
-                  />
+          {items.map((item, idx) => {
+            // Count materials for numbering
+            const materialIndex = items.slice(0, idx).filter(x => x.type === 'material').length + (item.type === 'material' ? 1 : 0);
+            
+            if (item.type === 'pagebreak') {
+              // Don't show page breaks in preview mode
+              if (preview) return null;
+              return (
+                <div key={item.id} className="no-print" style={{padding: '15px', background: '#fff3cd', border: '2px dashed #ffc107', textAlign: 'center', fontWeight: 'bold', color: '#856404', borderBottom: '2px solid var(--border)'}}>
+                  📄 PAGE BREAK
+                  <button 
+                    className="remove-btn" 
+                    onClick={() => removeItem(item.id)}
+                    style={{marginLeft: '10px', padding: '6px 12px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer'}}
+                  >
+                    Remove
+                  </button>
                 </div>
-              </div>
-              <div className="col-hsn"><input value={row.hsn} onChange={(e)=>updateMaterial(row.id,"hsn",e.target.value)} placeholder="HSN" readOnly={preview}/></div>
-              <div className="col-qty"><input type="number" value={row.qty} onChange={(e)=>updateMaterial(row.id,"qty",e.target.value)} min="0" readOnly={preview}/></div>
-              <div className="col-unit">
-                <select value={row.unit} onChange={(e)=>updateMaterial(row.id,"unit",e.target.value)} disabled={preview}>
-                  <option>Nos</option><option>Kg</option><option>Ltr</option><option>Mtr</option><option>Sq.Ft</option><option>Box</option>
-                </select>
-              </div>
-              <div className="col-price"><input type="number" value={row.pricePerUnit} onChange={(e)=>updateMaterial(row.id,"pricePerUnit",e.target.value)} min="0" step="0.01" readOnly={preview}/></div>
-              <div className="col-disc"><input type="number" value={row.discount} onChange={(e)=>updateMaterial(row.id,"discount",e.target.value)} min="0" max="100" step="0.01" readOnly={preview}/>%</div>
-              <div className="col-gst"><input type="number" value={row.gst} onChange={(e)=>updateMaterial(row.id,"gst",e.target.value)} min="0" step="0.01" readOnly={preview}/>%</div>
-              <div className="col-amount">₹{fmt(row.qty * row.pricePerUnit * (1 - row.discount/100))}</div>
-              {!preview && (
-                <div className="col-action">
-                  <button className="remove-btn" onClick={()=>removeMaterial(row.id)}>Remove</button>
+              );
+            }
+            
+            if (item.type === 'subject') {
+              return (
+                <div key={item.id} style={{padding: '10px', background: '#f0f8ff', borderBottom: '1px solid var(--border)'}}>
+                  <strong style={{color: '#155d50', marginBottom: '5px', display: 'block'}}>Subject/Note:</strong>
+                  <textarea
+                    value={item.content}
+                    onChange={(e) => updateSubject(item.id, e.target.value)}
+                    placeholder="Enter subject or notes..."
+                    readOnly={preview}
+                    style={{width: '100%', minHeight: '60px', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', fontFamily: 'Arial', fontSize: '14px', resize: 'vertical'}}
+                  />
+                  {!preview && (
+                    <button 
+                      className="remove-btn" 
+                      onClick={() => removeItem(item.id)}
+                      style={{marginTop: '5px', padding: '6px 12px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer'}}
+                    >
+                      Remove
+                    </button>
+                  )}
                 </div>
-              )}
-            </div>
-          ))}
+              );
+            }
+            
+            // Material row
+            return (
+              <div key={item.id} className="table-row">
+                <div className="col-num">{materialIndex}</div>
+                <div className="col-category">
+                  <div className="category-inputs">
+                    <input 
+                      value={item.category} 
+                      onChange={(e)=>updateMaterial(item.id,"category",e.target.value)} 
+                      placeholder="Main Category" 
+                      readOnly={preview}
+                      className="category-input main-category"
+                    />
+                    <input 
+                      value={item.subcategory} 
+                      onChange={(e)=>updateMaterial(item.id,"subcategory",e.target.value)} 
+                      placeholder="Subcategory" 
+                      readOnly={preview}
+                      className="category-input sub-category"
+                    />
+                  </div>
+                </div>
+                <div className="col-hsn"><input value={item.hsn} onChange={(e)=>updateMaterial(item.id,"hsn",e.target.value)} placeholder="HSN" readOnly={preview}/></div>
+                <div className="col-qty"><input type="number" value={item.qty} onChange={(e)=>updateMaterial(item.id,"qty",e.target.value)} min="0" readOnly={preview}/></div>
+                <div className="col-unit">
+                  <select value={item.unit} onChange={(e)=>updateMaterial(item.id,"unit",e.target.value)} disabled={preview}>
+                    <option>Nos</option><option>Kg</option><option>Ltr</option><option>Mtr</option><option>Sq.Ft</option><option>Box</option>
+                  </select>
+                </div>
+                <div className="col-price"><input type="number" value={item.pricePerUnit} onChange={(e)=>updateMaterial(item.id,"pricePerUnit",e.target.value)} min="0" step="0.01" readOnly={preview}/></div>
+                <div className="col-disc"><input type="number" value={item.discount} onChange={(e)=>updateMaterial(item.id,"discount",e.target.value)} min="0" max="100" step="0.01" readOnly={preview}/>%</div>
+                <div className="col-gst"><input type="number" value={item.gst} onChange={(e)=>updateMaterial(item.id,"gst",e.target.value)} min="0" step="0.01" readOnly={preview}/>%</div>
+                <div className="col-amount">₹{fmt(item.qty * item.pricePerUnit * (1 - item.discount/100))}</div>
+                {!preview && (
+                  <div className="col-action">
+                    <button className="remove-btn" onClick={()=>removeItem(item.id)}>Remove</button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
 
           {/* compact total row */}
           <div className="table-total-row">
@@ -794,8 +932,10 @@ export default function TaxQuotation() {
         </div>
 
         {!preview && (
-          <div className="add-material-section no-print">
+          <div className="add-material-section no-print" style={{display: 'flex', gap: '10px', padding: '10px'}}>
             <button onClick={addMaterial} className="btn add-material">+ Add Material</button>
+            <button onClick={addSubject} className="btn" style={{background: '#155d50', color: 'white', padding: '8px 16px', border: 'none', borderRadius: '4px', cursor: 'pointer'}}>+ Add Subject</button>
+            <button onClick={addPageBreak} className="btn" style={{background: '#ffc107', color: '#000', padding: '8px 16px', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold'}}>📄 Add Page Break</button>
           </div>
         )}
 
