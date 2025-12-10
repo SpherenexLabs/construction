@@ -102,8 +102,29 @@ const History = ({ onLoadQuotation, onBack }) => {
         
         if (item.id && item.storageRef) {
           // Delete from Firebase Storage and Firestore
-          await deletePDF(item.id, item.storageRef);
-          console.log('Deleted from Firebase');
+          try {
+            await deletePDF(item.id, item.storageRef);
+            console.log('Deleted from Firebase');
+          } catch (error) {
+            console.error('Firebase deletion error:', error);
+            
+            // If network error or Firestore error, try to at least delete from Firestore
+            if (error.code === 'unavailable' || error.message.includes('QUIC') || error.message.includes('CONNECTION')) {
+              console.log('Network error detected, retrying Firestore deletion only...');
+              try {
+                const { deleteDoc, doc } = await import('firebase/firestore');
+                const { db } = await import('./firebase');
+                await deleteDoc(doc(db, 'quotations', item.id));
+                console.log('Deleted from Firestore (direct)');
+              } catch (retryError) {
+                console.error('Retry failed:', retryError);
+                alert(`Failed to delete from Firebase: ${retryError.message}. The item may still appear in history.`);
+                return;
+              }
+            } else {
+              throw error;
+            }
+          }
         } else {
           // Delete from localStorage
           const savedHistory = localStorage.getItem('quotationHistory');
@@ -120,7 +141,7 @@ const History = ({ onLoadQuotation, onBack }) => {
       }
     } catch (error) {
       console.error('Error deleting item:', error);
-      alert('Error deleting item.');
+      alert(`Error deleting item: ${error.message}`);
     }
   };
 

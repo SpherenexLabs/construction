@@ -116,23 +116,42 @@ export const updatePDFMetadata = async (docId, updatedData) => {
 // Delete PDF from Storage and Firestore
 export const deletePDF = async (docId, storageRefPath) => {
   try {
-    console.log('Deleting PDF:', docId);
+    console.log('Deleting item:', docId);
+    console.log('Storage path:', storageRefPath);
     
-    // Delete from Storage
+    // Delete from Storage (handle if file doesn't exist)
     if (storageRefPath) {
-      const storageRef = ref(storage, storageRefPath);
-      await deleteObject(storageRef);
-      console.log('PDF deleted from Storage');
+      try {
+        console.log('Deleting PDF:', storageRefPath);
+        const storageRef = ref(storage, storageRefPath);
+        await deleteObject(storageRef);
+        console.log('✅ PDF deleted from Storage');
+      } catch (storageError) {
+        // If file doesn't exist in storage, log but continue to delete from Firestore
+        if (storageError.code === 'storage/object-not-found') {
+          console.warn('⚠️ PDF file not found in Storage (may have been deleted already):', storageRefPath);
+        } else if (storageError.message && (storageError.message.includes('QUIC') || storageError.message.includes('CONNECTION'))) {
+          console.warn('⚠️ Network error deleting from Storage, continuing to Firestore:', storageError.message);
+        } else {
+          console.error('❌ Storage deletion error:', storageError);
+          // Don't throw, continue to Firestore deletion
+        }
+      }
     }
     
     // Delete from Firestore
+    console.log('Deleting item from Firestore:', docId);
     await deleteDoc(doc(db, 'quotations', docId));
-    console.log('PDF metadata deleted from Firestore');
+    console.log('✅ PDF metadata deleted from Firestore');
+    
+    return true;
   } catch (error) {
-    console.error('Error deleting PDF:', error);
+    console.error('❌ Error deleting PDF:', error);
+    console.error('Error code:', error.code);
+    console.error('Error message:', error.message);
     throw error;
   }
-};
+};;
 
 // Sync existing Storage files to Firestore
 export const syncStorageToFirestore = async () => {

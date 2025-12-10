@@ -126,9 +126,98 @@ export default function TaxQuotation() {
 
   // Combined items list (materials, subjects, and page breaks)
   const [items, setItems] = useState([]);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
   
   useEffect(() => {
     try {
+      // Try to load full items first (includes subjects and page breaks)
+      const fullItemsRaw = localStorage.getItem("quotationFullItems");
+      const quotationItemsRaw = localStorage.getItem("quotationItems");
+      
+      if (fullItemsRaw) {
+        const fullItems = JSON.parse(fullItemsRaw);
+        if (Array.isArray(fullItems) && fullItems.length > 0) {
+          // Check if quotationItems has changed (user selected more/different materials)
+          if (quotationItemsRaw) {
+            const quotationItems = JSON.parse(quotationItemsRaw);
+            const existingMaterials = fullItems.filter(item => item.type === 'material');
+            const existingMaterialNames = existingMaterials.map(m => m.category);
+            const newMaterialNames = quotationItems.map(it => it.label || it.name || "");
+            
+            // Check if materials have changed
+            const materialsChanged = JSON.stringify(existingMaterialNames.sort()) !== JSON.stringify(newMaterialNames.sort());
+            
+            if (materialsChanged) {
+              // Merge: keep existing items in order, add new materials after subjects/page breaks
+              const existingMaterials = fullItems.filter(item => item.type === 'material');
+              const nonMaterials = fullItems.filter(item => item.type !== 'material');
+              
+              // Map existing materials by category name for preservation
+              const existingMap = new Map();
+              existingMaterials.forEach(mat => {
+                existingMap.set(mat.category, mat);
+              });
+              
+              // Process materials from quotationItems
+              const updatedMaterials = quotationItems.map((it) => {
+                const categoryName = it.label || it.name || "";
+                // If material exists, preserve its data (qty, price, etc.)
+                if (existingMap.has(categoryName)) {
+                  return existingMap.get(categoryName);
+                }
+                // New material
+                return {
+                  id: Date.now() + Math.random(),
+                  type: 'material',
+                  category: categoryName,
+                  subcategory: "",
+                  hsn: "", 
+                  qty: 1, 
+                  unit: "Nos", 
+                  pricePerUnit: 0, 
+                  discount: 0, 
+                  gst: 18
+                };
+              });
+              
+              // Reconstruct: materials first, then subjects/page breaks, then new materials added after
+              const finalItems = [];
+              
+              // Add existing materials that are still in quotationItems
+              updatedMaterials.forEach(mat => {
+                const wasExisting = existingMaterials.some(em => em.category === mat.category);
+                if (wasExisting) {
+                  finalItems.push(mat);
+                }
+              });
+              
+              // Add subjects and page breaks in their original position
+              nonMaterials.forEach(item => {
+                finalItems.push(item);
+              });
+              
+              // Add new materials (that weren't in existing) after subjects/page breaks
+              updatedMaterials.forEach(mat => {
+                const wasExisting = existingMaterials.some(em => em.category === mat.category);
+                if (!wasExisting) {
+                  finalItems.push(mat);
+                }
+              });
+              
+              setItems(finalItems);
+            } else {
+              // No change, use stored full items
+              setItems(fullItems);
+            }
+          } else {
+            setItems(fullItems);
+          }
+          setInitialLoadDone(true);
+          return;
+        }
+      }
+      
+      // Fallback: load from quotationItems only (first time)
       const raw = localStorage.getItem("quotationItems");
       if (raw) {
         const arr = JSON.parse(raw);
@@ -148,10 +237,19 @@ export default function TaxQuotation() {
       } else {
         setItems([{ id: 1, type: 'material', category: "", subcategory: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 }]);
       }
+      setInitialLoadDone(true);
     } catch {
       setItems([{ id: 1, type: 'material', category: "", subcategory: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 }]);
+      setInitialLoadDone(true);
     }
   }, []);
+
+  // Save full items (including subjects and page breaks) whenever items change
+  useEffect(() => {
+    if (initialLoadDone && items.length > 0) {
+      localStorage.setItem("quotationFullItems", JSON.stringify(items));
+    }
+  }, [items, initialLoadDone]);
 
   // Tax rates editable (manual input). Start at 0 so GST applies only if user enters a value
   const [taxRates, setTaxRates] = useState({ sgst: 0, cgst: 0 });
@@ -172,8 +270,44 @@ export default function TaxQuotation() {
     setItems((m) => [...m, { id: newId, type: 'pagebreak' }]);
   };
 
-  const removeItem = (id) =>
-    setItems((m) => m.length > 1 ? m.filter((x) => x.id !== id) : m);
+  const removeItem = (id) => {
+    setItems((m) => {
+      if (m.length <= 1) return m;
+      
+      const itemToRemove = m.find(x => x.id === id);
+      const filtered = m.filter((x) => x.id !== id);
+      
+      // If removing a material, also remove from quotationItems in localStorage
+      if (itemToRemove && itemToRemove.type === 'material') {
+        try {
+          const quotationItemsRaw = localStorage.getItem("quotationItems");
+          if (quotationItemsRaw) {
+            const quotationItems = JSON.parse(quotationItemsRaw);
+            const updatedQuotationItems = quotationItems.filter(item => {
+              const itemName = item.label || item.name || "";
+              return itemName !== itemToRemove.category;
+            });
+            localStorage.setItem("quotationItems", JSON.stringify(updatedQuotationItems));
+          }
+        } catch (error) {
+          console.error("Error updating quotationItems:", error);
+        }
+      }
+      
+      return filtered;
+    });
+  };
+
+  const addPageBreakAfter = (afterId) => {
+    const newId = Date.now() + Math.random();
+    setItems((m) => {
+      const index = m.findIndex(item => item.id === afterId);
+      if (index === -1) return m;
+      const newItems = [...m];
+      newItems.splice(index + 1, 0, { id: newId, type: 'pagebreak' });
+      return newItems;
+    });
+  };
 
   const updateMaterial = (id, field, value) =>
     setItems((m) =>
@@ -588,12 +722,24 @@ export default function TaxQuotation() {
       const allMaterials = items.filter(item => item.type === 'material');
       materialsForPage.forEach((item, index) => {
         if (item.type === 'subject') {
-          // Render subject
+          // Render subject with formatting
+          const renderFormattedContent = (text) => {
+            if (!text) return '';
+            let formatted = text;
+            // Bold: **text**
+            formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Italic: *text*
+            formatted = formatted.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
+            // Underline: __text__
+            formatted = formatted.replace(/__(.*?)__/g, '<u>$1</u>');
+            return formatted;
+          };
+          
           const subjectRow = document.createElement('div');
           subjectRow.style.cssText = 'padding: 10px; background: #f0f8ff; border-bottom: 1px solid #ddd; margin-bottom: 5px;';
           subjectRow.innerHTML = `
             <strong style="color: #155d50; margin-bottom: 5px; display: block;">Subject/Note:</strong>
-            <div style="font-family: Arial; font-size: 14px; line-height: 1.4; white-space: pre-wrap;">${item.content || ''}</div>
+            <div style="font-family: Arial; font-size: 14px; line-height: 1.5; white-space: pre-wrap;">${renderFormattedContent(item.content || '')}</div>
           `;
           materialsTable.appendChild(subjectRow);
         } else if (item.type === 'material') {
@@ -603,13 +749,24 @@ export default function TaxQuotation() {
           row.className = 'table-row';
           row.style.gridTemplateColumns = '35px 200px 65px 50px 55px 85px 50px 50px 85px';
           
-          const categoryDisplay = item.category && item.subcategory 
-            ? `${item.category} > ${item.subcategory}`
-            : item.category || item.subcategory || '';
+          // Build category display with proper formatting
+          let categoryHTML = '';
+          if (item.category && item.subcategory) {
+            categoryHTML = `
+              <div style="display: flex; flex-direction: column; gap: 2px; width: 100%;">
+                <span style="font-family: 'Times New Roman', serif; font-size: 14px; font-weight: 800; color: #155d50; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${item.category}</span>
+                <span style="font-family: Arial, sans-serif; font-size: 12px; color: #666; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${item.subcategory}</span>
+              </div>
+            `;
+          } else if (item.category) {
+            categoryHTML = `<span style="font-family: 'Times New Roman', serif; font-size: 14px; font-weight: 800; color: #155d50; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${item.category}</span>`;
+          } else if (item.subcategory) {
+            categoryHTML = `<span style="font-family: Arial, sans-serif; font-size: 12px; color: #666; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${item.subcategory}</span>`;
+          }
           
           row.innerHTML = `
             <div class="col-num">${globalIndex + 1}</div>
-            <div class="col-category"><span class="category-text">${categoryDisplay}</span></div>
+            <div class="col-category">${categoryHTML}</div>
             <div class="col-hsn"><span>${item.hsn}</span></div>
             <div class="col-qty"><span>${item.qty}</span></div>
             <div class="col-unit"><span>${item.unit}</span></div>
@@ -859,16 +1016,111 @@ export default function TaxQuotation() {
             }
             
             if (item.type === 'subject') {
+              const textareaRef = React.createRef();
+              
+              const applyFormatting = (format) => {
+                const textarea = textareaRef.current;
+                if (!textarea) return;
+                
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const selectedText = item.content.substring(start, end);
+                
+                if (!selectedText) {
+                  alert('Please select text to format');
+                  return;
+                }
+                
+                let formattedText = '';
+                if (format === 'bold') {
+                  formattedText = `**${selectedText}**`;
+                } else if (format === 'italic') {
+                  formattedText = `*${selectedText}*`;
+                } else if (format === 'underline') {
+                  formattedText = `__${selectedText}__`;
+                }
+                
+                const newContent = item.content.substring(0, start) + formattedText + item.content.substring(end);
+                updateSubject(item.id, newContent);
+                
+                // Set cursor position after formatted text
+                setTimeout(() => {
+                  textarea.focus();
+                  textarea.setSelectionRange(start + formattedText.length, start + formattedText.length);
+                }, 0);
+              };
+              
+              // Convert markdown-style formatting to HTML for preview
+              const renderFormattedContent = (text) => {
+                if (!text) return '';
+                let formatted = text;
+                // Bold: **text**
+                formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                // Italic: *text*
+                formatted = formatted.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
+                // Underline: __text__
+                formatted = formatted.replace(/__(.*?)__/g, '<u>$1</u>');
+                return formatted;
+              };
+              
               return (
                 <div key={item.id} style={{padding: '10px', background: '#f0f8ff', borderBottom: '1px solid var(--border)'}}>
                   <strong style={{color: '#155d50', marginBottom: '5px', display: 'block'}}>Subject/Note:</strong>
-                  <textarea
-                    value={item.content}
-                    onChange={(e) => updateSubject(item.id, e.target.value)}
-                    placeholder="Enter subject or notes..."
-                    readOnly={preview}
-                    style={{width: '100%', minHeight: '60px', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', fontFamily: 'Arial', fontSize: '14px', resize: 'vertical'}}
-                  />
+                  
+                  {!preview && (
+                    <div style={{marginBottom: '5px', display: 'flex', gap: '5px'}}>
+                      <button
+                        onClick={() => applyFormatting('bold')}
+                        title="Bold (Select text first)"
+                        style={{padding: '4px 8px', background: '#155d50', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer', fontWeight: 'bold'}}
+                      >
+                        B
+                      </button>
+                      <button
+                        onClick={() => applyFormatting('italic')}
+                        title="Italic (Select text first)"
+                        style={{padding: '4px 8px', background: '#155d50', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer', fontStyle: 'italic'}}
+                      >
+                        I
+                      </button>
+                      <button
+                        onClick={() => applyFormatting('underline')}
+                        title="Underline (Select text first)"
+                        style={{padding: '4px 8px', background: '#155d50', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer', textDecoration: 'underline'}}
+                      >
+                        U
+                      </button>
+                      <span style={{fontSize: '12px', color: '#666', alignSelf: 'center', marginLeft: '10px'}}>
+                        Select text and click format buttons
+                      </span>
+                    </div>
+                  )}
+                  
+                  {preview ? (
+                    <div 
+                      style={{
+                        width: '100%', 
+                        minHeight: '60px', 
+                        padding: '8px', 
+                        border: '1px solid #ddd', 
+                        borderRadius: '4px', 
+                        fontFamily: 'Arial', 
+                        fontSize: '14px', 
+                        whiteSpace: 'pre-wrap',
+                        lineHeight: '1.5'
+                      }}
+                      dangerouslySetInnerHTML={{ __html: renderFormattedContent(item.content) }}
+                    />
+                  ) : (
+                    <textarea
+                      ref={textareaRef}
+                      value={item.content}
+                      onChange={(e) => updateSubject(item.id, e.target.value)}
+                      placeholder="Enter subject or notes... (Use formatting buttons for bold/italic/underline)"
+                      style={{width: '100%', minHeight: '60px', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', fontFamily: 'Arial', fontSize: '14px', resize: 'vertical'}}
+                    />
+                  )}
+                  
                   {!preview && (
                     <button 
                       className="remove-btn" 
@@ -916,8 +1168,24 @@ export default function TaxQuotation() {
                 <div className="col-gst"><input type="number" value={item.gst} onChange={(e)=>updateMaterial(item.id,"gst",e.target.value)} min="0" step="0.01" readOnly={preview}/>%</div>
                 <div className="col-amount">₹{fmt(item.qty * item.pricePerUnit * (1 - item.discount/100))}</div>
                 {!preview && (
-                  <div className="col-action">
+                  <div className="col-action" style={{display: 'flex', gap: '5px', alignItems: 'center'}}>
                     <button className="remove-btn" onClick={()=>removeItem(item.id)}>Remove</button>
+                    <button 
+                      onClick={() => addPageBreakAfter(item.id)}
+                      title="Add page break after this category"
+                      style={{
+                        padding: '4px 8px',
+                        background: '#ffc107',
+                        color: '#000',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      📄
+                    </button>
                   </div>
                 )}
               </div>
