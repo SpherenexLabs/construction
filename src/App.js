@@ -7,6 +7,7 @@ import Login from './Login';
 import Dashboard from './Dashboard';
 import SubCategories from './subcategories';
 import Quotation from './Quotation';
+import History from './History';
 import './App.css';
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
         <Route path="/" element={<Dashboard user={user} />} />
         <Route path="/subcategories" element={<SubCategories />} />
         <Route path="/quotation" element={<Quotation />} />
+        <Route path="/history" element={<History />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

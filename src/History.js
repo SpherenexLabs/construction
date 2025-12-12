@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getAllPDFs, deletePDF } from './firebase';
 import './History.css';
 
 const History = ({ onLoadQuotation, onBack }) => {
+  const navigate = useNavigate();
   const [history, setHistory] = useState([]);
   const [filteredHistory, setFilteredHistory] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -168,6 +170,12 @@ const History = ({ onLoadQuotation, onBack }) => {
     console.log('Loading quotation data:', item);
     if (onLoadQuotation) {
       onLoadQuotation(item);
+    } else {
+      // Use the existing loadFromHistory mechanism in Quotation.js
+      localStorage.setItem('loadFromHistory', JSON.stringify(item));
+      
+      // Navigate to quotation page
+      navigate('/quotation');
     }
   };
 
@@ -198,7 +206,7 @@ const History = ({ onLoadQuotation, onBack }) => {
   return (
     <div className="history-container">
       <div className="history-header">
-        <button className="btn back-btn" onClick={onBack}>
+        <button className="btn back-btn" onClick={() => onBack ? onBack() : navigate(-1)}>
           ← Back
         </button>
         <h2>Quotation & Invoice History</h2>

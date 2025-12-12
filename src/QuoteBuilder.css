@@ -24,7 +24,7 @@
 /* Right pane toolbar */
 .qb-right .toolbar{ display:flex; align-items:center; gap:10px; margin-bottom: 8px; }
 .qb-right .spacer{ flex:1 1 auto; }
-.btn{ background:#111827; color:#fff; border:1px solid #111827; padding:10px 14px; border-radius:10px; font-weight:600; cursor:pointer;}
+.btn{ background:#111827; color:#000; border:1px solid #111827; padding:10px 14px; border-radius:10px; font-weight:600; cursor:pointer;}
 .btn:hover{ filter:brightness(.95); }
 .btn.ghost{ background:#fff; color:#111827; }
 .btn.sm{ padding:6px 10px; border-radius:8px; }
@@ -49,7 +49,7 @@
 
 .items{ padding: 8px 16px 12px; }
 .t-row{ display:grid; grid-template-columns: 60px 1.6fr 120px 150px 150px 80px; border-bottom:1px solid #f3f4f6; align-items:center; }
-.t-row.head{ background:#111827; color:#fff; border-bottom-color:#111827; }
+.t-row.head{ background:#111827; color:#000; border-bottom-color:#111827; }
 .t-cell{ padding:8px 10px; }
 .t-cell.no{ text-align:center; }
 .t-cell.qty{ text-align:center; }

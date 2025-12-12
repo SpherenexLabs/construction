@@ -1,8 +1,13 @@
 // Categories.js
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Categories.css';
+import History from './History';
 
 const Categories = () => {
+  const navigate = useNavigate();
+  const [showHistory, setShowHistory] = useState(false);
+  
   const categories = [
     {
       id: 1,
@@ -131,11 +136,49 @@ const Categories = () => {
     // Add your category navigation logic here
   };
 
+  // Create new quotation - clears localStorage and navigates to quotation page
+  const createNewQuotation = () => {
+    if (window.confirm('Are you sure you want to create a new blank quotation?')) {
+      // Clear localStorage for fresh start
+      localStorage.removeItem('quotationFullItems');
+      localStorage.removeItem('quotationItems');
+      
+      // Navigate to quotation page
+      navigate('/quotation');
+    }
+  };
+
+  // Load quotation from history
+  const loadFromHistory = (historyItem) => {
+    // Store the history item data to be loaded by Quotation component
+    localStorage.setItem('loadFromHistory', JSON.stringify(historyItem));
+    setShowHistory(false);
+    navigate('/quotation');
+  };
+
+  // Show history modal
+  if (showHistory) {
+    return (
+      <History 
+        onBack={() => setShowHistory(false)} 
+        onLoadQuotation={loadFromHistory}
+      />
+    );
+  }
+
   return (
     <section className="categories-section">
       <div className="categories-container">
         <div className="categories-header">
           <h2 className="categories-title">Explore Building, Construction and Infrastructure</h2>
+          <div className="categories-actions">
+            <button className="action-btn new-quotation-btn" onClick={createNewQuotation}>
+              ➕ Create New Quotation
+            </button>
+            <button className="action-btn history-btn" onClick={() => setShowHistory(true)}>
+              📋 History
+            </button>
+          </div>
         </div>
 
         <div className="categories-grid">

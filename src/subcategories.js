@@ -1851,8 +1851,28 @@ const SubCategories = () => {
       </div>
 
       <div className="subcats-container">
-        {/* Top bar button to open quotation */}
+        {/* Top bar buttons */}
         <div className="subcats-topbar">
+          <div style={{display: 'flex', gap: '12px'}}>
+            <button
+              className="btn ghost"
+              onClick={() => {
+                localStorage.removeItem('quotationItems');
+                localStorage.removeItem('quotationFullItems');
+                navigate("/quotation");
+              }}
+              style={{background: 'linear-gradient(135deg, #06e2ba 0%, #05c9a5 100%)', color: 'black', border: 'none'}}
+            >
+              + New Quotation
+            </button>
+            <button
+              className="btn ghost"
+              onClick={() => navigate("/history")}
+              style={{background: 'linear-gradient(135deg, #083a5e 0%, #0a4a75 100%)', color: 'white', border: 'none'}}
+            >
+              📋 History
+            </button>
+          </div>
           <button
             className="btn primary"
             disabled={totalSelected === 0}

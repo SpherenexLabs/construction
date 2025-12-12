@@ -79,6 +79,7 @@ export default function TaxQuotation() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+  const [subcategoryModal, setSubcategoryModal] = useState({ show: false, itemId: null, text: '' });
   
   useEffect(() => {
     console.log('[Quotation] mounted');
@@ -130,6 +131,36 @@ export default function TaxQuotation() {
   
   useEffect(() => {
     try {
+      // Check if loading from history (triggered from Categories page)
+      const loadFromHistoryRaw = localStorage.getItem("loadFromHistory");
+      if (loadFromHistoryRaw) {
+        const historyItem = JSON.parse(loadFromHistoryRaw);
+        localStorage.removeItem("loadFromHistory"); // Clear after loading
+        
+        // Load all the data from history item
+        if (historyItem.billTo) setBillTo(historyItem.billTo);
+        if (historyItem.siteLocation) setSiteLocation(historyItem.siteLocation);
+        if (historyItem.company) setCompany(historyItem.company);
+        if (historyItem.items && historyItem.items.length > 0) {
+          setItems(historyItem.items);
+        } else {
+          setItems([{ id: 1, type: 'material', category: "", subcategory: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 }]);
+        }
+        if (historyItem.taxRates) setTaxRates(historyItem.taxRates);
+        if (historyItem.discountPercent !== undefined) setDiscountPercent(historyItem.discountPercent);
+        
+        // Generate new quotation number to avoid conflicts
+        const newInvoiceNumber = "QTN-" + new Date().getTime().toString().slice(-6);
+        setInvoice({
+          ...historyItem.invoice,
+          number: newInvoiceNumber,
+          date: new Date().toISOString().slice(0, 10)
+        });
+        
+        setInitialLoadDone(true);
+        return;
+      }
+      
       // Try to load full items first (includes subjects and page breaks)
       const fullItemsRaw = localStorage.getItem("quotationFullItems");
       const quotationItemsRaw = localStorage.getItem("quotationItems");
@@ -141,20 +172,26 @@ export default function TaxQuotation() {
           if (quotationItemsRaw) {
             const quotationItems = JSON.parse(quotationItemsRaw);
             const existingMaterials = fullItems.filter(item => item.type === 'material');
-            const existingMaterialNames = existingMaterials.map(m => m.category);
+            
+            // Separate manually added materials (empty category or not matching any quotationItems)
+            const quotationItemNames = quotationItems.map(it => it.label || it.name || "");
+            const manuallyAddedMaterials = existingMaterials.filter(mat => 
+              !mat.category || !quotationItemNames.includes(mat.category)
+            );
+            const quotationMaterials = existingMaterials.filter(mat => 
+              mat.category && quotationItemNames.includes(mat.category)
+            );
+            
+            const existingMaterialNames = quotationMaterials.map(m => m.category);
             const newMaterialNames = quotationItems.map(it => it.label || it.name || "");
             
             // Check if materials have changed
             const materialsChanged = JSON.stringify(existingMaterialNames.sort()) !== JSON.stringify(newMaterialNames.sort());
             
             if (materialsChanged) {
-              // Merge: keep existing items in order, add new materials after subjects/page breaks
-              const existingMaterials = fullItems.filter(item => item.type === 'material');
-              const nonMaterials = fullItems.filter(item => item.type !== 'material');
-              
               // Map existing materials by category name for preservation
               const existingMap = new Map();
-              existingMaterials.forEach(mat => {
+              quotationMaterials.forEach(mat => {
                 existingMap.set(mat.category, mat);
               });
               
@@ -180,26 +217,31 @@ export default function TaxQuotation() {
                 };
               });
               
-              // Reconstruct: materials first, then subjects/page breaks, then new materials added after
+              // Reconstruct: keep all items including manually added materials
               const finalItems = [];
               
-              // Add existing materials that are still in quotationItems
-              updatedMaterials.forEach(mat => {
-                const wasExisting = existingMaterials.some(em => em.category === mat.category);
-                if (wasExisting) {
-                  finalItems.push(mat);
+              // Add all items in their original order, replacing quotation materials with updated ones
+              fullItems.forEach(item => {
+                if (item.type !== 'material') {
+                  // Keep subjects and page breaks
+                  finalItems.push(item);
+                } else if (!item.category || !quotationItemNames.includes(item.category)) {
+                  // Keep manually added materials
+                  finalItems.push(item);
+                } else {
+                  // Replace with updated material from quotationItems
+                  const updatedMat = updatedMaterials.find(m => m.category === item.category);
+                  if (updatedMat) {
+                    finalItems.push(updatedMat);
+                    // Mark as added so we don't add it again
+                    updatedMat._added = true;
+                  }
                 }
               });
               
-              // Add subjects and page breaks in their original position
-              nonMaterials.forEach(item => {
-                finalItems.push(item);
-              });
-              
-              // Add new materials (that weren't in existing) after subjects/page breaks
+              // Add any new materials from quotationItems that weren't in the original list
               updatedMaterials.forEach(mat => {
-                const wasExisting = existingMaterials.some(em => em.category === mat.category);
-                if (!wasExisting) {
+                if (!mat._added) {
                   finalItems.push(mat);
                 }
               });
@@ -254,6 +296,7 @@ export default function TaxQuotation() {
   // Tax rates editable (manual input). Start at 0 so GST applies only if user enters a value
   const [taxRates, setTaxRates] = useState({ sgst: 0, cgst: 0 });
   const [discountPercent, setDiscountPercent] = useState(0);
+  const [manualSubtotal, setManualSubtotal] = useState(null); // null means use calculated value
 
   const addMaterial = () => {
     const newId = Date.now() + Math.random(); // Ensure unique ID
@@ -268,6 +311,69 @@ export default function TaxQuotation() {
   const addPageBreak = () => {
     const newId = Date.now() + Math.random(); // Ensure unique ID
     setItems((m) => [...m, { id: newId, type: 'pagebreak' }]);
+  };
+
+  // Create new blank quotation
+  const createNewQuotation = async () => {
+    if (window.confirm('Are you sure you want to create a new quotation? Current data will be saved to history.')) {
+      // Check if there's data worth saving (at least one material with category or billTo name)
+      const hasMeaningfulData = items.some(item => item.type === 'material' && item.category) || billTo.name;
+      
+      if (hasMeaningfulData) {
+        try {
+          // Save current quotation to history before clearing
+          const historyItem = {
+            id: Date.now().toString(),
+            type: 'quotation',
+            documentTitle: 'Quotation (Auto-saved)',
+            quotationNumber: invoice.number || 'Unknown',
+            customerName: billTo.name || 'Unknown Customer',
+            siteLocationName: siteLocation.name || '',
+            totalAmount: calculations.grandTotal || 0,
+            createdAt: new Date().toISOString(),
+            items: items || [],
+            billTo: billTo,
+            siteLocation: siteLocation,
+            company: company,
+            invoice: invoice,
+            taxRates: taxRates,
+            discountPercent: discountPercent,
+            autoSaved: true
+          };
+
+          const existingHistory = localStorage.getItem('quotationHistory');
+          const history = existingHistory ? JSON.parse(existingHistory) : [];
+          history.unshift(historyItem);
+          
+          if (history.length > 50) {
+            history.splice(50);
+          }
+          
+          localStorage.setItem('quotationHistory', JSON.stringify(history));
+          console.log('✅ Current quotation auto-saved to history');
+        } catch (error) {
+          console.error('Error saving to history:', error);
+        }
+      }
+      
+      // Clear localStorage
+      localStorage.removeItem('quotationFullItems');
+      localStorage.removeItem('quotationItems');
+      
+      // Reset all state to initial values
+      setBillTo({ name: "", address: "", contactNo: "", gstin: "", state: "" });
+      setSiteLocation({ name: "", address: "", contactNo: "" });
+      setItems([{ id: 1, type: 'material', category: "", subcategory: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 }]);
+      setInvoice({
+        number: "QTN-" + new Date().getTime().toString().slice(-6),
+        date: new Date().toISOString().slice(0, 10),
+      });
+      setTaxRates({ sgst: 0, cgst: 0 });
+      setDiscountPercent(0);
+      setManualSubtotal(null);
+      
+      alert('New quotation created! Previous data saved to history.');
+    }
   };
 
   const removeItem = (id) => {
@@ -329,12 +435,16 @@ export default function TaxQuotation() {
       subtotal += (amt - (amt * m.discount) / 100);
     });
     const overallDiscount = (subtotal * discountPercent) / 100;
-    const finalSubtotal = subtotal - overallDiscount;
+    const calculatedSubtotal = subtotal - overallDiscount;
+    
+    // Use manual subtotal if provided, otherwise use calculated
+    const finalSubtotal = manualSubtotal !== null ? manualSubtotal : calculatedSubtotal;
+    
     const sgst = (finalSubtotal * taxRates.sgst) / 100;
     const cgst = (finalSubtotal * taxRates.cgst) / 100;
     const grandTotal = finalSubtotal + sgst + cgst;
     return { subtotal: finalSubtotal, discount: overallDiscount, sgst, cgst, grandTotal };
-  }, [items, discountPercent, taxRates.sgst, taxRates.cgst]);
+  }, [items, discountPercent, taxRates.sgst, taxRates.cgst, manualSubtotal]);
 
   // Logo
   const LOGO_PRIMARY = (process.env.PUBLIC_URL || "") + "/assets/vrmlogo.png";
@@ -456,7 +566,7 @@ export default function TaxQuotation() {
     setIsGenerating(true);
     
     try {
-      await downloadPDF('quotation', true, 'Tax Quotation');
+      await downloadPDF('quotation', true, 'Quotation');
     } catch (error) {
       console.error('Error downloading Tax Quotation:', error);
       alert('Error downloading Tax Quotation. Please try again.');
@@ -465,17 +575,17 @@ export default function TaxQuotation() {
     }
   };
 
-  // Download Invoice Quotation
+  // Download Tax Invoice
   const downloadInvoiceQuotation = async () => {
     if (isGenerating) return;
     setShowDownloadMenu(false);
     setIsGenerating(true);
     
     try {
-      await downloadPDF('invoice', true, 'Invoice Quotation');
+      await downloadPDF('invoice', true, 'Tax Invoice');
     } catch (error) {
-      console.error('Error downloading Invoice Quotation:', error);
-      alert('Error downloading Invoice Quotation. Please try again.');
+      console.error('Error downloading Tax Invoice:', error);
+      alert('Error downloading Tax Invoice. Please try again.');
     } finally {
       setIsGenerating(false);
     }
@@ -510,16 +620,20 @@ export default function TaxQuotation() {
       // A4 dimensions: 210mm x 297mm
       // Calculate items per page with accurate measurements
       const headerHeight = 120; // Header + bill-to section (including company info, logo, customer details)
-      const footerHeight = 100; // Totals + bank details + terms & conditions + signature
+      const footerHeight = 220; // Totals + bank details + terms & conditions + signature (must fit all on last page)
       const rowHeight = 13;     // Height per material row (accounting for subcategory inputs - 50px CSS min-height)
-      const availableHeight = contentHeight - headerHeight - footerHeight;
-      const maxItemsPerPage = Math.max(1, Math.floor(availableHeight / rowHeight)); // Minimum 1 item per page
+      const availableHeightFirstPages = contentHeight - headerHeight - 30; // First/middle pages: just small margin at bottom
+      const availableHeightLastPage = contentHeight - headerHeight - footerHeight; // Last page: reserve space for full footer
+      const maxItemsPerPage = Math.max(1, Math.floor(availableHeightFirstPages / rowHeight)); // Items on first/middle pages
+      const maxItemsLastPage = Math.max(1, Math.floor(availableHeightLastPage / rowHeight)); // Items that can fit with footer
       
       console.log('PDF Pagination Info:', {
         pageHeight: pageHeight + 'mm',
         contentHeight: contentHeight + 'mm', 
-        availableHeight: availableHeight + 'mm',
+        availableHeightFirstPages: availableHeightFirstPages + 'mm',
+        availableHeightLastPage: availableHeightLastPage + 'mm',
         maxItemsPerPage,
+        maxItemsLastPage,
         totalMaterials: items.filter(item => item.type === 'material').length
       });
 
@@ -606,9 +720,13 @@ export default function TaxQuotation() {
           itemsOnPage: currentChunk.length
         });
 
+        // Wait for fonts to load before rendering
+        await document.fonts.ready;
+        await new Promise(resolve => setTimeout(resolve, 100));
+
         // Generate canvas optimized for A4 dimensions
         const canvas = await html2canvas(pageElement, {
-          scale: 1.2,
+          scale: 3,
           useCORS: true,
           backgroundColor: '#ffffff',
           logging: false,
@@ -679,8 +797,18 @@ export default function TaxQuotation() {
   const createPageElement = async (sourceElement, materialsForPage, pageNum, totalPages, isFirstPage, isLastPage, variant, customTitle = null) => {
     const clone = sourceElement.cloneNode(true);
     const isInvoice = variant === 'invoice';
-    const mainHeadingWord = customTitle ? customTitle.split(' ')[1] : (isInvoice ? 'INVOICE' : 'QUOTATION');
-    const barTitle = customTitle || (isInvoice ? 'Tax Invoice' : 'Tax Quotation');
+    const mainHeadingWord = customTitle || (isInvoice ? 'INVOICE' : 'QUOTATION');
+    const barTitle = customTitle || (isInvoice ? 'Tax Invoice' : 'Quotation');
+    
+    // Add font import and styling for PDF rendering
+    const fontStyle = document.createElement('style');
+    fontStyle.textContent = `
+      @import url('https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&display=swap');
+      .brand-vrm, .brand-groups { 
+        font-family: 'Quantico', Impact, 'Arial Black', sans-serif !important; 
+      }
+    `;
+    clone.appendChild(fontStyle);
     
     // Style the clone with A4 page constraints
     clone.style.cssText = `
@@ -701,95 +829,113 @@ export default function TaxQuotation() {
     const elementsToHide = clone.querySelectorAll('.col-action, .remove-btn, .add-material-section, .no-print');
     elementsToHide.forEach(el => el.style.display = 'none');
 
+    // Force Quantico font on VRM GROUPS elements
+    const vrmElements = clone.querySelectorAll('.brand-vrm, .brand-groups');
+    vrmElements.forEach(el => {
+      el.style.fontFamily = 'Quantico, Impact, Arial Black, sans-serif';
+    });
+
     // Update table headers to remove action column
     const tableHeaders = clone.querySelectorAll('.table-header');
     tableHeaders.forEach(header => {
-      header.style.gridTemplateColumns = '35px 200px 65px 50px 55px 85px 50px 50px 85px';
+      header.style.gridTemplateColumns = '35px 200px 65px 50px 55px 85px 50px 60px 85px';
     });
 
     // Handle materials table
     const materialsTable = clone.querySelector('.materials-table');
     if (materialsTable) {
-      // Remove ALL existing content except header (including subjects, materials, page breaks)
-      const children = Array.from(materialsTable.children);
-      children.forEach(child => {
-        if (!child.classList.contains('table-header')) {
-          child.remove();
-        }
-      });
-
-      // Add rows for this page
-      const allMaterials = items.filter(item => item.type === 'material');
-      materialsForPage.forEach((item, index) => {
-        if (item.type === 'subject') {
-          // Render subject with formatting
-          const renderFormattedContent = (text) => {
-            if (!text) return '';
-            let formatted = text;
-            // Bold: **text**
-            formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            // Italic: *text*
-            formatted = formatted.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
-            // Underline: __text__
-            formatted = formatted.replace(/__(.*?)__/g, '<u>$1</u>');
-            return formatted;
-          };
-          
-          const subjectRow = document.createElement('div');
-          subjectRow.style.cssText = 'padding: 10px; background: #f0f8ff; border-bottom: 1px solid #ddd; margin-bottom: 5px;';
-          subjectRow.innerHTML = `
-            <strong style="color: #155d50; margin-bottom: 5px; display: block;">Subject/Note:</strong>
-            <div style="font-family: Arial; font-size: 14px; line-height: 1.5; white-space: pre-wrap;">${renderFormattedContent(item.content || '')}</div>
-          `;
-          materialsTable.appendChild(subjectRow);
-        } else if (item.type === 'material') {
-          // Render material
-          const globalIndex = allMaterials.findIndex(m => m.id === item.id);
-          const row = document.createElement('div');
-          row.className = 'table-row';
-          row.style.gridTemplateColumns = '35px 200px 65px 50px 55px 85px 50px 50px 85px';
-          
-          // Build category display with proper formatting
-          let categoryHTML = '';
-          if (item.category && item.subcategory) {
-            categoryHTML = `
-              <div style="display: flex; flex-direction: column; gap: 2px; width: 100%;">
-                <span style="font-family: 'Times New Roman', serif; font-size: 14px; font-weight: 800; color: #155d50; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${item.category}</span>
-                <span style="font-family: Arial, sans-serif; font-size: 12px; color: #666; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${item.subcategory}</span>
-              </div>
-            `;
-          } else if (item.category) {
-            categoryHTML = `<span style="font-family: 'Times New Roman', serif; font-size: 14px; font-weight: 800; color: #155d50; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${item.category}</span>`;
-          } else if (item.subcategory) {
-            categoryHTML = `<span style="font-family: Arial, sans-serif; font-size: 12px; color: #666; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${item.subcategory}</span>`;
+      // Check if this page has any materials to show
+      const hasMaterialsOnPage = materialsForPage.some(item => item.type === 'material' || item.type === 'subject');
+      
+      // If last page with no materials, hide the entire table (header included)
+      if (isLastPage && !hasMaterialsOnPage) {
+        materialsTable.style.display = 'none';
+      } else {
+        // Remove ALL existing content except header (including subjects, materials, page breaks)
+        const children = Array.from(materialsTable.children);
+        children.forEach(child => {
+          if (!child.classList.contains('table-header')) {
+            child.remove();
           }
-          
-          row.innerHTML = `
-            <div class="col-num">${globalIndex + 1}</div>
-            <div class="col-category">${categoryHTML}</div>
-            <div class="col-hsn"><span>${item.hsn}</span></div>
-            <div class="col-qty"><span>${item.qty}</span></div>
-            <div class="col-unit"><span>${item.unit}</span></div>
-            <div class="col-price"><span>${item.pricePerUnit}</span></div>
-            <div class="col-disc"><span>${item.discount}%</span></div>
-            <div class="col-gst"><span>${item.gst}%</span></div>
-            <div class="col-amount">₹${fmt(item.qty * item.pricePerUnit * (1 - item.discount/100))}</div>
-          `;
-          
-          materialsTable.appendChild(row);
-        }
-      });
+        });
 
-      // Add total row only on last page
-      if (isLastPage) {
-        const totalRow = document.createElement('div');
-        totalRow.className = 'table-total-row';
-        totalRow.style.gridTemplateColumns = '35px 200px 65px 50px 55px 85px 50px 50px 85px';
-        totalRow.innerHTML = `
-          <div class="col-category total-label">Total</div>
-          <div class="col-amount">₹${fmt(calculations.subtotal + calculations.discount)}</div>
-        `;
-        materialsTable.appendChild(totalRow);
+        // Add rows for this page
+        const allMaterials = items.filter(item => item.type === 'material');
+        materialsForPage.forEach((item, index) => {
+          if (item.type === 'subject') {
+            // Render subject with formatting
+            const renderFormattedContent = (text) => {
+              if (!text) return '';
+              let formatted = text;
+              // Bold: **text**
+              formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+              // Italic: *text*
+              formatted = formatted.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
+              // Underline: __text__
+              formatted = formatted.replace(/__(.*?)__/g, '<u>$1</u>');
+              return formatted;
+            };
+            
+            const subjectRow = document.createElement('div');
+            subjectRow.style.cssText = 'padding: 10px; background: #06e2ba; border-bottom: 1px solid #ddd; margin-bottom: 5px;';
+            subjectRow.innerHTML = `
+              <strong style="color: #000000; margin-bottom: 5px; display: block;">Subject/Note:</strong>
+              <div style="font-family: Arial; font-size: 18px; line-height: 1.5; white-space: pre-wrap;">${renderFormattedContent(item.content || '')}</div>
+            `;
+            materialsTable.appendChild(subjectRow);
+          } else if (item.type === 'material') {
+            // Render material
+            const globalIndex = allMaterials.findIndex(m => m.id === item.id);
+            const row = document.createElement('div');
+            row.className = 'table-row';
+            row.style.gridTemplateColumns = '35px 200px 65px 50px 55px 85px 50px 60px 85px';
+            
+            // Build category display with proper formatting
+            let categoryHTML = '';
+            if (item.category && item.subcategory) {
+              categoryHTML = `
+                <div style="display: flex; flex-direction: column; gap: 2px; width: 100%;">
+                  <span style="font-family: 'Times New Roman', serif; font-size: 16px; font-weight: 800; color: #000000; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${item.category}</span>
+                  <span style="font-family: Arial, sans-serif; font-size: 14px; color: #000000; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${item.subcategory}</span>
+                </div>
+              `;
+            } else if (item.category) {
+              categoryHTML = `<span style="font-family: 'Times New Roman', serif; font-size: 16px; font-weight: 800; color: #000000; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${item.category}</span>`;
+            } else if (item.subcategory) {
+              categoryHTML = `<span style="font-family: Arial, sans-serif; font-size: 14px; color: #000000; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${item.subcategory}</span>`;
+            }
+            
+            row.innerHTML = `
+              <div class="col-num">${globalIndex + 1}</div>
+              <div class="col-category">${categoryHTML}</div>
+              <div class="col-hsn"><span>${item.hsn}</span></div>
+              <div class="col-qty"><span>${item.qty}</span></div>
+              <div class="col-unit"><span>${item.unit}</span></div>
+              <div class="col-price"><span>${item.pricePerUnit}</span></div>
+              <div class="col-disc"><span>${item.discount}%</span></div>
+              <div class="col-gst"><span>${item.gst}%</span></div>
+              <div class="col-amount">₹${fmt(item.qty * item.pricePerUnit * (1 - item.discount/100))}</div>
+            `;
+            
+            materialsTable.appendChild(row);
+          }
+        });
+
+        // Add total row only on last page (if there are materials on page)
+        if (isLastPage && hasMaterialsOnPage) {
+          const totalRow = document.createElement('div');
+          totalRow.className = 'table-total-row';
+          totalRow.style.gridTemplateColumns = '35px 200px 65px 50px 55px 85px 50px 60px 85px';
+          totalRow.innerHTML = `
+            <div class="col-category total-label">Total</div>
+            <div class="col-amount">₹${fmt(calculations.subtotal + calculations.discount)}</div>
+          `;
+          materialsTable.appendChild(totalRow);
+        } else if (!isLastPage) {
+          // Remove any existing total row on non-last pages
+          const existingTotalRow = clone.querySelector('.table-total-row');
+          if (existingTotalRow) existingTotalRow.remove();
+        }
       }
     }
 
@@ -809,15 +955,29 @@ export default function TaxQuotation() {
       if (billSiteSection) billSiteSection.style.display = 'none';
     }
 
-    // Hide bottom section on non-last pages
+    // Hide bottom section on non-last pages - REMOVE from DOM completely
     if (!isLastPage) {
       const bottomSection = clone.querySelector('.bottom-section');
       if (bottomSection) {
-        bottomSection.style.display = 'none';
+        bottomSection.remove(); // Remove completely, not just hide
       }
       const termsSection = clone.querySelector('.terms-conditions');
       if (termsSection) {
-        termsSection.style.display = 'none';
+        termsSection.remove(); // Remove completely, not just hide
+      }
+    } else {
+      // Ensure bottom and terms sections are visible on last page
+      const bottomSection = clone.querySelector('.bottom-section');
+      if (bottomSection) {
+        bottomSection.style.display = 'grid';
+        bottomSection.style.pageBreakInside = 'avoid';
+        bottomSection.style.breakInside = 'avoid';
+      }
+      const termsSection = clone.querySelector('.terms-conditions');
+      if (termsSection) {
+        termsSection.style.display = 'block';
+        termsSection.style.pageBreakInside = 'avoid';
+        termsSection.style.breakInside = 'avoid';
       }
     }
 
@@ -845,6 +1005,9 @@ export default function TaxQuotation() {
           <div className="toolbar no-print">
             <button className="btn ghost" onClick={() => window.history.back()}>
               ← Back
+            </button>
+            <button className="btn ghost" onClick={createNewQuotation}>
+              ➕ New Quotation
             </button>
             <button className="btn ghost" onClick={() => setPreview(!preview)}>
               {preview ? "Exit Preview" : "Preview"}
@@ -875,7 +1038,7 @@ export default function TaxQuotation() {
                     onClick={downloadInvoiceQuotation}
                     disabled={isGenerating}
                   >
-                    📋 Generate Invoice Quotation
+                    📋 Generate Tax Invoice
                   </button>
                 </div>
               )}
@@ -952,7 +1115,7 @@ export default function TaxQuotation() {
           </div>
         </header>
 
-        <div className="invoice-title">Tax Quotation</div>
+        <div className="invoice-title">Quotation</div>
 
         {/* Bill To & Site/Location */}
         <div className="bill-site-section">
@@ -1007,7 +1170,7 @@ export default function TaxQuotation() {
                   <button 
                     className="remove-btn" 
                     onClick={() => removeItem(item.id)}
-                    style={{marginLeft: '10px', padding: '6px 12px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer'}}
+                    style={{marginLeft: '10px', padding: '6px 12px', background: '#dc3545', color: 'black', border: 'none', borderRadius: '4px', cursor: 'pointer'}}
                   >
                     Remove
                   </button>
@@ -1065,32 +1228,32 @@ export default function TaxQuotation() {
               
               return (
                 <div key={item.id} style={{padding: '10px', background: '#f0f8ff', borderBottom: '1px solid var(--border)'}}>
-                  <strong style={{color: '#155d50', marginBottom: '5px', display: 'block'}}>Subject/Note:</strong>
+                  <strong style={{color: '#000000', marginBottom: '5px', display: 'block'}}>Subject/Note:</strong>
                   
                   {!preview && (
                     <div style={{marginBottom: '5px', display: 'flex', gap: '5px'}}>
                       <button
                         onClick={() => applyFormatting('bold')}
                         title="Bold (Select text first)"
-                        style={{padding: '4px 8px', background: '#155d50', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer', fontWeight: 'bold'}}
+                        style={{padding: '4px 8px', background: '#06e2ba', color: 'black', border: 'none', borderRadius: '3px', cursor: 'pointer', fontWeight: 'bold'}}
                       >
                         B
                       </button>
                       <button
                         onClick={() => applyFormatting('italic')}
                         title="Italic (Select text first)"
-                        style={{padding: '4px 8px', background: '#155d50', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer', fontStyle: 'italic'}}
+                        style={{padding: '4px 8px', background: '#06e2ba', color: 'black', border: 'none', borderRadius: '3px', cursor: 'pointer', fontStyle: 'italic'}}
                       >
                         I
                       </button>
                       <button
                         onClick={() => applyFormatting('underline')}
                         title="Underline (Select text first)"
-                        style={{padding: '4px 8px', background: '#155d50', color: 'white', border: 'none', borderRadius: '3px', cursor: 'pointer', textDecoration: 'underline'}}
+                        style={{padding: '4px 8px', background: '#06e2ba', color: 'black', border: 'none', borderRadius: '3px', cursor: 'pointer', textDecoration: 'underline'}}
                       >
                         U
                       </button>
-                      <span style={{fontSize: '12px', color: '#666', alignSelf: 'center', marginLeft: '10px'}}>
+                      <span style={{fontSize: '12px', color: '#000', alignSelf: 'center', marginLeft: '10px'}}>
                         Select text and click format buttons
                       </span>
                     </div>
@@ -1105,7 +1268,7 @@ export default function TaxQuotation() {
                         border: '1px solid #ddd', 
                         borderRadius: '4px', 
                         fontFamily: 'Arial', 
-                        fontSize: '14px', 
+                        fontSize: '16px', 
                         whiteSpace: 'pre-wrap',
                         lineHeight: '1.5'
                       }}
@@ -1117,7 +1280,7 @@ export default function TaxQuotation() {
                       value={item.content}
                       onChange={(e) => updateSubject(item.id, e.target.value)}
                       placeholder="Enter subject or notes... (Use formatting buttons for bold/italic/underline)"
-                      style={{width: '100%', minHeight: '60px', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', fontFamily: 'Arial', fontSize: '14px', resize: 'vertical'}}
+                      style={{width: '100%', minHeight: '60px', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', fontFamily: 'Arial', fontSize: '16px', resize: 'vertical'}}
                     />
                   )}
                   
@@ -1125,7 +1288,7 @@ export default function TaxQuotation() {
                     <button 
                       className="remove-btn" 
                       onClick={() => removeItem(item.id)}
-                      style={{marginTop: '5px', padding: '6px 12px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer'}}
+                      style={{marginTop: '5px', padding: '6px 12px', background: '#dc3545', color: 'black', border: 'none', borderRadius: '4px', cursor: 'pointer'}}
                     >
                       Remove
                     </button>
@@ -1149,10 +1312,16 @@ export default function TaxQuotation() {
                     />
                     <input 
                       value={item.subcategory} 
-                      onChange={(e)=>updateMaterial(item.id,"subcategory",e.target.value)} 
+                      onClick={(e) => {
+                        if (!preview) {
+                          e.preventDefault();
+                          setSubcategoryModal({ show: true, itemId: item.id, text: item.subcategory });
+                        }
+                      }}
+                      readOnly
                       placeholder="Subcategory" 
-                      readOnly={preview}
                       className="category-input sub-category"
+                      style={{cursor: preview ? 'default' : 'pointer', color: '#000000'}}
                     />
                   </div>
                 </div>
@@ -1202,7 +1371,7 @@ export default function TaxQuotation() {
         {!preview && (
           <div className="add-material-section no-print" style={{display: 'flex', gap: '10px', padding: '10px'}}>
             <button onClick={addMaterial} className="btn add-material">+ Add Material</button>
-            <button onClick={addSubject} className="btn" style={{background: '#155d50', color: 'white', padding: '8px 16px', border: 'none', borderRadius: '4px', cursor: 'pointer'}}>+ Add Subject</button>
+            <button onClick={addSubject} className="btn" style={{background: '#06e2ba', color: 'black', padding: '8px 16px', border: 'none', borderRadius: '4px', cursor: 'pointer'}}>+ Add Subject</button>
             <button onClick={addPageBreak} className="btn" style={{background: '#ffc107', color: '#000', padding: '8px 16px', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold'}}>📄 Add Page Break</button>
           </div>
         )}
@@ -1215,16 +1384,36 @@ export default function TaxQuotation() {
             <div className="bank-details">
               <div><strong>Account Number:</strong> 1672102000027186</div>
               <div><strong>Bank Name:</strong> IDBI Bank</div>
-              <div><strong>A/c Holder Name:</strong> VRM GROUPS</div>
+              <div><strong>A/c Holder Name:</strong> <span style={{color: '#f8bd5f', fontWeight: 'bold', fontFamily: 'Quantico, Impact, Arial Black, sans-serif'}}>VRM</span> <span style={{color: '#08263b', fontWeight: 'bold', fontFamily: 'Quantico, Impact, Arial Black, sans-serif'}}>GROUPS</span></div>
               <div><strong>IFSC Code:</strong> IBKL0001672</div>
               <div><strong>MMID:</strong> 9259362</div>
             </div>
-            <div className="signature-area"><div className="signature-label">Company seal and Sign</div></div>
           </div>
 
           <div className="totals-section">
             <div className="total-row">
-              <span className="label">Sub Total:</span>
+              <span className="label">
+                Sub Total:
+                {!preview && (
+                  <input
+                    className="discount-input"
+                    type="number"
+                    value={manualSubtotal !== null ? manualSubtotal : calculations.subtotal}
+                    onChange={(e)=>{
+                      const val = Number(e.target.value || 0);
+                      setManualSubtotal(val);
+                    }}
+                    onBlur={(e) => {
+                      // Allow clearing to go back to calculated
+                      if (e.target.value === '') setManualSubtotal(null);
+                    }}
+                    min="0"
+                    step="0.01"
+                    placeholder="Auto"
+                    title="Enter custom subtotal or leave for auto-calculation"
+                  />
+                )}
+              </span>
               <span className="value">₹{fmt(calculations.subtotal + calculations.discount)}</span>
             </div>
             <div className="total-row">
@@ -1275,15 +1464,121 @@ export default function TaxQuotation() {
 
         {/* Terms and Conditions */}
         <div className="terms-conditions">
-          <div className="terms-title">Terms & Conditions:</div>
+          <div className="terms-title">STANDARD EXCLUSIONS/ TO BE PROVIDED BY THE CLIENT:</div>
           <div className="terms-list">
-            <div className="term-item">• Once quotation is given it is valid for 15 days of time duration from given date</div>
-            <div className="term-item">• If any changes in prices may applicable date on agreement</div>
-            <div className="term-item">• Further details will be stored in agreement</div>
+            <div className="term-item">1. Drinking water for the labourers to be provided by the client.</div>
+            <div className="term-item">2. Utilities water for labourers to be provided by the client.</div>
+            <div className="term-item">3. Electricity for all the work activities welding, Sheet fixing etc. at work site to be provided by the client.</div>
+            <div className="term-item">4. In case of works carried at night, Lighting arrangements to be provided by the client.</div>
+            <div className="term-item">5. Security to be arranged by the client.</div>
+            <div className="term-item">6. All Statutory permissions to be obtained and provided by the client.</div>
+            <div className="term-item">7. Any other item not specifically mention but required for the execution of work to be provided by the client.</div>
+            <div className="term-item">8. Compacted ground for crane movement inside the building will be in client scope.</div>
+          </div>
+          
+          <div className="terms-title" style={{marginTop: '15px'}}> PAYMENT TERMS:</div>
+          <div className="terms-list">
+            <div className="term-item">1. The above quote is exclusive of all duties and Taxes. GST at 18% extra on the above mentioned quote. Any increase or decrease in taxes at the time of billing will be into your account.</div>
+            <div className="term-item">2. All payment to be made in the name of "<span style={{color: '#f8bd5f', fontWeight: 'bold', fontFamily: 'Quantico, Impact, Arial Black, sans-serif'}}>VRM</span> <span style={{color: '#08263b', fontWeight: 'bold', fontFamily: 'Quantico, Impact, Arial Black, sans-serif'}}>GROUPS</span>" Account payee only.</div>
+            <div className="term-item">3. 25% of advance along with the confirmed purchase order.</div>
+            <div className="term-item">4. Slab by slab payment has to be done.</div>
+          </div>
+          
+          <div style={{marginTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', paddingLeft: '5px', paddingRight: '5px'}}>
+            <div style={{textAlign: 'left'}}>
+              <div style={{marginBottom: '8px'}}>Thanking you and assuring you our best of our services.</div>
+              {/* <div style={{marginTop: '15px', fontWeight: 'bold'}}>For VRM GROUPS</div> */}
+              {/* <div style={{fontWeight: 'bold', marginTop: '5px'}}>Proprietor M.R. Venkatesh</div> */}
+            </div>
+            <div style={{textAlign: 'center'}}>
+              <div style={{fontWeight: 'bold'}}>Proprietor of <span style={{color: '#f8bd5f', fontWeight: 'bold', fontFamily: 'Quantico, Impact, Arial Black, sans-serif'}}>VRM</span> <span style={{color: '#08263b', fontWeight: 'bold', fontFamily: 'Quantico, Impact, Arial Black, sans-serif'}}>GROUPS</span></div>
+              {/* <div style={{fontWeight: 'bold'}}>M.R. Venkatesh</div> */}
+            </div>
           </div>
         </div>
       </div>
         </>
+      )}
+
+      {/* Subcategory Modal */}
+      {subcategoryModal.show && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.6)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999
+        }}>
+          <div style={{
+            backgroundColor: '#ffffff',
+            padding: '24px',
+            borderRadius: '12px',
+            width: '90%',
+            maxWidth: '600px',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
+            border: '3px solid #06e2ba'
+          }}>
+            <h3 style={{marginTop: 0, marginBottom: '16px', color: '#000000', fontSize: '20px', fontWeight: '700'}}>Edit Subcategory</h3>
+            <textarea
+              value={subcategoryModal.text}
+              onChange={(e) => setSubcategoryModal({...subcategoryModal, text: e.target.value})}
+              placeholder="Enter subcategory text..."
+              autoFocus
+              style={{
+                width: '100%',
+                minHeight: '150px',
+                padding: '12px',
+                border: '2px solid #06e2ba',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontFamily: 'Arial, sans-serif',
+                resize: 'vertical',
+                outline: 'none',
+                backgroundColor: '#ffffff'
+              }}
+            />
+            <div style={{display: 'flex', gap: '12px', marginTop: '20px', justifyContent: 'flex-end'}}>
+              <button
+                onClick={() => setSubcategoryModal({ show: false, itemId: null, text: '' })}
+                style={{
+                  padding: '10px 24px',
+                  background: '#e0e0e0',
+                  color: '#000000',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '600'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  updateMaterial(subcategoryModal.itemId, 'subcategory', subcategoryModal.text);
+                  setSubcategoryModal({ show: false, itemId: null, text: '' });
+                }}
+                style={{
+                  padding: '10px 24px',
+                  background: '#06e2ba',
+                  color: '#000000',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '700'
+                }}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
