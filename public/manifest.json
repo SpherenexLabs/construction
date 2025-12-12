@@ -3,17 +3,17 @@
   "name": "VRM Groups - Construction Materials",
   "icons": [
     {
-      "src": "assets/logoC.png",
+      "src": "assests/logoC.png",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     },
     {
-      "src": "assets/logoC.png",
+      "src": "assests/logoC.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "assets/logoC.png",
+      "src": "assests/logoC.png",
       "type": "image/png",
       "sizes": "512x512"
     }
