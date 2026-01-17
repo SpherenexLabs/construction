@@ -667,6 +667,19 @@ export default function TaxQuotation() {
         materialChunks.push([]);
       }
 
+      // CRITICAL FIX: Always ensure there's a final page for footer content
+      // Check if last chunk has too many items to fit footer properly
+      if (materialChunks.length > 0) {
+        const lastChunk = materialChunks[materialChunks.length - 1];
+        const materialCount = lastChunk.filter(item => item.type === 'material' || item.type === 'subject').length;
+        
+        // If last page would have more items than can fit with footer, create empty final page
+        if (materialCount > maxItemsLastPage) {
+          materialChunks.push([]); // Add empty final page for footer only
+          console.log('Added empty final page for footer - last chunk had', materialCount, 'items, max with footer is', maxItemsLastPage);
+        }
+      }
+
       // Generate each page
       for (let pageIndex = 0; pageIndex < materialChunks.length; pageIndex++) {
         const isFirstPage = pageIndex === 0;
