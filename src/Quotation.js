@@ -173,11 +173,8 @@ export default function TaxQuotation() {
             const quotationItems = JSON.parse(quotationItemsRaw);
             const existingMaterials = fullItems.filter(item => item.type === 'material');
             
-            // Separate manually added materials (empty category or not matching any quotationItems)
+            // Filter quotation materials that match the quotationItems
             const quotationItemNames = quotationItems.map(it => it.label || it.name || "");
-            const manuallyAddedMaterials = existingMaterials.filter(mat => 
-              !mat.category || !quotationItemNames.includes(mat.category)
-            );
             const quotationMaterials = existingMaterials.filter(mat => 
               mat.category && quotationItemNames.includes(mat.category)
             );

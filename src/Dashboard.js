@@ -287,7 +287,6 @@ import { useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { auth } from './firebase';
 import './Dashboard.css';
-import Categories from './Categories';
 import Footer from './Footer';
 
 const Dashboard = ({ user }) => {

@@ -17,6 +17,7 @@ const History = ({ onLoadQuotation, onBack }) => {
 
   useEffect(() => {
     filterAndSortHistory();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [history, searchTerm, sortBy, filterType]);
 
   const loadHistory = async () => {
