@@ -79,7 +79,7 @@ export default function TaxQuotation() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
-  const [subcategoryModal, setSubcategoryModal] = useState({ show: false, itemId: null, text: '' });
+  const [categoryModal, setCategoryModal] = useState({ show: false, itemId: null, text: '', field: 'category' });
   
   useEffect(() => {
     console.log('[Quotation] mounted');
@@ -739,7 +739,7 @@ export default function TaxQuotation() {
 
         // Generate canvas optimized for A4 dimensions
         const canvas = await html2canvas(pageElement, {
-          scale: 3,
+          scale: 2,
           useCORS: true,
           backgroundColor: '#ffffff',
           logging: false,
@@ -759,7 +759,7 @@ export default function TaxQuotation() {
           pdf.addPage();
         }
 
-        const imgData = canvas.toDataURL('image/png', 1.0);
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
         
         // Calculate dimensions to properly fit A4 page
         const imgWidth = canvas.width;
@@ -780,7 +780,7 @@ export default function TaxQuotation() {
         const x = margin;
         const y = margin;
 
-        pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
+        pdf.addImage(imgData, 'JPEG', x, y, finalWidth, finalHeight);
       }
 
   // Determine titles & filename based on variant and customTitle
@@ -1318,17 +1318,23 @@ export default function TaxQuotation() {
                   <div className="category-inputs">
                     <input 
                       value={item.category} 
-                      onChange={(e)=>updateMaterial(item.id,"category",e.target.value)} 
+                      onClick={(e) => {
+                        if (!preview) {
+                          e.preventDefault();
+                          setCategoryModal({ show: true, itemId: item.id, text: item.category, field: 'category' });
+                        }
+                      }}
+                      readOnly
                       placeholder="Main Category" 
-                      readOnly={preview}
                       className="category-input main-category"
+                      style={{cursor: preview ? 'default' : 'pointer', color: '#000000'}}
                     />
                     <input 
                       value={item.subcategory} 
                       onClick={(e) => {
                         if (!preview) {
                           e.preventDefault();
-                          setSubcategoryModal({ show: true, itemId: item.id, text: item.subcategory });
+                          setCategoryModal({ show: true, itemId: item.id, text: item.subcategory, field: 'subcategory' });
                         }
                       }}
                       readOnly
@@ -1513,8 +1519,8 @@ export default function TaxQuotation() {
         </>
       )}
 
-      {/* Subcategory Modal */}
-      {subcategoryModal.show && (
+      {/* Category/Subcategory Modal */}
+      {categoryModal.show && (
         <div style={{
           position: 'fixed',
           top: 0,
@@ -1536,11 +1542,13 @@ export default function TaxQuotation() {
             boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
             border: '3px solid #06e2ba'
           }}>
-            <h3 style={{marginTop: 0, marginBottom: '16px', color: '#000000', fontSize: '20px', fontWeight: '700'}}>Edit Subcategory</h3>
+            <h3 style={{marginTop: 0, marginBottom: '16px', color: '#000000', fontSize: '20px', fontWeight: '700'}}>
+              Edit {categoryModal.field === 'category' ? 'Main Category' : 'Subcategory'}
+            </h3>
             <textarea
-              value={subcategoryModal.text}
-              onChange={(e) => setSubcategoryModal({...subcategoryModal, text: e.target.value})}
-              placeholder="Enter subcategory text..."
+              value={categoryModal.text}
+              onChange={(e) => setCategoryModal({...categoryModal, text: e.target.value})}
+              placeholder={`Enter ${categoryModal.field === 'category' ? 'main category' : 'subcategory'} text...`}
               autoFocus
               style={{
                 width: '100%',
@@ -1557,7 +1565,7 @@ export default function TaxQuotation() {
             />
             <div style={{display: 'flex', gap: '12px', marginTop: '20px', justifyContent: 'flex-end'}}>
               <button
-                onClick={() => setSubcategoryModal({ show: false, itemId: null, text: '' })}
+                onClick={() => setCategoryModal({ show: false, itemId: null, text: '', field: 'category' })}
                 style={{
                   padding: '10px 24px',
                   background: '#e0e0e0',
@@ -1573,8 +1581,8 @@ export default function TaxQuotation() {
               </button>
               <button
                 onClick={() => {
-                  updateMaterial(subcategoryModal.itemId, 'subcategory', subcategoryModal.text);
-                  setSubcategoryModal({ show: false, itemId: null, text: '' });
+                  updateMaterial(categoryModal.itemId, categoryModal.field, categoryModal.text);
+                  setCategoryModal({ show: false, itemId: null, text: '', field: 'category' });
                 }}
                 style={{
                   padding: '10px 24px',
