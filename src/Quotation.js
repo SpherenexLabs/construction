@@ -848,7 +848,7 @@ export default function TaxQuotation() {
     // Update table headers to remove action column
     const tableHeaders = clone.querySelectorAll('.table-header');
     tableHeaders.forEach(header => {
-      header.style.gridTemplateColumns = '35px 200px 65px 50px 55px 85px 50px 60px 85px';
+      header.style.gridTemplateColumns = '35px 380px 65px 50px 85px 90px';
     });
 
     // Handle materials table
@@ -898,32 +898,29 @@ export default function TaxQuotation() {
             const globalIndex = allMaterials.findIndex(m => m.id === item.id);
             const row = document.createElement('div');
             row.className = 'table-row';
-            row.style.gridTemplateColumns = '35px 200px 65px 50px 55px 85px 50px 60px 85px';
+            row.style.gridTemplateColumns = '35px 380px 65px 50px 85px 90px';
             
             // Build category display with proper formatting
             let categoryHTML = '';
             if (item.category && item.subcategory) {
               categoryHTML = `
                 <div style="display: flex; flex-direction: column; gap: 2px; width: 100%;">
-                  <span style="font-family: 'Times New Roman', serif; font-size: 16px; font-weight: 800; color: #000000; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${item.category}</span>
-                  <span style="font-family: Arial, sans-serif; font-size: 14px; color: #000000; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${item.subcategory}</span>
+                  <span style="font-family: 'Times New Roman', serif; font-size: 13px; font-weight: 800; color: #000000; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${item.category}</span>
+                  <span style="font-family: Arial, sans-serif; font-size: 12px; color: #000000; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${item.subcategory}</span>
                 </div>
               `;
             } else if (item.category) {
-              categoryHTML = `<span style="font-family: 'Times New Roman', serif; font-size: 16px; font-weight: 800; color: #000000; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${item.category}</span>`;
+              categoryHTML = `<span style="font-family: 'Times New Roman', serif; font-size: 13px; font-weight: 800; color: #000000; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${item.category}</span>`;
             } else if (item.subcategory) {
-              categoryHTML = `<span style="font-family: Arial, sans-serif; font-size: 14px; color: #000000; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${item.subcategory}</span>`;
+              categoryHTML = `<span style="font-family: Arial, sans-serif; font-size: 12px; color: #000000; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${item.subcategory}</span>`;
             }
             
             row.innerHTML = `
               <div class="col-num">${globalIndex + 1}</div>
               <div class="col-category">${categoryHTML}</div>
-              <div class="col-hsn"><span>${item.hsn}</span></div>
-              <div class="col-qty"><span>${item.qty}</span></div>
               <div class="col-unit"><span>${item.unit}</span></div>
+              <div class="col-qty"><span>${item.qty}</span></div>
               <div class="col-price"><span>${item.pricePerUnit}</span></div>
-              <div class="col-disc"><span>${item.discount}%</span></div>
-              <div class="col-gst"><span>${item.gst}%</span></div>
               <div class="col-amount">₹${fmt(item.qty * item.pricePerUnit * (1 - item.discount/100))}</div>
             `;
             
@@ -935,7 +932,7 @@ export default function TaxQuotation() {
         if (isLastPage && hasMaterialsOnPage) {
           const totalRow = document.createElement('div');
           totalRow.className = 'table-total-row';
-          totalRow.style.gridTemplateColumns = '35px 200px 65px 50px 55px 85px 50px 60px 85px';
+          totalRow.style.gridTemplateColumns = '35px 380px 65px 50px 85px 90px';
           totalRow.innerHTML = `
             <div class="col-category total-label">Total</div>
             <div class="col-amount">₹${fmt(calculations.subtotal + calculations.discount)}</div>
@@ -1152,17 +1149,13 @@ export default function TaxQuotation() {
           </div>
         </div>
 
-        {/* Materials */}
         <div className="materials-table">
           <div className="table-header">
             <div className="col-num">#</div>
             <div className="col-category">Category</div>
-            <div className="col-hsn">HSN</div>
-            <div className="col-qty">QTY</div>
             <div className="col-unit">Unit</div>
+            <div className="col-qty">QTY</div>
             <div className="col-price">Price/Unit</div>
-            <div className="col-disc">Disc</div>
-            <div className="col-gst">GST</div>
             <div className="col-amount">Amount</div>
             {!preview && <div className="col-action">Action</div>}
           </div>
@@ -1341,16 +1334,13 @@ export default function TaxQuotation() {
                     />
                   </div>
                 </div>
-                <div className="col-hsn"><input value={item.hsn} onChange={(e)=>updateMaterial(item.id,"hsn",e.target.value)} placeholder="HSN" readOnly={preview}/></div>
-                <div className="col-qty"><input type="number" value={item.qty} onChange={(e)=>updateMaterial(item.id,"qty",e.target.value)} min="0" readOnly={preview}/></div>
                 <div className="col-unit">
                   <select value={item.unit} onChange={(e)=>updateMaterial(item.id,"unit",e.target.value)} disabled={preview}>
-                    <option>Nos</option><option>Kg</option><option>Ltr</option><option>Mtr</option><option>Sq.Ft</option><option>Box</option>
+                    <option>Nos</option><option>Kg</option><option>Ltr</option><option>Mtr</option><option>Sq.Ft</option><option>Box</option><option>Cft</option><option>Rft</option><option>LS</option>
                   </select>
                 </div>
+                <div className="col-qty"><input type="number" value={item.qty} onChange={(e)=>updateMaterial(item.id,"qty",e.target.value)} min="0" readOnly={preview}/></div>
                 <div className="col-price"><input type="number" value={item.pricePerUnit} onChange={(e)=>updateMaterial(item.id,"pricePerUnit",e.target.value)} min="0" step="0.01" readOnly={preview}/></div>
-                <div className="col-disc"><input type="number" value={item.discount} onChange={(e)=>updateMaterial(item.id,"discount",e.target.value)} min="0" max="100" step="0.01" readOnly={preview}/>%</div>
-                <div className="col-gst"><input type="number" value={item.gst} onChange={(e)=>updateMaterial(item.id,"gst",e.target.value)} min="0" step="0.01" readOnly={preview}/>%</div>
                 <div className="col-amount">₹{fmt(item.qty * item.pricePerUnit * (1 - item.discount/100))}</div>
                 {!preview && (
                   <div className="col-action" style={{display: 'flex', gap: '5px', alignItems: 'center'}}>

@@ -1,3 +1,7 @@
+/* Ensure .main-category font size is 14px in PDF mode (override at end) */
+.pdf-mode .category-inputs .main-category {
+  font-size: 14px !important;
+}
 :root{
   --primary-green:#06e2ba;
   --primary-green-dark:#06e2ba;
@@ -98,11 +102,11 @@
 
 /* ===== TABLE ===== */
 .materials-table{border-bottom:2px solid var(--border);margin-top:10px}
-.table-header{display:grid;grid-template-columns:35px 200px 65px 50px 55px 85px 50px 60px 85px 85px;background:var(--primary-green-dark);color:#000;font-weight:800;font-size:13px}
+.table-header{display:grid;grid-template-columns:35px 200px 70px 60px 100px 100px 120px;background:var(--primary-green-dark);color:#000;font-weight:800;font-size:13px}
 .table-header>div{padding:10px 6px;border-right:2px solid #000;display:flex;align-items:center;justify-content:center}
 .table-header>div:last-child{border-right:none}
 
-.table-row{display:grid;grid-template-columns:35px 200px 65px 50px 55px 85px 50px 60px 85px 85px;min-height:50px;border-bottom:1px solid var(--border);background:#fff}
+.table-row{display:grid;grid-template-columns:35px 200px 70px 60px 100px 100px 120px;min-height:50px;border-bottom:1px solid var(--border);background:#fff}
 .table-row:nth-child(even){background:#f9f9f9}
 .table-row>div{padding:6px 4px;border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;overflow:visible}
 .table-row>div:last-child{border-right:none}
@@ -189,7 +193,7 @@
 
 /* Print/PDF adjustments - ENHANCED */
 .print-mode .remove-btn,.print-mode .add-material-section,.print-mode .col-action{display:none !important}
-.print-mode .table-header,.print-mode .table-row,.print-mode .table-total-row{grid-template-columns:35px 200px 65px 50px 55px 85px 50px 60px 85px !important}
+.print-mode .table-header,.print-mode .table-row,.print-mode .table-total-row{grid-template-columns:35px 380px 65px 50px 85px 90px !important}
 
 /* PDF mode specific improvements */
 .pdf-mode {
@@ -220,7 +224,7 @@
 .pdf-mode .table-header,
 .pdf-mode .table-row,
 .pdf-mode .table-total-row {
-  grid-template-columns: 35px 200px 65px 50px 55px 85px 50px 60px 85px !important;
+  grid-template-columns: 35px 380px 65px 50px 85px 90px !important;
 }
 
 .pdf-mode * {
@@ -280,7 +284,7 @@
   .no-print{display:none !important}
   .quotation-container{max-width:100%;padding:0}
   .invoice-sheet{width:100%;min-height:auto;margin:0;box-shadow:none;border:3px solid var(--border)}
-  .table-header,.table-row,.table-total-row{grid-template-columns:35px 200px 65px 50px 55px 85px 50px 60px 85px !important}
+  .table-header,.table-row,.table-total-row{grid-template-columns:35px 380px 65px 50px 85px 90px !important}
   input,select,textarea{background:transparent !important;border:none !important;color:var(--text) !important}
   .invoice-title,.table-header,.total-row.grand-total,.table-total-row{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .remove-btn, .col-action{display:none !important}
@@ -340,7 +344,7 @@
 
 .pdf-page .table-row, 
 .pdf-page .table-total-row {
-    grid-template-columns: 35px 200px 65px 50px 55px 85px 50px 60px 85px;
+    grid-template-columns: 35px 380px 65px 50px 85px 90px;
 }
 
 .pdf-page input, 
