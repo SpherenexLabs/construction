@@ -1261,7 +1261,7 @@ const ITEM_IMAGES = {
   press_door: "https://th.bing.com/th/id/OIP.YfBX5TJxfyzYdTJylqOZ7gHaI_?w=115&h=180&c=7&r=0&o=7&pid=1.7&rm=3",
 
   /* ============= 7) Bathroom Doors ============= */
-  bath_pvc: "https://tse3.mm.bing.net/th/id/OIP.59Gj7hSYchfV8CgAiQeLdQAAAA?rs=1&pid=ImgDetMain&o=7&rm=3 Door – PVC",
+  bath_pvc: "https://www.tradeindia.com/manufacturers/pvc-bathroom-door.html",
   bath_wpc: "https://th.bing.com/th/id/OIP.LfWh5Ln1iA6Rweemtsvv_QHaJ4?w=198&h=264&c=7&r=0&o=7&pid=1.7&rm=3",
 
   /* ============= 8) Electrical (Wall Box) ============= */
@@ -1526,7 +1526,7 @@ const SubCategories = () => {
       /* 7 */ {
         id: 7,
         title: "Bathroom Doors",
-        image: "https://tse3.mm.bing.net/th/id/OIP.59Gj7hSYchfV8CgAiQeLdQAAAA?rs=1&pid=ImgDetMain&o=7&rm=3",
+        image: "https://th.bing.com/th/id/OIP.LfWh5Ln1iA6Rweemtsvv_QHaJ4?w=198&h=264&c=7&r=0&o=7&pid=1.7&rm=3",
         subItems: [
           { key: "bath_pvc", label: "PVC", img: imgOrPH("bath_pvc", "PVC Bathroom Door") },
           { key: "bath_wpc", label: "WPC", img: imgOrPH("bath_wpc", "WPC Bathroom Door") },
@@ -1556,7 +1556,7 @@ const SubCategories = () => {
       /* 10 */ {
         id: 10,
         title: "Electrical Wires & Cables",
-        image: "https://thumbs.dreamstime.com/b/sparking-electrical-wires-ai-generated-image-two-disconnected-sparks-flying-them-382802919.jpg",
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbqj54jCqpsmT1MR-PdRNoXX157Q9dmliinw&s",
         subItems: [
           { key: "polycab_wire", label: "Polycab", img: imgOrPH("polycab_wire", "Polycab") },
           { key: "finolex_wire", label: "Finolex", img: imgOrPH("finolex_wire", "Finolex") },
