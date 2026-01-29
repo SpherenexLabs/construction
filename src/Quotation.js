@@ -300,6 +300,15 @@ export default function TaxQuotation() {
     setItems((m) => [...m, { id: newId, type: 'material', category: "", subcategory: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 }]);
   };
 
+  const addMaterialAfter = (afterId) => {
+    const newId = Date.now() + Math.random();
+    setItems((items) => {
+      const index = items.findIndex(item => item.id === afterId);
+      const newItem = { id: newId, type: 'material', category: "", subcategory: "", hsn: "", qty: 0, unit: "Nos", pricePerUnit: 0, discount: 0, gst: 18 };
+      return [...items.slice(0, index + 1), newItem, ...items.slice(index + 1)];
+    });
+  };
+
   const addSubject = () => {
     const newId = Date.now() + Math.random(); // Ensure unique ID
     setItems((m) => [...m, { id: newId, type: 'subject', content: '' }]);
@@ -1343,7 +1352,23 @@ export default function TaxQuotation() {
                 <div className="col-price"><input type="number" value={item.pricePerUnit} onChange={(e)=>updateMaterial(item.id,"pricePerUnit",e.target.value)} min="0" step="0.01" readOnly={preview}/></div>
                 <div className="col-amount">₹{fmt(item.qty * item.pricePerUnit * (1 - item.discount/100))}</div>
                 {!preview && (
-                  <div className="col-action" style={{display: 'flex', gap: '5px', alignItems: 'center'}}>
+                  <div className="col-action" style={{display: 'flex', gap: '5px', alignItems: 'center', justifyContent: 'center'}}>
+                    <button 
+                      onClick={() => addMaterialAfter(item.id)}
+                      title="Add material after this row"
+                      style={{
+                        padding: '4px 8px',
+                        background: '#28a745',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      +
+                    </button>
                     <button className="remove-btn" onClick={()=>removeItem(item.id)}>Remove</button>
                     <button 
                       onClick={() => addPageBreakAfter(item.id)}
