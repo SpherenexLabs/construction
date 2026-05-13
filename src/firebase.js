@@ -284,4 +284,49 @@ export const syncStorageToFirestore = async () => {
   }
 };
 
+// ── DRAFT FUNCTIONS ──────────────────────────────────────────────────────────
+
+// Save a new draft or update an existing one
+export const saveDraftToFirebase = async (draftId, draftData) => {
+  try {
+    const payload = { ...draftData, updatedAt: new Date().toISOString() };
+    if (draftId) {
+      const docRef = doc(db, 'drafts', draftId);
+      await updateDoc(docRef, payload);
+      return draftId;
+    } else {
+      const docRef = await addDoc(collection(db, 'drafts'), {
+        ...payload,
+        createdAt: new Date().toISOString(),
+      });
+      return docRef.id;
+    }
+  } catch (error) {
+    console.error('Error saving draft to Firebase:', error);
+    throw error;
+  }
+};
+
+// Get all drafts ordered by last updated
+export const getAllDrafts = async () => {
+  try {
+    const q = query(collection(db, 'drafts'), orderBy('updatedAt', 'desc'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error('Error fetching drafts from Firebase:', error);
+    throw error;
+  }
+};
+
+// Delete a draft
+export const deleteDraftFromFirebase = async (docId) => {
+  try {
+    await deleteDoc(doc(db, 'drafts', docId));
+  } catch (error) {
+    console.error('Error deleting draft from Firebase:', error);
+    throw error;
+  }
+};
+
 export default app;

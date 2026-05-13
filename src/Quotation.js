@@ -2,7 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import History from "./History";
-import { uploadPDFToStorage } from "./firebase";
+import Drafts from "./Drafts";
+import { uploadPDFToStorage, saveDraftToFirebase } from "./firebase";
 import "./Quotation.css";
 
 const fmt = (n) =>
@@ -78,8 +79,11 @@ export default function TaxQuotation() {
   const [preview, setPreview] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showDrafts, setShowDrafts] = useState(false);
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
   const [categoryModal, setCategoryModal] = useState({ show: false, itemId: null, text: '', field: 'category' });
+  const [currentDraftId, setCurrentDraftId] = useState(null);
+  const [saveDraftStatus, setSaveDraftStatus] = useState(null); // 'saving' | 'saved' | null
   
   useEffect(() => {
     console.log('[Quotation] mounted');
@@ -552,7 +556,7 @@ export default function TaxQuotation() {
     setItems(historyItem.items || []);
     setTaxRates(historyItem.taxRates);
     setDiscountPercent(historyItem.discountPercent);
-    
+
     // Generate new quotation number to avoid conflicts
     const newInvoiceNumber = "QTN-" + new Date().getTime().toString().slice(-6);
     setInvoice({
@@ -560,9 +564,89 @@ export default function TaxQuotation() {
       number: newInvoiceNumber,
       date: new Date().toISOString().slice(0, 10) // Update to current date
     });
-    
+
     // Exit history view
     setShowHistory(false);
+  };
+
+  // Save current form as a draft (creates or updates)
+  const saveDraft = async () => {
+    setSaveDraftStatus('saving');
+    const draftData = {
+      quotationNumber: invoice.number,
+      customerName: billTo.name || 'Untitled Draft',
+      siteLocationName: siteLocation.name || '',
+      totalAmount: calculations.grandTotal || 0,
+      items,
+      billTo,
+      siteLocation,
+      company,
+      invoice,
+      taxRates,
+      discountPercent,
+    };
+
+    let savedId = currentDraftId;
+    try {
+      // Try Firebase first
+      try {
+        savedId = await saveDraftToFirebase(currentDraftId, draftData);
+      } catch {
+        // Firebase unavailable — use localStorage
+        const all = JSON.parse(localStorage.getItem('quotationDrafts') || '[]');
+        const now = new Date().toISOString();
+        if (currentDraftId) {
+          const idx = all.findIndex(d => d.id === currentDraftId);
+          if (idx >= 0) {
+            all[idx] = { ...all[idx], ...draftData, updatedAt: now };
+          } else {
+            all.unshift({ id: currentDraftId, ...draftData, createdAt: now, updatedAt: now });
+          }
+        } else {
+          savedId = 'draft_' + Date.now();
+          all.unshift({ id: savedId, ...draftData, createdAt: now, updatedAt: now });
+        }
+        if (all.length > 50) all.splice(50);
+        localStorage.setItem('quotationDrafts', JSON.stringify(all));
+      }
+
+      setCurrentDraftId(savedId);
+      setSaveDraftStatus('saved');
+      setTimeout(() => setSaveDraftStatus(null), 2500);
+    } catch (err) {
+      setSaveDraftStatus(null);
+      alert('Failed to save draft: ' + err.message);
+    }
+  };
+
+  // Load a draft for continued editing (keeps same quotation number & draft ID)
+  const loadFromDraft = (draft) => {
+    if (draft.billTo) setBillTo(draft.billTo);
+    if (draft.siteLocation) setSiteLocation(draft.siteLocation);
+    if (draft.company) setCompany(draft.company);
+    if (draft.items && draft.items.length > 0) setItems(draft.items);
+    if (draft.taxRates) setTaxRates(draft.taxRates);
+    if (draft.discountPercent !== undefined) setDiscountPercent(draft.discountPercent);
+    if (draft.invoice) setInvoice(draft.invoice); // preserve quotation number
+    setCurrentDraftId(draft.id);
+    setShowDrafts(false);
+  };
+
+  // Reuse a draft as a brand-new quotation (new number, no draft link)
+  const reuseFromDraft = (draft) => {
+    if (draft.billTo) setBillTo(draft.billTo);
+    if (draft.siteLocation) setSiteLocation(draft.siteLocation);
+    if (draft.company) setCompany(draft.company);
+    if (draft.items && draft.items.length > 0) setItems(draft.items);
+    if (draft.taxRates) setTaxRates(draft.taxRates);
+    if (draft.discountPercent !== undefined) setDiscountPercent(draft.discountPercent);
+    setInvoice({
+      ...(draft.invoice || {}),
+      number: "QTN-" + new Date().getTime().toString().slice(-6),
+      date: new Date().toISOString().slice(0, 10),
+    });
+    setCurrentDraftId(null);
+    setShowDrafts(false);
   };
 
   // Download Tax Quotation
@@ -1012,9 +1096,15 @@ export default function TaxQuotation() {
   return (
     <div className="quotation-container">
       {showHistory ? (
-        <History 
+        <History
           onLoadQuotation={loadFromHistory}
           onBack={() => setShowHistory(false)}
+        />
+      ) : showDrafts ? (
+        <Drafts
+          onLoadDraft={loadFromDraft}
+          onReuseDraft={reuseFromDraft}
+          onBack={() => setShowDrafts(false)}
         />
       ) : (
         <>
@@ -1030,6 +1120,19 @@ export default function TaxQuotation() {
             </button>
             <button className="btn ghost" onClick={() => setShowHistory(true)}>
               📋 History
+            </button>
+            <button
+              className={`btn ghost save-draft-btn${saveDraftStatus === 'saved' ? ' save-draft-saved' : ''}`}
+              onClick={saveDraft}
+              disabled={saveDraftStatus === 'saving'}
+              title={currentDraftId ? 'Update existing draft' : 'Save work-in-progress as a draft'}
+            >
+              {saveDraftStatus === 'saving' ? '⏳ Saving…' :
+               saveDraftStatus === 'saved'  ? '✅ Saved!'   :
+               currentDraftId              ? '💾 Update Draft' : '💾 Save Draft'}
+            </button>
+            <button className="btn ghost" onClick={() => setShowDrafts(true)}>
+              📁 Saved Drafts
             </button>
             <div className="spacer" />
             <div className="download-dropdown-wrapper">

@@ -35,6 +35,10 @@
 .btn:hover{opacity:.92}
 .btn:disabled{opacity:.6;cursor:not-allowed}
 
+/* Save Draft button states */
+.save-draft-btn { transition: background 0.25s, color 0.25s, border-color 0.25s; }
+.save-draft-saved { background:#28a745 !important; color:#fff !important; border-color:#28a745 !important; }
+
 /* A4 sheet */
 .invoice-sheet{width:210mm;min-height:297mm;margin:0 auto;background:var(--bg);
   border:3px solid var(--border);padding:0;position:relative;box-shadow:0 4px 10px rgba(0,0,0,.08)}
