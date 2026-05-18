@@ -160,6 +160,7 @@
 .total-row.grand-total{background:var(--primary-green-dark);color:#000;font-weight:800;font-size:14px}
 .total-row .value{font-weight:800;min-width:90px;text-align:right}
 .discount-input{width:64px;margin-left:8px;padding:3px 6px;border:1px solid #ccc;border-radius:3px;font-size:12px}
+.amount-input{width:88px}
 
 /* Terms and Conditions */
 .terms-conditions{border-top:2px solid var(--border);padding:15px 20px;margin-top:10px;background:#f9f9f9;page-break-inside:avoid;break-inside:avoid}

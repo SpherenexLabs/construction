@@ -152,6 +152,8 @@ export default function TaxQuotation() {
         }
         if (historyItem.taxRates) setTaxRates(historyItem.taxRates);
         if (historyItem.discountPercent !== undefined) setDiscountPercent(historyItem.discountPercent);
+        if (historyItem.discountAmount !== undefined) setDiscountAmount(historyItem.discountAmount);
+        setDiscountMode(historyItem.discountMode || 'percent');
         
         // Generate new quotation number to avoid conflicts
         const newInvoiceNumber = "QTN-" + new Date().getTime().toString().slice(-6);
@@ -297,6 +299,8 @@ export default function TaxQuotation() {
   // Tax rates editable (manual input). Start at 0 so GST applies only if user enters a value
   const [taxRates, setTaxRates] = useState({ sgst: 0, cgst: 0 });
   const [discountPercent, setDiscountPercent] = useState(0);
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [discountMode, setDiscountMode] = useState('percent');
   const [manualSubtotal, setManualSubtotal] = useState(null); // null means use calculated value
 
   const addMaterial = () => {
@@ -348,6 +352,8 @@ export default function TaxQuotation() {
             invoice: invoice,
             taxRates: taxRates,
             discountPercent: discountPercent,
+            discountAmount: discountAmount,
+            discountMode: discountMode,
             autoSaved: true
           };
 
@@ -380,6 +386,8 @@ export default function TaxQuotation() {
       });
       setTaxRates({ sgst: 0, cgst: 0 });
       setDiscountPercent(0);
+      setDiscountAmount(0);
+      setDiscountMode('percent');
       setManualSubtotal(null);
       
       alert('New quotation created! Previous data saved to history.');
@@ -444,7 +452,9 @@ export default function TaxQuotation() {
       const amt = m.qty * m.pricePerUnit;
       subtotal += (amt - (amt * m.discount) / 100);
     });
-    const overallDiscount = (subtotal * discountPercent) / 100;
+    const overallDiscount = discountMode === 'amount'
+      ? Math.min(discountAmount, subtotal)
+      : (subtotal * discountPercent) / 100;
     const calculatedSubtotal = subtotal - overallDiscount;
     
     // Use manual subtotal if provided, otherwise use calculated
@@ -454,7 +464,22 @@ export default function TaxQuotation() {
     const cgst = (finalSubtotal * taxRates.cgst) / 100;
     const grandTotal = finalSubtotal + sgst + cgst;
     return { subtotal: finalSubtotal, discount: overallDiscount, sgst, cgst, grandTotal };
-  }, [items, discountPercent, taxRates.sgst, taxRates.cgst, manualSubtotal]);
+  }, [items, discountAmount, discountMode, discountPercent, taxRates.sgst, taxRates.cgst, manualSubtotal]);
+
+  const handleDiscountPercentChange = (value) => {
+    const nextPercent = Math.max(0, Math.min(100, Number(value || 0)));
+    setDiscountPercent(nextPercent);
+    setDiscountMode('percent');
+  };
+
+  const handleDiscountAmountChange = (value) => {
+    const originalSubtotal = calculations.subtotal + calculations.discount;
+    const nextAmount = Math.max(0, Math.min(Number(value || 0), originalSubtotal));
+    const nextPercent = originalSubtotal > 0 ? (nextAmount / originalSubtotal) * 100 : 0;
+    setDiscountAmount(nextAmount);
+    setDiscountPercent(Number(Math.min(100, nextPercent).toFixed(2)));
+    setDiscountMode('amount');
+  };
 
   // Logo
   const LOGO_PRIMARY = (process.env.PUBLIC_URL || "") + "/assets/vrmlogo.png";
@@ -489,6 +514,8 @@ export default function TaxQuotation() {
         invoice: invoice,
         taxRates: taxRates,
         discountPercent: discountPercent,
+        discountAmount: discountAmount,
+        discountMode: discountMode,
         status: 'active'
       };
 
@@ -521,6 +548,8 @@ export default function TaxQuotation() {
           invoice: invoice,
           taxRates: taxRates,
           discountPercent: discountPercent,
+          discountAmount: discountAmount,
+          discountMode: discountMode,
           pdfInfo: pdfBlob ? {
             size: pdfBlob.size,
             type: pdfBlob.type,
@@ -556,6 +585,8 @@ export default function TaxQuotation() {
     setItems(historyItem.items || []);
     setTaxRates(historyItem.taxRates);
     setDiscountPercent(historyItem.discountPercent);
+    setDiscountAmount(historyItem.discountAmount || 0);
+    setDiscountMode(historyItem.discountMode || 'percent');
 
     // Generate new quotation number to avoid conflicts
     const newInvoiceNumber = "QTN-" + new Date().getTime().toString().slice(-6);
@@ -584,6 +615,8 @@ export default function TaxQuotation() {
       invoice,
       taxRates,
       discountPercent,
+      discountAmount,
+      discountMode,
     };
 
     let savedId = currentDraftId;
@@ -627,6 +660,8 @@ export default function TaxQuotation() {
     if (draft.items && draft.items.length > 0) setItems(draft.items);
     if (draft.taxRates) setTaxRates(draft.taxRates);
     if (draft.discountPercent !== undefined) setDiscountPercent(draft.discountPercent);
+    if (draft.discountAmount !== undefined) setDiscountAmount(draft.discountAmount);
+    setDiscountMode(draft.discountMode || 'percent');
     if (draft.invoice) setInvoice(draft.invoice); // preserve quotation number
     setCurrentDraftId(draft.id);
     setShowDrafts(false);
@@ -640,6 +675,8 @@ export default function TaxQuotation() {
     if (draft.items && draft.items.length > 0) setItems(draft.items);
     if (draft.taxRates) setTaxRates(draft.taxRates);
     if (draft.discountPercent !== undefined) setDiscountPercent(draft.discountPercent);
+    if (draft.discountAmount !== undefined) setDiscountAmount(draft.discountAmount);
+    setDiscountMode(draft.discountMode || 'percent');
     setInvoice({
       ...(draft.invoice || {}),
       number: "QTN-" + new Date().getTime().toString().slice(-6),
@@ -1555,11 +1592,26 @@ export default function TaxQuotation() {
                 Discount ({discountPercent}%):
                 {!preview && (
                   <input className="discount-input" type="number" value={discountPercent}
-                    onChange={(e)=>setDiscountPercent(Number(e.target.value || 0))}
+                    onChange={(e)=>handleDiscountPercentChange(e.target.value)}
                     min="0" max="100" step="0.1"/>
                 )}
               </span>
-              <span className="value">₹{fmt(calculations.discount)}</span>
+              <span className="value">
+                {!preview && (
+                  <>
+                    ₹
+                    <input
+                      className="discount-input amount-input"
+                      type="number"
+                      value={discountMode === 'amount' ? discountAmount : calculations.discount}
+                      onChange={(e)=>handleDiscountAmountChange(e.target.value)}
+                      min="0"
+                      step="0.01"
+                    />
+                  </>
+                )}
+                {preview && <>₹{fmt(calculations.discount)}</>}
+              </span>
             </div>
             <div className="total-row">
               <span className="label">
