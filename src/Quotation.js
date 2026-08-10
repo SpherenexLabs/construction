@@ -154,6 +154,7 @@ export default function TaxQuotation() {
         if (historyItem.discountPercent !== undefined) setDiscountPercent(historyItem.discountPercent);
         if (historyItem.discountAmount !== undefined) setDiscountAmount(historyItem.discountAmount);
         setDiscountMode(historyItem.discountMode || 'percent');
+        setAdvanceAmount(Number(historyItem.advanceAmount) || 0);
         
         // Generate new quotation number to avoid conflicts
         const newInvoiceNumber = "QTN-" + new Date().getTime().toString().slice(-6);
@@ -302,6 +303,7 @@ export default function TaxQuotation() {
   const [discountAmount, setDiscountAmount] = useState(0);
   const [discountMode, setDiscountMode] = useState('percent');
   const [manualSubtotal, setManualSubtotal] = useState(null); // null means use calculated value
+  const [advanceAmount, setAdvanceAmount] = useState(0);
 
   const addMaterial = () => {
     const newId = Date.now() + Math.random(); // Ensure unique ID
@@ -354,6 +356,7 @@ export default function TaxQuotation() {
             discountPercent: discountPercent,
             discountAmount: discountAmount,
             discountMode: discountMode,
+            advanceAmount: advanceAmount,
             autoSaved: true
           };
 
@@ -389,6 +392,7 @@ export default function TaxQuotation() {
       setDiscountAmount(0);
       setDiscountMode('percent');
       setManualSubtotal(null);
+      setAdvanceAmount(0);
       
       alert('New quotation created! Previous data saved to history.');
     }
@@ -463,8 +467,9 @@ export default function TaxQuotation() {
     const sgst = (finalSubtotal * taxRates.sgst) / 100;
     const cgst = (finalSubtotal * taxRates.cgst) / 100;
     const grandTotal = finalSubtotal + sgst + cgst;
-    return { subtotal: finalSubtotal, discount: overallDiscount, sgst, cgst, grandTotal };
-  }, [items, discountAmount, discountMode, discountPercent, taxRates.sgst, taxRates.cgst, manualSubtotal]);
+    const balance = Math.max(0, grandTotal - advanceAmount);
+    return { subtotal: finalSubtotal, discount: overallDiscount, sgst, cgst, grandTotal, balance };
+  }, [items, discountAmount, discountMode, discountPercent, taxRates.sgst, taxRates.cgst, manualSubtotal, advanceAmount]);
 
   const handleDiscountPercentChange = (value) => {
     const nextPercent = Math.max(0, Math.min(100, Number(value || 0)));
@@ -516,6 +521,7 @@ export default function TaxQuotation() {
         discountPercent: discountPercent,
         discountAmount: discountAmount,
         discountMode: discountMode,
+        advanceAmount: advanceAmount,
         status: 'active'
       };
 
@@ -550,6 +556,7 @@ export default function TaxQuotation() {
           discountPercent: discountPercent,
           discountAmount: discountAmount,
           discountMode: discountMode,
+          advanceAmount: advanceAmount,
           pdfInfo: pdfBlob ? {
             size: pdfBlob.size,
             type: pdfBlob.type,
@@ -587,6 +594,7 @@ export default function TaxQuotation() {
     setDiscountPercent(historyItem.discountPercent);
     setDiscountAmount(historyItem.discountAmount || 0);
     setDiscountMode(historyItem.discountMode || 'percent');
+    setAdvanceAmount(Number(historyItem.advanceAmount) || 0);
 
     // Generate new quotation number to avoid conflicts
     const newInvoiceNumber = "QTN-" + new Date().getTime().toString().slice(-6);
@@ -617,6 +625,7 @@ export default function TaxQuotation() {
       discountPercent,
       discountAmount,
       discountMode,
+      advanceAmount,
     };
 
     let savedId = currentDraftId;
@@ -662,6 +671,7 @@ export default function TaxQuotation() {
     if (draft.discountPercent !== undefined) setDiscountPercent(draft.discountPercent);
     if (draft.discountAmount !== undefined) setDiscountAmount(draft.discountAmount);
     setDiscountMode(draft.discountMode || 'percent');
+    setAdvanceAmount(Number(draft.advanceAmount) || 0);
     if (draft.invoice) setInvoice(draft.invoice); // preserve quotation number
     setCurrentDraftId(draft.id);
     setShowDrafts(false);
@@ -677,6 +687,7 @@ export default function TaxQuotation() {
     if (draft.discountPercent !== undefined) setDiscountPercent(draft.discountPercent);
     if (draft.discountAmount !== undefined) setDiscountAmount(draft.discountAmount);
     setDiscountMode(draft.discountMode || 'percent');
+    setAdvanceAmount(Number(draft.advanceAmount) || 0);
     setInvoice({
       ...(draft.invoice || {}),
       number: "QTN-" + new Date().getTime().toString().slice(-6),
@@ -1644,7 +1655,27 @@ export default function TaxQuotation() {
               <span className="value">₹{fmt(calculations.cgst)}</span>
             </div>
             <div className="total-row grand-total"><span className="label">Total:</span><span className="value">₹{fmt(calculations.grandTotal)}</span></div>
-            <div className="total-row"><span className="label">Balance:</span><span className="value">₹{fmt(calculations.grandTotal)}</span></div>
+            <div className="total-row">
+              <span className="label">Advance:</span>
+              <span className="value">
+                {!preview && (
+                  <>
+                    ₹
+                    <input
+                      className="discount-input amount-input"
+                      type="number"
+                      value={advanceAmount}
+                      onChange={(e) => setAdvanceAmount(Math.max(0, Number(e.target.value || 0)))}
+                      min="0"
+                      max={calculations.grandTotal}
+                      step="0.01"
+                    />
+                  </>
+                )}
+                {preview && <>₹{fmt(advanceAmount)}</>}
+              </span>
+            </div>
+            <div className="total-row"><span className="label">Balance:</span><span className="value">₹{fmt(calculations.balance)}</span></div>
           </div>
         </div>
 
